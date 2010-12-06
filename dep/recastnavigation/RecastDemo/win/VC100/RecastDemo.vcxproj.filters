@@ -1,0 +1,121 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="include">
+      <UniqueIdentifier>{02a6d833-33fe-4ea4-9243-2f6828bc9846}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{46ae83a6-02d8-4b63-b1d1-ceee736bbaa6}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\Include\ChunkyTriMesh.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\TestCase.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\ConvexVolumeTool.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\CrowdTool.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\Filelist.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\imgui.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\imguiRenderGL.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\MeshLoaderObj.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\NavMeshTesterTool.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\OffMeshConnectionTool.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\Sample_SoloMeshSimple.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\Sample_SoloMeshTiled.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\Sample_TileMesh.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\SDLMain.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\SlideShow.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\contrib\mmap\src\MMapCommon.h" />
+    <ClInclude Include="..\..\Include\Debug.h" />
+    <ClInclude Include="..\..\Include\InputGeom.h" />
+    <ClInclude Include="..\..\Include\Sample_Debug.h" />
+    <ClInclude Include="..\..\Include\Sample.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="..\..\Include\SampleInterfaces.h">
+      <Filter>include</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\Source\ChunkyTriMesh.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\ConvexVolumeTool.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\CrowdTool.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Filelist.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\imgui.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\imguiRenderGL.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\MeshLoaderObj.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\NavMeshTesterTool.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\OffMeshConnectionTool.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Sample.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Sample_SoloMeshSimple.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Sample_SoloMeshTiled.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Sample_TileMesh.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\SlideShow.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\TestCase.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Debug.cpp" />
+    <ClCompile Include="..\..\Source\InputGeom.cpp" />
+    <ClCompile Include="..\..\Source\Sample_Debug.cpp" />
+    <ClCompile Include="..\..\Source\main.cpp" />
+    <ClCompile Include="..\..\Source\SampleInterfaces.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

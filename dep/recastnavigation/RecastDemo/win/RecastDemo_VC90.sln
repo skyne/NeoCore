@@ -1,0 +1,38 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RecastDemo", "VC90\RecastDemo.vcproj", "{01D9DC7A-0B67-428F-A9C3-4BE36628CB14}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DebugUtils", "..\..\DebugUtils\win\VC90\DebugUtils.vcproj", "{62E4675D-2DB3-47EF-9697-3A1086CE7DD1}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Detour", "..\..\Detour\win\VC90\Detour.vcproj", "{5FDC0EBC-3F80-4518-A5DF-1CD5BBEB64F7}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Recast", "..\..\Recast\win\VC90\Recast.vcproj", "{B6137343-A2F6-4AE7-BA47-484EC0EF369C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{01D9DC7A-0B67-428F-A9C3-4BE36628CB14}.Debug|Win32.ActiveCfg = Debug|Win32
+		{01D9DC7A-0B67-428F-A9C3-4BE36628CB14}.Debug|Win32.Build.0 = Debug|Win32
+		{01D9DC7A-0B67-428F-A9C3-4BE36628CB14}.Release|Win32.ActiveCfg = Release|Win32
+		{01D9DC7A-0B67-428F-A9C3-4BE36628CB14}.Release|Win32.Build.0 = Release|Win32
+		{62E4675D-2DB3-47EF-9697-3A1086CE7DD1}.Debug|Win32.ActiveCfg = Debug|Win32
+		{62E4675D-2DB3-47EF-9697-3A1086CE7DD1}.Debug|Win32.Build.0 = Debug|Win32
+		{62E4675D-2DB3-47EF-9697-3A1086CE7DD1}.Release|Win32.ActiveCfg = Release|Win32
+		{62E4675D-2DB3-47EF-9697-3A1086CE7DD1}.Release|Win32.Build.0 = Release|Win32
+		{5FDC0EBC-3F80-4518-A5DF-1CD5BBEB64F7}.Debug|Win32.ActiveCfg = Debug|Win32
+		{5FDC0EBC-3F80-4518-A5DF-1CD5BBEB64F7}.Debug|Win32.Build.0 = Debug|Win32
+		{5FDC0EBC-3F80-4518-A5DF-1CD5BBEB64F7}.Release|Win32.ActiveCfg = Release|Win32
+		{5FDC0EBC-3F80-4518-A5DF-1CD5BBEB64F7}.Release|Win32.Build.0 = Release|Win32
+		{B6137343-A2F6-4AE7-BA47-484EC0EF369C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{B6137343-A2F6-4AE7-BA47-484EC0EF369C}.Debug|Win32.Build.0 = Debug|Win32
+		{B6137343-A2F6-4AE7-BA47-484EC0EF369C}.Release|Win32.ActiveCfg = Release|Win32
+		{B6137343-A2F6-4AE7-BA47-484EC0EF369C}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
