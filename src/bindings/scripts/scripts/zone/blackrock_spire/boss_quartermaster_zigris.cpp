@@ -43,7 +43,7 @@ struct NEO_DLL_DECL boss_quatermasterzigrisAI : public ScriptedAI
         //HelingPotion_Timer = 25000;
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
     }
 

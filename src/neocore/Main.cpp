@@ -1,7 +1,9 @@
 /*
  * Copyright (C) 2005-2008 MaNGOS <http://www.mangosproject.org/>
  *
- * Copyright (C) 2008 Trinitycore <http://www.trinitycore.org/>
+ * Copyright (C) 2008 Neo <http://www.neocore.org/>
+ *
+ * Copyright (C) 2009-2010 NeoZero <http://www.neozero.org/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,7 +39,7 @@
 // Format is YYYYMMDDRR where RR is the change in the conf file
 // for that day.
 #ifndef _NEO_CORE_CONFVER
-# define _NEO_CORE_CONFVER 20100920
+# define _NEO_CORE_CONFVER 2009081701
 #endif //_NEO_CORE_CONFVER
 
 #ifdef WIN32
@@ -75,7 +77,7 @@ void usage(const char *prog)
         ,prog);
 }
 
-/// Launch the NEO server
+/// Launch the Neo server
 extern int main(int argc, char **argv)
 {
     ///- Command line parsing to get the configuration file name

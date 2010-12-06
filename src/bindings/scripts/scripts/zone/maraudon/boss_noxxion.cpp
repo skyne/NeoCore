@@ -49,7 +49,7 @@ struct NEO_DLL_DECL boss_noxxionAI : public ScriptedAI
         Invisible = false;
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
     }
 

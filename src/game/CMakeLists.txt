@@ -9,9 +9,6 @@ SET(game_STAT_SRCS
    CombatAI.cpp
    CombatAI.h
    AnimalRandomMovementGenerator.h
-   ArenaTeam.cpp
-   ArenaTeam.h
-   ArenaTeamHandler.cpp
    AuctionHouseBot.cpp
    AuctionHouseBot.h
    AuctionHouseHandler.cpp
@@ -20,22 +17,12 @@ SET(game_STAT_SRCS
    Bag.cpp
    Bag.h
    BattleGround.cpp
-   BattleGroundAA.cpp
    BattleGroundAB.cpp
    BattleGroundAV.cpp
-   BattleGroundBE.cpp
-   BattleGroundEY.cpp
-   BattleGroundNA.cpp
-   BattleGroundRL.cpp
    BattleGroundWS.cpp
    BattleGround.h
-   BattleGroundAA.h
    BattleGroundAB.h
    BattleGroundAV.h
-   BattleGroundBE.h
-   BattleGroundEY.h
-   BattleGroundNA.h
-   BattleGroundRL.h
    BattleGroundWS.h
    BattleGroundHandler.cpp
    BattleGroundMgr.cpp
@@ -143,6 +130,8 @@ SET(game_STAT_SRCS
    MovementHandler.cpp
    NPCHandler.cpp
    NPCHandler.h
+   PassiveAI.cpp
+   PassiveAI.h
    ObjectAccessor.cpp
    ObjectAccessor.h
    Object.cpp
@@ -158,22 +147,12 @@ SET(game_STAT_SRCS
    OutdoorPvP.h
    OutdoorPvPEP.cpp
    OutdoorPvPEP.h
-   OutdoorPvPHP.cpp
-   OutdoorPvPHP.h
    OutdoorPvPMgr.cpp
    OutdoorPvPMgr.h
-   OutdoorPvPNA.cpp
-   OutdoorPvPNA.h
    OutdoorPvPObjectiveAI.cpp
    OutdoorPvPObjectiveAI.h
    OutdoorPvPSI.cpp
    OutdoorPvPSI.h
-   OutdoorPvPTF.cpp
-   OutdoorPvPTF.h
-   OutdoorPvPZM.cpp
-   OutdoorPvPZM.h
-   PassiveAI.cpp
-   PassiveAI.h
    Path.h
    PetAI.cpp
    PetAI.h
@@ -205,10 +184,6 @@ SET(game_STAT_SRCS
    Spell.cpp
    SpellEffects.cpp
    Spell.h
-   SkillDiscovery.cpp
-   SkillDiscovery.h
-   SkillExtraItems.cpp
-   SkillExtraItems.h
    SpellHandler.cpp
    SocialMgr.cpp
    SocialMgr.h
@@ -222,7 +197,9 @@ SET(game_STAT_SRCS
    TemporarySummon.h
    TicketHandler.cpp
    TicketMgr.cpp
-   TicketMgr.h
+   TicketMgr.h 
+   Tools.cpp
+   Tools.h
    TotemAI.cpp
    TotemAI.h
    Totem.cpp
@@ -242,7 +219,6 @@ SET(game_STAT_SRCS
    UpdateData.h
    UpdateFields.h
    UpdateMask.h
-   VoiceChatHandler.cpp
    WaypointManager.cpp
    WaypointManager.h
    WaypointMovementGenerator.cpp

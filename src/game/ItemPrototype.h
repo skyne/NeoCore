@@ -1,7 +1,9 @@
 /*
  * Copyright (C) 2005-2008 MaNGOS <http://www.mangosproject.org/>
  *
- * Copyright (C) 2008 Trinity <http://www.trinitycore.org/>
+ * Copyright (C) 2008 Neo <http://www.neocore.org/>
+ *
+ * Copyright (C) 2009-2010 NeoZero <http://www.neozero.org/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,6 +34,7 @@ enum ItemModType
     ITEM_MOD_INTELLECT                = 5,
     ITEM_MOD_SPIRIT                   = 6,
     ITEM_MOD_STAMINA                  = 7,
+    // [TZERO] tbc enumerations [?]
     ITEM_MOD_DEFENSE_SKILL_RATING     = 12,
     ITEM_MOD_DODGE_RATING             = 13,
     ITEM_MOD_PARRY_RATING             = 14,
@@ -68,6 +71,7 @@ enum ItemSpelltriggerType
     ITEM_SPELLTRIGGER_ON_EQUIP        = 1,
     ITEM_SPELLTRIGGER_CHANCE_ON_HIT   = 2,
     ITEM_SPELLTRIGGER_SOULSTONE       = 4,
+    // [TZERO] tbc enumerations [?]
     ITEM_SPELLTRIGGER_ON_NO_DELAY_USE = 5,                  // no equip cooldown
     ITEM_SPELLTRIGGER_LEARN_SPELL_ID  = 6                   // used in item_template.spell_2 with spell_id with SPELL_GENERIC_LEARN in spell_1
 };
@@ -89,49 +93,32 @@ enum ItemBondingType
 // masks for ITEM_FIELD_FLAGS field
 enum ITEM_FLAGS
 {
-    ITEM_FLAGS_BINDED                         = 0x00000001,	// set in game at binding, not set in template
+    ITEM_FLAGS_BINDED                         = 0x00000001,
     ITEM_FLAGS_CONJURED                       = 0x00000002,
     ITEM_FLAGS_OPENABLE                       = 0x00000004,
     ITEM_FLAGS_WRAPPED                        = 0x00000008,
     ITEM_FLAGS_WRAPPER                        = 0x00000200, // used or not used wrapper
     ITEM_FLAGS_PARTY_LOOT                     = 0x00000800, // determines if item is party loot or not
-    ITEM_FLAGS_CHARTER                        = 0x00002000, // arena/guild charter
+    ITEM_FLAGS_CHARTER                        = 0x00002000, // guild charter
     ITEM_FLAGS_UNIQUE_EQUIPPED                = 0x00080000,
-    ITEM_FLAGS_USEABLE_IN_ARENA               = 0x00200000,
     ITEM_FLAGS_THROWABLE                      = 0x00400000, // not used in game for check trow possibility, only for item in game tooltip
-    ITEM_FLAGS_SPECIALUSE                     = 0x00800000, // last used flag in 2.3.0
-    ITEM_FLAGS_BOA                            = 0x08000000, // bind on account (set in template for items that can binded in like way)
+    ITEM_FLAGS_BOA                            = 0x08000000, // bind on account
     ITEM_FLAGS_MILLABLE                       = 0x20000000
 };
 
-enum BAG_FAMILY_MASK
+enum BAG_FAMILY
 {
-    BAG_FAMILY_MASK_ARROWS                    = 0x00000001,
-    BAG_FAMILY_MASK_BULLETS                   = 0x00000002,
-    BAG_FAMILY_MASK_SOUL_SHARDS               = 0x00000004,
-    BAG_FAMILY_MASK_LEATHERWORKING_SUPP       = 0x00000008,
-    BAG_FAMILY_MASK_INSCRIPTION_SUPP          = 0x00000010,
-    BAG_FAMILY_MASK_HERBS                     = 0x00000020,
-    BAG_FAMILY_MASK_ENCHANTING_SUPP           = 0x00000040,
-    BAG_FAMILY_MASK_ENGINEERING_SUPP          = 0x00000080,
-    BAG_FAMILY_MASK_KEYS                      = 0x00000100,
-    BAG_FAMILY_MASK_GEMS                      = 0x00000200,
-    BAG_FAMILY_MASK_MINING_SUPP               = 0x00000400,
-    BAG_FAMILY_MASK_SOULBOUND_EQUIPMENT       = 0x00000800,
-    BAG_FAMILY_MASK_VANITY_PETS               = 0x00001000,
-    BAG_FAMILY_MASK_CURRENCY_TOKENS           = 0x00002000,
-    BAG_FAMILY_MASK_QUEST_ITEMS               = 0x00004000
+    BAG_FAMILY_NONE                             = 0,
+    BAG_FAMILY_ARROWS                           = 1,
+    BAG_FAMILY_BULLETS                          = 2,
+    BAG_FAMILY_SOUL_SHARDS                      = 3,
+    BAG_FAMILY_UNKNOWN1                         = 4,
+    BAG_FAMILY_UNKNOWN2                         = 5,
+    BAG_FAMILY_HERBS                            = 6,
+    BAG_FAMILY_ENCHANTING_SUPP                  = 7,
+    BAG_FAMILY_ENGINEERING_SUPP                 = 8,
+    BAG_FAMILY_KEYS                             = 9,
 };
-
-enum SocketColor
-{
-    SOCKET_COLOR_META                           = 1,
-    SOCKET_COLOR_RED                            = 2,
-    SOCKET_COLOR_YELLOW                         = 4,
-    SOCKET_COLOR_BLUE                           = 8
-};
-
-#define SOCKET_COLOR_ALL (SOCKET_COLOR_META | SOCKET_COLOR_RED | SOCKET_COLOR_YELLOW | SOCKET_COLOR_BLUE)
 
 enum InventoryType
 {
@@ -192,15 +179,15 @@ enum ItemClass
 
 enum ItemSubclassConsumable
 {
-    ITEM_SUBCLASS_CONSUMABLE                    = 0,
-    ITEM_SUBCLASS_POTION                        = 1,
-    ITEM_SUBCLASS_ELIXIR                        = 2,
-    ITEM_SUBCLASS_FLASK                         = 3,
-    ITEM_SUBCLASS_SCROLL                        = 4,
-    ITEM_SUBCLASS_FOOD                          = 5,
-    ITEM_SUBCLASS_ITEM_ENHANCEMENT              = 6,
-    ITEM_SUBCLASS_BANDAGE                       = 7,
-    ITEM_SUBCLASS_CONSUMABLE_OTHER              = 8
+
+    ITEM_SUBCLASS_FOOD                    = 1,
+    ITEM_SUBCLASS_LIQUID                  = 2,
+    ITEM_SUBCLASS_POTION                  = 3,
+    ITEM_SUBCLASS_SCROLL                  = 4,
+    ITEM_SUBCLASS_BANDAGE                 = 5,
+    ITEM_SUBCLASS_HEALTHSTONE             = 6,
+    ITEM_SUBCLASS_COMBAT_EFFECT           = 7,
+    ITEM_SUBCLASS_CONSUMABLE_OTHER        = 8 //tbc ?
 };
 
 #define MAX_ITEM_SUBCLASS_CONSUMABLE              9
@@ -212,6 +199,7 @@ enum ItemSubclassContainer
     ITEM_SUBCLASS_HERB_CONTAINER                = 2,
     ITEM_SUBCLASS_ENCHANTING_CONTAINER          = 3,
     ITEM_SUBCLASS_ENGINEERING_CONTAINER         = 4,
+    
     ITEM_SUBCLASS_GEM_CONTAINER                 = 5,
     ITEM_SUBCLASS_MINING_CONTAINER              = 6,
     ITEM_SUBCLASS_LEATHERWORKING_CONTAINER      = 7
@@ -246,21 +234,6 @@ enum ItemSubclassWeapon
 
 #define MAX_ITEM_SUBCLASS_WEAPON                  21
 
-enum ItemSubclassGem
-{
-    ITEM_SUBCLASS_GEM_RED                       = 0,
-    ITEM_SUBCLASS_GEM_BLUE                      = 1,
-    ITEM_SUBCLASS_GEM_YELLOW                    = 2,
-    ITEM_SUBCLASS_GEM_PURPLE                    = 3,
-    ITEM_SUBCLASS_GEM_GREEN                     = 4,
-    ITEM_SUBCLASS_GEM_ORANGE                    = 5,
-    ITEM_SUBCLASS_GEM_META                      = 6,
-    ITEM_SUBCLASS_GEM_SIMPLE                    = 7,
-    ITEM_SUBCLASS_GEM_PRISMATIC                 = 8
-};
-
-#define MAX_ITEM_SUBCLASS_GEM                     9
-
 enum ItemSubclassArmor
 {
     ITEM_SUBCLASS_ARMOR_MISC                    = 0,
@@ -270,6 +243,7 @@ enum ItemSubclassArmor
     ITEM_SUBCLASS_ARMOR_PLATE                   = 4,
     ITEM_SUBCLASS_ARMOR_BUCKLER                 = 5,
     ITEM_SUBCLASS_ARMOR_SHIELD                  = 6,
+    // [TZERO] tbc enumerations [?]
     ITEM_SUBCLASS_ARMOR_LIBRAM                  = 7,
     ITEM_SUBCLASS_ARMOR_IDOL                    = 8,
     ITEM_SUBCLASS_ARMOR_TOTEM                   = 9
@@ -390,28 +364,11 @@ enum ItemSubclassJunk
 
 #define MAX_ITEM_SUBCLASS_JUNK                    6
 
-enum ItemSubclassGlyph
-{
-    ITEM_SUBCLASS_GLYPH_WARRIOR                 = 1,
-    ITEM_SUBCLASS_GLYPH_PALADIN                 = 2,
-    ITEM_SUBCLASS_GLYPH_HUNTER                  = 3,
-    ITEM_SUBCLASS_GLYPH_ROGUE                   = 4,
-    ITEM_SUBCLASS_GLYPH_PRIEST                  = 5,
-    ITEM_SUBCLASS_GLYPH_DEATH_KNIGHT            = 6,
-    ITEM_SUBCLASS_GLYPH_SHAMAN                  = 7,
-    ITEM_SUBCLASS_GLYPH_MAGE                    = 8,
-    ITEM_SUBCLASS_GLYPH_WARLOCK                 = 9,
-    ITEM_SUBCLASS_GLYPH_DRUID                   = 11
-};
-
-#define MAX_ITEM_SUBCLASS_GLYPH                   12
-
 const uint32 MaxItemSubclassValues[MAX_ITEM_CLASS] =
 {
     MAX_ITEM_SUBCLASS_CONSUMABLE,
     MAX_ITEM_SUBCLASS_CONTAINER,
     MAX_ITEM_SUBCLASS_WEAPON,
-    MAX_ITEM_SUBCLASS_GEM,
     MAX_ITEM_SUBCLASS_ARMOR,
     MAX_ITEM_SUBCLASS_REAGENT,
     MAX_ITEM_SUBCLASS_PROJECTILE,
@@ -437,7 +394,7 @@ inline uint8 ItemSubClassToDurabilityMultiplierId(uint32 ItemClass, uint32 ItemS
 }
 
 // GCC have alternative #pragma pack(N) syntax and old gcc version not support pack(push,N), also any gcc version not support it at some platform
-#if defined(__GNUC__ )
+#if defined( __GNUC__ )
 #pragma pack(1)
 #else
 #pragma pack(push,1)
@@ -522,18 +479,13 @@ struct ItemPrototype
     uint32 LockID;
     uint32 Material;                                        // id from Material.dbc
     uint32 Sheath;
-    uint32 RandomProperty;                                  // id from ItemRandomProperties.dbc
-    uint32 RandomSuffix;                                    // id from ItemRandomSuffix.dbc
+    uint32 RandomProperty;
     uint32 Block;
     uint32 ItemSet;                                         // id from ItemSet.dbc
     uint32 MaxDurability;
     uint32 Area;                                            // id from AreaTable.dbc
     uint32 Map;                                             // id from Map.dbc
     uint32 BagFamily;                                       // id from ItemBagFamily.dbc
-    uint32 TotemCategory;                                   // id from TotemCategory.dbc
-    _Socket Socket[3];
-    uint32 socketBonus;                                     // id from SpellItemEnchantment.dbc
-    uint32 GemProperties;                                   // id from GemProperties.dbc
     uint32 RequiredDisenchantSkill;
     float  ArmorDamageModifier;
     uint32 ScriptId;
@@ -572,7 +524,7 @@ struct ItemLocale
 };
 
 // GCC have alternative #pragma pack() syntax and old gcc version not support pack(pop), also any gcc version not support it at some platform
-#if defined(__GNUC__ )
+#if defined( __GNUC__ )
 #pragma pack()
 #else
 #pragma pack(pop)

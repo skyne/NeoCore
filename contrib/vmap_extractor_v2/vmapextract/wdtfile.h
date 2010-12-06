@@ -1,19 +1,20 @@
 #ifndef WDTFILE_H
 #define WDTFILE_H
 
-#include "mpq_libmpq04.h"
+#define __STORMLIB_SELF__
+
+#include "mpq.h"
+#include "adtfile.h"
 #include "wmo.h"
 #include <string>
 #include "stdlib.h"
-
-class ADTFile;
 
 class WDTFile
 {
 public:
     WDTFile(char* file_name, char* file_name1);
     ~WDTFile(void);
-    bool init(char *map_id, unsigned int mapID);
+    bool init(char *map_id);
 
     string* gWmoInstansName;
     int gnWMO, nMaps;
@@ -27,3 +28,4 @@ private:
 };
 
 #endif
+

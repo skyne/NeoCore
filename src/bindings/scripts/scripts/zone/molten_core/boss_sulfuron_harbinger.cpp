@@ -58,7 +58,7 @@ struct NEO_DLL_DECL boss_sulfuronAI : public ScriptedAI
         Flamespear_Timer = 2000;
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
     }
 
@@ -142,7 +142,7 @@ struct NEO_DLL_DECL mob_flamewaker_priestAI : public ScriptedAI
         Immolate_Timer = 8000;
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
     }
 

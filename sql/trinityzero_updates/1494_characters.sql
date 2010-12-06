@@ -1,0 +1,1 @@
+DROP TABLE `arena_team`,`arena_team_member`,`arena_team_stats`;

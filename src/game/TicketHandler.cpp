@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2005-2008 MaNGOS
  *
- * Copyright (C) 2008 Trinity
+ * Copyright (C) 2008 Neo
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,8 +31,11 @@
 #include "Chat.h"
 
 
-void WorldSession::HandleGMTicketCreateOpcode(WorldPacket & recv_data )
+void WorldSession::HandleGMTicketCreateOpcode( WorldPacket & recv_data )
 {
+    // always do a packet check
+    CHECK_PACKET_SIZE(recv_data, 4*4+1+2*4);
+
     uint32 map;
     float x, y, z;
     std::string ticketText = "";
@@ -83,8 +86,11 @@ void WorldSession::HandleGMTicketCreateOpcode(WorldPacket & recv_data )
 
 }
 
-void WorldSession::HandleGMTicketUpdateOpcode(WorldPacket & recv_data)
+void WorldSession::HandleGMTicketUpdateOpcode( WorldPacket & recv_data)
 {
+    // always do a packet check
+    CHECK_PACKET_SIZE(recv_data,1);
+
     std::string message = "";
     time_t t = time(NULL);
 
@@ -97,7 +103,7 @@ void WorldSession::HandleGMTicketUpdateOpcode(WorldPacket & recv_data)
     GM_Ticket *ticket = ticketmgr.GetGMTicketByPlayer(GetPlayer()->GetGUID());
 
     // Check if player has a GM Ticket yet
-    if (!ticket)
+    if(!ticket)
     {
         // Response - error couldnt find existing Ticket
         data << uint32(1);
@@ -122,14 +128,14 @@ void WorldSession::HandleGMTicketUpdateOpcode(WorldPacket & recv_data)
 
 }
 
-void WorldSession::HandleGMTicketDeleteOpcode(WorldPacket & /*recv_data*/)
+void WorldSession::HandleGMTicketDeleteOpcode( WorldPacket & /*recv_data*/)
 {
     // NO recv_data, NO packet check size
 
     GM_Ticket* ticket = ticketmgr.GetGMTicketByPlayer(GetPlayer()->GetGUID());
 
     // CHeck for Ticket
-    if (ticket)
+    if(ticket)
     {
         // Remove Tickets from Player
 
@@ -139,12 +145,12 @@ void WorldSession::HandleGMTicketDeleteOpcode(WorldPacket & /*recv_data*/)
         // Send Packet
         SendPacket(&data);
 
-        sWorld.SendGMText(LANG_COMMAND_TICKETPLAYERABANDON, GetPlayer()->GetName(), ticket->guid);
+        sWorld.SendGMText(LANG_COMMAND_TICKETPLAYERABANDON, GetPlayer()->GetName(), ticket->guid );
         ticketmgr.RemoveGMTicketByPlayer(GetPlayer()->GetGUID(), GetPlayer()->GetGUID());
     }
 }
 
-void WorldSession::HandleGMTicketGetTicketOpcode(WorldPacket & /*recv_data*/)
+void WorldSession::HandleGMTicketGetTicketOpcode( WorldPacket & /*recv_data*/)
 {
     // NO recv_data NO packet size check
 
@@ -154,7 +160,7 @@ void WorldSession::HandleGMTicketGetTicketOpcode(WorldPacket & /*recv_data*/)
     GM_Ticket *ticket = ticketmgr.GetGMTicketByPlayer(GetPlayer()->GetGUID());
 
     // check for existing ticket
-    if (!ticket)
+    if(!ticket)
     {
         data << uint32(10);
         // send packet
@@ -170,7 +176,7 @@ void WorldSession::HandleGMTicketGetTicketOpcode(WorldPacket & /*recv_data*/)
 
 }
 
-void WorldSession::HandleGMTicketSystemStatusOpcode(WorldPacket & /*recv_data*/)
+void WorldSession::HandleGMTicketSystemStatusOpcode( WorldPacket & /*recv_data*/)
 {
     // NO recv_data NO packet size check
 

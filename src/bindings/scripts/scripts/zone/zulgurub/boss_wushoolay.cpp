@@ -40,7 +40,7 @@ struct NEO_DLL_DECL boss_wushoolayAI : public ScriptedAI
         LightningWave_Timer = 8000 + rand()%8000;
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
     }
 

@@ -89,7 +89,7 @@ struct NEO_DLL_DECL boss_razuviousAI : public ScriptedAI
         DoPlaySoundToSet(m_creature, SOUND_DEATH);
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
         switch (rand()%3)
         {

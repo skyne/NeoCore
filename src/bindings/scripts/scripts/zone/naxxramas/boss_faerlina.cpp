@@ -55,7 +55,7 @@ struct NEO_DLL_DECL boss_faerlinaAI : public ScriptedAI
         HasTaunted = false;
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
         switch (rand()%4)
         {

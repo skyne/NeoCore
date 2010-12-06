@@ -62,7 +62,7 @@ struct NEO_DLL_DECL boss_theravenianAI : public ScriptedAI
         }
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
         DoYell(SAY_AGGRO1, LANG_UNIVERSAL, NULL);
     }

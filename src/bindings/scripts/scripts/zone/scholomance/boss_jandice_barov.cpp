@@ -51,7 +51,7 @@ struct NEO_DLL_DECL boss_jandicebarovAI : public ScriptedAI
         Invisible = false;
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
     }
 
@@ -122,8 +122,7 @@ struct NEO_DLL_DECL boss_jandicebarovAI : public ScriptedAI
             for(int i = 0; i < 10;i++)
             {
                 target = SelectUnit(SELECT_TARGET_RANDOM,0);
-                if(target)
-                    SummonIllusions(target);
+                SummonIllusions(target);
             }
             Invisible = true;
             Invisible_Timer = 3000;
@@ -171,7 +170,7 @@ struct NEO_DLL_DECL mob_illusionofjandicebarovAI : public ScriptedAI
         m_creature->ApplySpellImmune(0, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_MAGIC, true);
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
     }
 

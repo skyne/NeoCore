@@ -52,7 +52,7 @@ struct NEO_DLL_DECL boss_ayamissAI : public ScriptedAI
         phase=1;
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
         pTarget = who;
     }

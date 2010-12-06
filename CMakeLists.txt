@@ -1,10 +1,11 @@
-PROJECT(Neo)
+PROJECT(Trinity)
 cmake_minimum_required(VERSION 2.6)
 cmake_policy(SET CMP0005 OLD)
 
 include(CheckIncludeFiles)
 include(cmake/FindAce.cmake)
 include(cmake/FindMySql.cmake)
+include(cmake/FindPostgreSql.cmake)
 include(cmake/FindReadline.cmake)
 CONFIGURE_FILE(
   "${CMAKE_CURRENT_SOURCE_DIR}/cmake/cmake_uninstall.cmake.in"
@@ -13,7 +14,8 @@ CONFIGURE_FILE(
 ADD_CUSTOM_TARGET(uninstall "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake")
 
 OPTION(DO_MYSQL "With MySQL support" 1)
-OPTION(DO_SCRIPTS "With neoscripts" 1)
+OPTION(DO_POSTGRESQL "With PostgreSQL support" 0) # not complete yet, may not link properly.
+OPTION(DO_SCRIPTS "With trinityscripts" 1)
 OPTION(DO_CLI "With CLI" 1)
 OPTION(DO_RA "With RA" 0)
 OPTION(DO_DEBUG "Debug mode" 0)
@@ -30,21 +32,19 @@ ADD_EXECUTABLE(genrev
 ${GENREV_SRC}
 )
 ADD_CUSTOM_TARGET("revision.h" ALL
-    COMMAND "${Neo_BINARY_DIR}/genrev"
-    ${Neo_SOURCE_DIR}
-    WORKING_DIRECTORY "${Neo_SOURCE_DIR}/src/shared"
+    COMMAND "${Trinity_BINARY_DIR}/genrev"
+    ${Trinity_SOURCE_DIR}
+    WORKING_DIRECTORY "${Trinity_SOURCE_DIR}/src/shared"
     DEPENDS genrev
 )
 
 
 EXECUTE_PROCESS(
-#	COMMAND svn info | grep -i "Revision" |  awk -F' ' '{print $2}'      for svn systems
         COMMAND hg tip --template {rev}
-		WORKING_DIRECTORY "${Neo_SOURCE_DIR}"
         OUTPUT_VARIABLE HG_REVISION
 )
 
-message("* Neo Core revision: ${HG_REVISION}")
+message("* Trinity Core revision: ${HG_REVISION}")
 
 IF (PREFIX)
     SET(CMAKE_INSTALL_PREFIX ${PREFIX})
@@ -64,6 +64,12 @@ message("* Libs install dir at: ${LIBSDIR}")
 FIND_LIBRARY(SSLLIB NAMES ssl DOC "SSL library")
 FIND_LIBRARY(ZLIB z "Zlib library")
 
+IF(DO_POSTGRESQL)
+    MESSAGE("* With PostgreSQL")
+    FIND_PostgreSQL()
+    ADD_DEFINITIONS(-DDO_POSTGRESQL)
+ENDIF(DO_POSTGRESQL)
+
 IF(DO_MYSQL)
     MESSAGE("* With MySQL")
     FIND_MYSQL()
@@ -71,13 +77,13 @@ IF(DO_MYSQL)
 ENDIF(DO_MYSQL)
 
 if(DO_SCRIPTS)
-message("* With Neo Scripts")
-SET(SCRIPT_LIB neoscript)
+message("* With Trinity Scripts")
+SET(SCRIPT_LIB trinityscript)
 SET(SCRIPT_INCLUDE src/bindings/scripts/include)
 ADD_DEFINITIONS(-DDO_SCRIPTS)
 else (DO_SCRIPTS)
-message("* Without Neo Scripts")
-SET(SCRIPT_LIB neointerface)
+message("* Without Trinity Scripts")
+SET(SCRIPT_LIB trinityinterface)
 SET(SCRIPT_INCLUDE src/bindings/interface)
 endif(DO_SCRIPTS)
 
@@ -99,7 +105,7 @@ endif(DO_RA)
 
 if(DO_DEBUG)
 message("* Debug mode ON")
-add_definitions(-g -DNEO_DEBUG)
+add_definitions(-g -DTRINITY_DEBUG)
 endif(DO_DEBUG)
 
 if(DO_WARN)
@@ -133,7 +139,7 @@ if(ACE_FOUND)
 message(STATUS "Found ACE library: ${ACE_LIBRARY}")
 message(STATUS "Include dir is: ${ACE_INCLUDE_DIR}")
 else(ACE_FOUND)
-message(SEND_ERROR "** ACE library not found! NeoCore cannot be compiled!")
+message(SEND_ERROR "** ACE library not found! Trinity Core cannot be compiled!")
 message(SEND_ERROR "** Please build ACE from http://www.cs.wustl.edu/~schmidt/ACE.html")
 #For now remove msg about install from repo, as ubuntu/debian don't have needed ver in repos.
 #message(SEND_ERROR "** your distro may provide a binary for ACE e.g. for ubuntu try apt-get install libace-dev")
@@ -184,7 +190,7 @@ src/framework
 src/shared/Database 
 src/shared/vmap
 src/game 
-src/bindings/scripts/scripts/npc
+src/bindings/scripts/base
 ${CMAKE_BINARY_DIR}
 ${SCRIPT_INCLUDE}
 ${MYSQL_INCLUDE_DIR} 
@@ -203,3 +209,4 @@ SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 add_subdirectory(dep)
 add_subdirectory(doc)
 add_subdirectory(src)
+add_subdirectory(sql)

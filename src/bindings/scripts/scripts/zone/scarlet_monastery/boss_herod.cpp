@@ -22,7 +22,7 @@ SDCategory: Scarlet Monastery
 EndScriptData */
 
 #include "precompiled.h"
-#include "escort_ai.h"
+#include "../../npc/npc_escortAI.h"
 
 #define SAY_AGGRO                   -1189000
 #define SAY_WHIRLWIND               -1189001
@@ -55,7 +55,7 @@ struct NEO_DLL_DECL boss_herodAI : public ScriptedAI
         Whirlwind_Timer = 60000;
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
         DoScriptText(SAY_AGGRO, m_creature);
         DoCast(m_creature,SPELL_RUSHINGCHARGE);
@@ -110,7 +110,6 @@ CreatureAI* GetAI_boss_herod(Creature *_Creature)
     return new boss_herodAI (_Creature);
 }
 
-
 float Location[12][3]=
 {
     {1945.81, -431.54, 16.36},
@@ -132,19 +131,20 @@ uint32 Wait[12][1]=
     {0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{600000}
 };
 
-
 struct NEO_DLL_DECL mob_scarlet_traineeAI : public npc_escortAI
 {
-    mob_scarlet_traineeAI(Creature *c) : npc_escortAI(c)
-    {
-        Start_Timer = urand(1000,6000);
-    }
+    mob_scarlet_traineeAI(Creature *c) : npc_escortAI(c) {}
 
     uint32 Start_Timer;
 
-    void Reset() {}
-    void WaypointReached(uint32 uiPoint) {}
-    void EnterCombat(Unit* who) {}
+    void WaypointReached(uint32 i) { }
+
+    void Reset()
+    {
+        Start_Timer = urand(1500,4500);
+    }
+
+    void Aggro(Unit* who) { }
 
     void UpdateAI(const uint32 diff)
     {
@@ -152,7 +152,7 @@ struct NEO_DLL_DECL mob_scarlet_traineeAI : public npc_escortAI
         {
             if (Start_Timer < diff)
             {
-                Start(true,true);
+                Start(true,true,true);
                 Start_Timer = 0;
             }else Start_Timer -= diff;
         }
@@ -184,3 +184,4 @@ void AddSC_boss_herod()
     newscript->GetAI = &GetAI_mob_scarlet_trainee;
     newscript->RegisterSelf();
 }
+

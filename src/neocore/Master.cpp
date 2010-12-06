@@ -1,10 +1,10 @@
 /*
  * Copyright (C) 2005-2008 MaNGOS <http://www.mangosproject.org/>
  *
- * Copyright (C) 2008 Trinity <http://www.trinitycore.org/>
- * 
- * Copyright (C) 2010 Neo <http://www.neocore.info/>
- * 
+ * Copyright (C) 2008 Neo <http://www.neocore.org/>
+ *
+ * Copyright (C) 2009-2010 NeoZero <http://www.neozero.org/>
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -81,7 +81,7 @@ public:
         w_lastchange = 0;
         while(!World::IsStopped())
         {
-            ACE_Based::Thread::Sleep(1000);
+           ACE_Based::Thread::Sleep(1000);
             uint32 curtime = getMSTime();
             //DEBUG_LOG("anti-freeze: time=%u, counters=[%u; %u]",curtime,Master::m_masterLoopCounter,World::m_worldLoopCounter);
 
@@ -120,74 +120,72 @@ public:
 class RARunnable : public ACE_Based::Runnable
 {
 public:
-    uint32 numLoops, loopCounter;
+  uint32 numLoops, loopCounter;
 
-    RARunnable ()
-    {
-        uint32 socketSelecttime = sWorld.getConfig (CONFIG_SOCKET_SELECTTIME);
-        numLoops = (sConfig.GetIntDefault ("MaxPingTime", 30) * (MINUTE * 1000000 / socketSelecttime));
+  RARunnable ()
+  {
+    uint32 socketSelecttime = sWorld.getConfig (CONFIG_SOCKET_SELECTTIME);
+    numLoops = (sConfig.GetIntDefault ("MaxPingTime", 30) * (MINUTE * 1000000 / socketSelecttime));
+    loopCounter = 0;
+  }
+
+  void
+  checkping ()
+  {
+    // ping if need
+    if ((++loopCounter) == numLoops)
+      {
         loopCounter = 0;
-    }
+        sLog.outDetail ("Ping MySQL to keep connection alive");
+        WorldDatabase.Query ("SELECT 1 FROM command LIMIT 1");
+        LoginDatabase.Query ("SELECT 1 FROM realmlist LIMIT 1");
+        CharacterDatabase.Query ("SELECT 1 FROM bugreport LIMIT 1");
+      }
+  }
 
-    void checkping ()
-    {
-        // ping if need
-        if ((++loopCounter) == numLoops)
-        {
-            loopCounter = 0;
-            sLog.outDetail ("Ping MySQL to keep connection alive");
-            WorldDatabase.Query ("SELECT 1 FROM command LIMIT 1");
-            LoginDatabase.Query ("SELECT 1 FROM realmlist LIMIT 1");
-            CharacterDatabase.Query ("SELECT 1 FROM bugreport LIMIT 1");
-        }
-    }
+  void
+  run (void)
+  {
+    SocketHandler h;
 
-    void run ()
-    {
-        SocketHandler h;
+    // Launch the RA listener socket
+    ListenSocket<RASocket> RAListenSocket (h);
+    bool usera = sConfig.GetBoolDefault ("Ra.Enable", false);
 
-        // Launch the RA listener socket
-        ListenSocket<RASocket> RAListenSocket (h);
-        bool usera = sConfig.GetBoolDefault ("Ra.Enable", false);
-
-        if (usera)
-        {
-            port_t raport = sConfig.GetIntDefault ("Ra.Port", 3443);
-            std::string stringip = sConfig.GetStringDefault ("Ra.IP", "0.0.0.0");
-            ipaddr_t raip;
-            if (!Utility::u2ip (stringip, raip))
-                sLog.outError ("Neo RA can not bind to ip %s", stringip.c_str ());
-            else if (RAListenSocket.Bind (raip, raport))
-                sLog.outError ("Neo RA can not bind to port %d on %s", raport, stringip.c_str ());
-            else
-            {
-                h.Add (&RAListenSocket);
-
-                sLog.outString ("Starting Remote access listner on port %d on %s", raport, stringip.c_str ());
-            }
-        }
-
-        // Socket Selet time is in microseconds , not miliseconds!!
-        uint32 socketSelecttime = sWorld.getConfig (CONFIG_SOCKET_SELECTTIME);
-
-        // if use ra spend time waiting for io, if not use ra ,just sleep
-        if (usera)
-        {
-            while (!World::IsStopped())
-            {
-                h.Select (0, socketSelecttime);
-                checkping ();
-            }
-        }
+    if (usera)
+      {
+        port_t raport = sConfig.GetIntDefault ("Ra.Port", 3443);
+        std::string stringip = sConfig.GetStringDefault ("Ra.IP", "0.0.0.0");
+        ipaddr_t raip;
+        if (!Utility::u2ip (stringip, raip))
+          sLog.outError ("Neo RA can not bind to ip %s", stringip.c_str ());
+        else if (RAListenSocket.Bind (raip, raport))
+          sLog.outError ("Neo RA can not bind to port %d on %s", raport, stringip.c_str ());
         else
+          {
+            h.Add (&RAListenSocket);
+
+            sLog.outString ("Starting Remote access listner on port %d on %s", raport, stringip.c_str ());
+          }
+      }
+
+    // Socket Selet time is in microseconds , not miliseconds!!
+    uint32 socketSelecttime = sWorld.getConfig (CONFIG_SOCKET_SELECTTIME);
+
+    // if use ra spend time waiting for io, if not use ra ,just sleep
+    if (usera)
+      while (!World::IsStopped())
         {
-            while (!World::IsStopped())
-            {
-                ACE_Based::Thread::Sleep(static_cast<unsigned long> (socketSelecttime / 1000));
-                checkping ();
-            }
+          h.Select (0, socketSelecttime);
+          checkping ();
         }
-    }
+    else
+      while (!World::IsStopped())
+        {
+          ACE_Based::Thread::Sleep(static_cast<unsigned long> (socketSelecttime / 1000));
+          checkping ();
+        }
+  }
 };
 
 Master::Master()
@@ -203,17 +201,16 @@ int Master::Run()
 {
     sLog.outString( "%s (core-daemon)", _FULLVERSION );
     sLog.outString( "<Ctrl-C> to stop.\n" );
-    // Remove the warnings C4129 while compiling
-    #pragma warning (disable : 4129)
 
-    sLog.outString( "______________________B_E_T_A_____________________");
-	sLog.outString( "    _     _                 __                    ");
-	sLog.outString( "    /|   /                /    )                  ");
-	sLog.outString( "---/-| -/-----__----__---/---------__---)__----__-");
-  	sLog.outString( "  /  | /    /___) /   ) /        /   ) /   ) /___)");
-	sLog.outString( "_/___|/____(___ _(___/_(____/___(___/_/_____(___ _");
-	sLog.outString( "______________________B_E_T_A_____________________");
-    
+    sLog.outString( " ______                       __");
+    sLog.outString( "/\\__  _\\       __          __/\\ \\__");
+    sLog.outString( "\\/_/\\ \\/ _ __ /\\_\\    ___ /\\_\\ \\ ,_\\  __  __");
+    sLog.outString( "   \\ \\ \\/\\`'__\\/\\ \\ /' _ `\\/\\ \\ \\ \\/ /\\ \\/\\ \\");
+    sLog.outString( "    \\ \\ \\ \\ \\/ \\ \\ \\/\\ \\/\\ \\ \\ \\ \\ \\_\\ \\ \\_\\ \\");
+    sLog.outString( "     \\ \\_\\ \\_\\  \\ \\_\\ \\_\\ \\_\\ \\_\\ \\__\\\\/`____ \\");
+    sLog.outString( "      \\/_/\\/_/   \\/_/\\/_/\\/_/\\/_/\\/__/ `/___/> \\");
+    sLog.outString( "                                 Z E R O  /\\___/");
+    sLog.outString( "http://NeoZero.org                    \\/__/\n");
 
     /// worldd PID file creation
     std::string pidfile = sConfig.GetStringDefault("PidFile", "");
@@ -240,13 +237,11 @@ int Master::Run()
     _HookSignals();
 
     ///- Launch WorldRunnable thread
-    ACE_Based::Thread world_thread(new WorldRunnable);
-    world_thread.setPriority(ACE_Based::Highest);
+    ACE_Based::Thread t(new WorldRunnable);
+    t.setPriority ((ACE_Based::Priority )2);
 
     // set server online
     LoginDatabase.PExecute("UPDATE realmlist SET color = 0, population = 0 WHERE id = '%d'",realmID);
-
-    ACE_Based::Thread* cliThread = NULL;
 
 #ifdef WIN32
     if (sConfig.GetBoolDefault("Console.Enable", true) && (m_ServiceStatus == -1)/* need disable console in service mode*/)
@@ -255,10 +250,10 @@ int Master::Run()
 #endif
     {
         ///- Launch CliRunnable thread
-        cliThread = new ACE_Based::Thread(new CliRunnable);
+        ACE_Based::Thread td1(new CliRunnable);
     }
 
-    ACE_Based::Thread rar_thread(new RARunnable);
+    ACE_Based::Thread td2(new RARunnable);
 
     ///- Handle affinity for multiple processors and process priority on Windows
     #ifdef WIN32
@@ -277,7 +272,7 @@ int Master::Run()
 
                 if(!curAff )
                 {
-                    sLog.outError("Processors marked in UseProcessors bitmask (hex) %x not accessible for Neo. Accessible processors bitmask (hex): %x",Aff,appAff);
+                    sLog.outError("Processors marked in UseProcessors bitmask (hex) %x not accessible for Neod. Accessible processors bitmask (hex): %x",Aff,appAff);
                 }
                 else
                 {
@@ -287,7 +282,7 @@ int Master::Run()
                         sLog.outError("Can't set used processors (hex): %x",curAff);
                 }
             }
-            sLog.outString("");
+            sLog.outString();
         }
 
         bool Prio = sConfig.GetBoolDefault("ProcessPriority", false);
@@ -299,7 +294,7 @@ int Master::Run()
                 sLog.outString("NeoCore process priority class set to HIGH");
             else
                 sLog.outError("ERROR: Can't set Neod process priority class.");
-            sLog.outString("");
+            sLog.outString();
         }
     }
     #endif
@@ -309,24 +304,29 @@ int Master::Run()
 
     uint32 socketSelecttime = sWorld.getConfig(CONFIG_SOCKET_SELECTTIME);
 
+    // maximum counter for next ping
+    uint32 numLoops = (sConfig.GetIntDefault( "MaxPingTime", 30 ) * (MINUTE * 1000000 / socketSelecttime));
+    uint32 loopCounter = 0;
+
     ///- Start up freeze catcher thread
-    if(uint32 freeze_delay = sConfig.GetIntDefault("MaxCoreStuckTime", 0))
+    uint32 freeze_delay = sConfig.GetIntDefault("MaxCoreStuckTime", 0);
+    if(freeze_delay)
     {
         FreezeDetectorRunnable *fdr = new FreezeDetectorRunnable();
         fdr->SetDelayTime(freeze_delay*1000);
-        ACE_Based::Thread freeze_thread(fdr);
-        freeze_thread.setPriority(ACE_Based::Highest);
+        ACE_Based::Thread t(fdr);
+        t.setPriority(ACE_Based::High);
     }
 
     ///- Launch the world listener socket
-    port_t wsport = sWorld.getConfig (CONFIG_PORT_WORLD);
-    std::string bind_ip = sConfig.GetStringDefault ("BindIP", "0.0.0.0");
+  port_t wsport = sWorld.getConfig (CONFIG_PORT_WORLD);
+  std::string bind_ip = sConfig.GetStringDefault ("BindIP", "0.0.0.0");
 
-    if (sWorldSocketMgr->StartNetwork (wsport, bind_ip.c_str ()) == -1)
+  if (sWorldSocketMgr->StartNetwork (wsport, bind_ip.c_str ()) == -1)
     {
-        sLog.outError ("Failed to start network");
-        World::StopNow(ERROR_EXIT_CODE);
-        // go down and shutdown the server
+      sLog.outError ("Failed to start network");
+      World::StopNow(ERROR_EXIT_CODE);
+      // go down and shutdown the server
     }
 
     sWorldSocketMgr->Wait ();
@@ -339,8 +339,8 @@ int Master::Run()
 
     // when the main thread closes the singletons get unloaded
     // since worldrunnable uses them, it will crash if unloaded after master
-    world_thread.wait();
-    rar_thread.wait ();
+    t.wait();
+    td2.wait ();
 
     ///- Clean database before leaving
     clearOnlineAccounts();
@@ -352,10 +352,9 @@ int Master::Run()
 
     sLog.outString( "Halting process..." );
 
-    if (cliThread)
+    #ifdef WIN32
+    if (sConfig.GetBoolDefault("Console.Enable", true))
     {
-        #ifdef WIN32
-
         // this only way to terminate CLI thread exist at Win32 (alt. way exist only in Windows Vista API)
         //_exit(1);
         // send keyboard input to safely unblock the CLI thread
@@ -390,21 +389,12 @@ int Master::Run()
         b[3].Event.KeyEvent.wRepeatCount = 1;
         DWORD numb;
         BOOL ret = WriteConsoleInput(hStdIn, b, 4, &numb);
-
-        cliThread->wait();
-
-        #else
-
-        cliThread->destroy();
-
-        #endif
-
-        delete cliThread;
     }
+    #endif
 
     // for some unknown reason, unloading scripts here and not in worldrunnable
     // fixes a memory leak related to detaching threads from the module
-    //UnloadScriptingModule();
+    UnloadScriptingModule();
 
     // Exit the process with specified return value
     return World::GetExitCode();
@@ -413,16 +403,14 @@ int Master::Run()
 /// Initialize connection to the databases
 bool Master::_StartDB()
 {
-    sLog.SetLogDB(false);
-    std::string dbstring;
-
     ///- Get world database info from configuration file
-    dbstring = sConfig.GetStringDefault("WorldDatabaseInfo", "");
-    if(dbstring.empty())
+    std::string dbstring;
+    if(!sConfig.GetString("WorldDatabaseInfo", &dbstring))
     {
         sLog.outError("Database not specified in configuration file");
         return false;
     }
+    sLog.outDetail("World Database: %s", dbstring.c_str());
 
     ///- Initialise the world database
     if(!WorldDatabase.Initialize(dbstring.c_str()))
@@ -431,13 +419,12 @@ bool Master::_StartDB()
         return false;
     }
 
-    ///- Get character database info from configuration file
-    dbstring = sConfig.GetStringDefault("CharacterDatabaseInfo", "");
-    if(dbstring.empty())
+    if(!sConfig.GetString("CharacterDatabaseInfo", &dbstring))
     {
         sLog.outError("Character Database not specified in configuration file");
         return false;
     }
+    sLog.outDetail("Character Database: %s", dbstring.c_str());
 
     ///- Initialise the Character database
     if(!CharacterDatabase.Initialize(dbstring.c_str()))
@@ -447,14 +434,14 @@ bool Master::_StartDB()
     }
 
     ///- Get login database info from configuration file
-    dbstring = sConfig.GetStringDefault("LoginDatabaseInfo", "");
-    if(dbstring.empty())
+    if(!sConfig.GetString("LoginDatabaseInfo", &dbstring))
     {
         sLog.outError("Login database not specified in configuration file");
         return false;
     }
 
     ///- Initialise the login database
+    sLog.outDetail("Login Database: %s", dbstring.c_str() );
     if(!LoginDatabase.Initialize(dbstring.c_str()))
     {
         sLog.outError("Cannot connect to login database %s",dbstring.c_str());
@@ -470,30 +457,15 @@ bool Master::_StartDB()
     }
     sLog.outString("Realm running as realm ID %d", realmID);
 
-    ///- Initialize the DB logging system
-    if(sConfig.GetBoolDefault("EnableLogDB", false))
-    {
-        // everything successful - set var to enable DB logging once startup finished.
-        sLog.SetLogDBLater(true);
-        sLog.SetLogDB(false);
-        sLog.SetRealmID(realmID);
-    }
-    else
-    {
-        sLog.SetLogDBLater(false);
-        sLog.SetLogDB(false);
-        sLog.SetRealmID(realmID);
-    }
-
     ///- Clean the database before starting
     clearOnlineAccounts();
 
     ///- Insert version info into DB
-    WorldDatabase.PExecute("UPDATE version SET core_version = '%s'", _FULLVERSION);
+    WorldDatabase.PExecute("UPDATE `version` SET `core_version` = '%s', `core_revision` = '%s'", _FULLVERSION, _REVISION);
 
     sWorld.LoadDBVersion();
 
-    sLog.outString("Using World DB: %s", sWorld.GetDBVersion());
+    sLog.outString("Using %s", sWorld.GetDBVersion());
     return true;
 }
 
@@ -502,7 +474,10 @@ void Master::clearOnlineAccounts()
 {
     // Cleanup online status for characters hosted at current realm
     /// \todo Only accounts with characters logged on *this* realm should have online status reset. Move the online column from 'account' to 'realmcharacters'?
-    LoginDatabase.PExecute("UPDATE account SET active_realm_id = 0 WHERE active_realm_id = '%d'", realmID);
+    LoginDatabase.PExecute(
+        "UPDATE account SET online = 0 WHERE online > 0 "
+        "AND id IN (SELECT acctid FROM realmcharacters WHERE realmid = '%d')",realmID);
+
 
     CharacterDatabase.Execute("UPDATE characters SET online = 0 WHERE online<>0");
 }
@@ -545,3 +520,4 @@ void Master::_UnhookSignals()
     signal(SIGBREAK, 0);
     #endif
 }
+

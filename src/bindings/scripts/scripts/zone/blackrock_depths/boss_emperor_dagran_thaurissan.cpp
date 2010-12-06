@@ -44,7 +44,7 @@ struct NEO_DLL_DECL boss_draganthaurissanAI : public ScriptedAI
         //Counter= 0;
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
         DoYell(SAY_AGGRO,LANG_UNIVERSAL,NULL);
     }

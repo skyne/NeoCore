@@ -59,7 +59,7 @@ struct NEO_DLL_DECL boss_ouroAI : public ScriptedAI
         Submerged = false;
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
         DoCast(m_creature->getVictim(), SPELL_BIRTH);
     }
@@ -103,8 +103,7 @@ struct NEO_DLL_DECL boss_ouroAI : public ScriptedAI
             Unit* target = NULL;
             target = SelectUnit(SELECT_TARGET_RANDOM,0);
 
-            if(target)
-                DoTeleportTo(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ());
+            DoTeleportTo(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ());
 
             ChangeTarget_Timer = 10000 + rand()%10000;
         }else ChangeTarget_Timer -= diff;

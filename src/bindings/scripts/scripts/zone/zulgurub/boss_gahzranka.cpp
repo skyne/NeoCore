@@ -41,7 +41,7 @@ struct NEO_DLL_DECL boss_gahzrankaAI : public ScriptedAI
         Slam_Timer = 17000;
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
     }
 

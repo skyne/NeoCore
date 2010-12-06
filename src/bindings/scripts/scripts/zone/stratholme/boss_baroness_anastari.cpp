@@ -51,7 +51,7 @@ struct NEO_DLL_DECL boss_baroness_anastariAI : public ScriptedAI
         //Possess_Timer = 35000;
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
     }
 
@@ -115,6 +115,7 @@ CreatureAI* GetAI_boss_baroness_anastari(Creature *_Creature)
 {
     return new boss_baroness_anastariAI (_Creature);
 }
+
 
 void AddSC_boss_baroness_anastari()
 {

@@ -1,7 +1,9 @@
 /*
  * Copyright (C) 2005-2008 MaNGOS <http://www.mangosproject.org/>
  *
- * Copyright (C) 2008 Trinity <http://www.trinitycore.org/>
+ * Copyright (C) 2008 Neo <http://www.neocore.org/>
+ *
+ * Copyright (C) 2009-2010 NeoZero <http://www.neozero.org/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -98,7 +100,7 @@ class Roll : public LootValidatorRef
 {
     public:
         Roll(uint64 _guid, LootItem const& li)
-            : itemGUID(_guid), itemid(li.itemid), itemRandomPropId(li.randomPropertyId), itemRandomSuffix(li.randomSuffix),
+            : itemGUID(_guid), itemid(li.itemid), itemRandomPropId(li.randomPropertyId),
             totalPlayersRolling(0), totalNeed(0), totalGreed(0), totalPass(0), itemSlot(0) {}
         ~Roll() { }
         void setLoot(Loot *pLoot) { link(pLoot, this); }
@@ -165,11 +167,9 @@ class NEO_DLL_SPEC Group
                                                             // method: 0=just remove, 1=kick
         uint32 RemoveMember(const uint64 &guid, const uint8 &method);
         void   ChangeLeader(const uint64 &guid);
-        void   CheckLeader(const uint64 &guid, bool isLogout);
-        bool   ChangeLeaderToFirstOnlineMember();
         void   SetLootMethod(LootMethod method) { m_lootMethod = method; }
         void   SetLooterGuid(const uint64 &guid) { m_looterGuid = guid; }
-        void   UpdateLooterGuid(WorldObject* object, bool ifneed = false);
+        void   UpdateLooterGuid( Creature* creature, bool ifneed = false );
         void   SetLootThreshold(ItemQualities threshold) { m_lootThreshold = threshold; }
         void   Disband(bool hideDestroy=false);
 
@@ -189,9 +189,9 @@ class NEO_DLL_SPEC Group
         bool IsLeader(const uint64& guid) const { return (GetLeaderGUID() == guid); }
         uint64 GetMemberGUID(const std::string& name)
         {
-            for (member_citerator itr = m_memberSlots.begin(); itr != m_memberSlots.end(); ++itr)
+            for(member_citerator itr = m_memberSlots.begin(); itr != m_memberSlots.end(); ++itr)
             {
-                if (itr->name == name)
+                if(itr->name == name)
                 {
                     return itr->guid;
                 }
@@ -201,7 +201,7 @@ class NEO_DLL_SPEC Group
         bool IsAssistant(uint64 guid) const
         {
             member_citerator mslot = _getMemberCSlot(guid);
-            if (mslot==m_memberSlots.end())
+            if(mslot==m_memberSlots.end())
                 return false;
 
             return mslot->assistant;
@@ -212,7 +212,7 @@ class NEO_DLL_SPEC Group
         bool SameSubGroup(uint64 guid1,const uint64& guid2) const
         {
             member_citerator mslot2 = _getMemberCSlot(guid2);
-            if (mslot2==m_memberSlots.end())
+            if(mslot2==m_memberSlots.end())
                 return false;
 
             return SameSubGroup(guid1,&*mslot2);
@@ -221,7 +221,7 @@ class NEO_DLL_SPEC Group
         bool SameSubGroup(uint64 guid1, MemberSlot const* slot2) const
         {
             member_citerator mslot1 = _getMemberCSlot(guid1);
-            if (mslot1==m_memberSlots.end() || !slot2)
+            if(mslot1==m_memberSlots.end() || !slot2)
                 return false;
 
             return (mslot1->group==slot2->group);
@@ -241,7 +241,7 @@ class NEO_DLL_SPEC Group
         uint8  GetMemberGroup(uint64 guid) const
         {
             member_citerator mslot = _getMemberCSlot(guid);
-            if (mslot==m_memberSlots.end())
+            if(mslot==m_memberSlots.end())
                 return (MAXRAIDSIZE/MAXGROUPSIZE+1);
 
             return mslot->group;
@@ -251,38 +251,36 @@ class NEO_DLL_SPEC Group
         void ConvertToRaid();
 
         void SetBattlegroundGroup(BattleGround *bg) { m_bgGroup = bg; }
-        uint32 CanJoinBattleGroundQueue(uint32 bgTypeId, uint32 bgQueueType, uint32 MinPlayerCount, uint32 MaxPlayerCount, bool isRated, uint32 arenaSlot);
+        uint32 CanJoinBattleGroundQueue(uint32 bgTypeId, uint32 bgQueueType, uint32 MinPlayerCount, uint32 MaxPlayerCount);
 
         void ChangeMembersGroup(const uint64 &guid, const uint8 &group);
         void ChangeMembersGroup(Player *player, const uint8 &group);
 
         void SetAssistant(uint64 guid, const bool &state)
         {
-            if (!isRaidGroup())
+            if(!isRaidGroup())
                 return;
-            if (_setAssistantFlag(guid, state))
+            if(_setAssistantFlag(guid, state))
                 SendUpdate();
         }
         void SetMainTank(uint64 guid)
         {
-            if (!isRaidGroup())
+            if(!isRaidGroup())
                 return;
 
-            if (_setMainTank(guid))
+            if(_setMainTank(guid))
                 SendUpdate();
         }
         void SetMainAssistant(uint64 guid)
         {
-            if (!isRaidGroup())
+            if(!isRaidGroup())
                 return;
 
-            if (_setMainAssistant(guid))
+            if(_setMainAssistant(guid))
                 SendUpdate();
         }
 
         void SetTargetIcon(uint8 id, uint64 guid);
-        void SetDifficulty(uint8 difficulty);
-        uint8 GetDifficulty() { return m_difficulty; }
         uint16 InInstance();
         bool InCombatToInstance(uint32 instanceId);
         void ResetInstances(uint8 method, Player* SendMsgTo);
@@ -291,7 +289,6 @@ class NEO_DLL_SPEC Group
         //void SendInit(WorldSession *session);
         void SendTargetIconList(WorldSession *session);
         void SendUpdate();
-        void Update(time_t diff);
         void UpdatePlayerOutOfRange(Player* pPlayer);
                                                             // ignore: GUID of player that will be ignored
         void BroadcastPacket(WorldPacket *packet, int group=-1, uint64 ignore=0);
@@ -306,9 +303,9 @@ class NEO_DLL_SPEC Group
         void SendLootRoll(const uint64& SourceGuid, const uint64& TargetGuid, uint8 RollNumber, uint8 RollType, const Roll &r);
         void SendLootRollWon(const uint64& SourceGuid, const uint64& TargetGuid, uint8 RollNumber, uint8 RollType, const Roll &r);
         void SendLootAllPassed(uint32 NumberOfPlayers, const Roll &r);
-        void GroupLoot(const uint64& playerGUID, Loot *loot, WorldObject* object);
-        void NeedBeforeGreed(const uint64& playerGUID, Loot *loot, WorldObject* object);
-        void MasterLoot(const uint64& playerGUID, Loot *loot, WorldObject* object);
+        void GroupLoot(const uint64& playerGUID, Loot *loot, Creature *creature);
+        void NeedBeforeGreed(const uint64& playerGUID, Loot *loot, Creature *creature);
+        void MasterLoot(const uint64& playerGUID, Loot *loot, Creature *creature);
         Rolls::iterator GetRoll(uint64 Guid)
         {
             Rolls::iterator iter;
@@ -329,9 +326,9 @@ class NEO_DLL_SPEC Group
         void DelinkMember(GroupReference* /*pRef*/ ) { }
 
         InstanceGroupBind* BindToInstance(InstanceSave *save, bool permanent, bool load = false);
-        void UnbindInstance(uint32 mapid, uint8 difficulty, bool unload = false);
-        InstanceGroupBind* GetBoundInstance(uint32 mapid, uint8 difficulty);
-        BoundInstancesMap& GetBoundInstances(uint8 difficulty) { return m_boundInstances[difficulty]; }
+        void UnbindInstance(uint32 mapid, bool unload = false);
+        InstanceGroupBind* GetBoundInstance(uint32 mapid);
+        BoundInstancesMap& GetBoundInstances() { return m_boundInstances; }
 
         // FG: evil hacks
         void BroadcastGroupUpdate(void);
@@ -365,7 +362,7 @@ class NEO_DLL_SPEC Group
 
         member_citerator _getMemberCSlot(uint64 Guid) const
         {
-            for (member_citerator itr = m_memberSlots.begin(); itr != m_memberSlots.end(); ++itr)
+            for(member_citerator itr = m_memberSlots.begin(); itr != m_memberSlots.end(); ++itr)
             {
                 if (itr->guid == Guid)
                     return itr;
@@ -375,7 +372,7 @@ class NEO_DLL_SPEC Group
 
         member_witerator _getMemberWSlot(uint64 Guid)
         {
-            for (member_witerator itr = m_memberSlots.begin(); itr != m_memberSlots.end(); ++itr)
+            for(member_witerator itr = m_memberSlots.begin(); itr != m_memberSlots.end(); ++itr)
             {
                 if (itr->guid == Guid)
                     return itr;
@@ -403,16 +400,14 @@ class NEO_DLL_SPEC Group
         uint64              m_mainTank;
         uint64              m_mainAssistant;
         GroupType           m_groupType;
-        uint8               m_difficulty;
         BattleGround*       m_bgGroup;
         uint64              m_targetIcons[TARGETICONCOUNT];
         LootMethod          m_lootMethod;
         ItemQualities       m_lootThreshold;
         uint64              m_looterGuid;
         Rolls               RollId;
-        BoundInstancesMap   m_boundInstances[TOTAL_DIFFICULTIES];
+        BoundInstancesMap   m_boundInstances;
         uint8*              m_subGroupsCounts;
-        time_t              m_leaderLogoutTime;
 };
 #endif
 

@@ -42,7 +42,7 @@ struct NEO_DLL_DECL boss_ambassador_flamelashAI : public ScriptedAI
         Spirit_Timer = 24000;
     }
 
-    void EnterCombat(Unit *who) {}
+    void Aggro(Unit *who) {}
 
     void SummonSpirits(Unit* victim)
     {

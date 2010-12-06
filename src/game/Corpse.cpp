@@ -1,7 +1,9 @@
 /*
  * Copyright (C) 2005-2008 MaNGOS <http://www.mangosproject.org/>
  *
- * Copyright (C) 2008 Trinity <http://www.trinitycore.org/>
+ * Copyright (C) 2008 Neo <http://www.neocore.org/>
+ *
+ * Copyright (C) 2009-2010 NeoZero <http://www.neozero.org/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,7 +38,7 @@ Corpse::Corpse(CorpseType type) : WorldObject()
     m_objectType |= TYPEMASK_CORPSE;
     m_objectTypeId = TYPEID_CORPSE;
                                                             // 2.3.2 - 0x58
-    m_updateFlag = (UPDATEFLAG_LOWGUID | UPDATEFLAG_HIGHGUID | UPDATEFLAG_HASPOSITION);
+   // m_updateFlag = (UPDATEFLAG_LOWGUID | UPDATEFLAG_HIGHGUID | UPDATEFLAG_HASPOSITION);
 
     m_valuesCount = CORPSE_END;
 
@@ -54,24 +56,24 @@ Corpse::~Corpse()
 void Corpse::AddToWorld()
 {
     ///- Register the corpse for guid lookup
-    if (!IsInWorld()) ObjectAccessor::Instance().AddObject(this);
+    if(!IsInWorld()) ObjectAccessor::Instance().AddObject(this);
     Object::AddToWorld();
 }
 
 void Corpse::RemoveFromWorld()
 {
     ///- Remove the corpse from the accessor
-    if (IsInWorld()) ObjectAccessor::Instance().RemoveObject(this);
+    if(IsInWorld()) ObjectAccessor::Instance().RemoveObject(this);
     Object::RemoveFromWorld();
 }
 
-bool Corpse::Create(uint32 guidlow )
+bool Corpse::Create( uint32 guidlow )
 {
     Object::_Create(guidlow, 0, HIGHGUID_CORPSE);
     return true;
 }
 
-bool Corpse::Create(uint32 guidlow, Player *owner, uint32 mapid, float x, float y, float z, float ang )
+bool Corpse::Create( uint32 guidlow, Player *owner, uint32 mapid, float x, float y, float z, float ang )
 {
     SetInstanceId(owner->GetInstanceId());
 
@@ -79,19 +81,19 @@ bool Corpse::Create(uint32 guidlow, Player *owner, uint32 mapid, float x, float 
 
     Relocate(x,y,z,ang);
 
-    if (!IsPositionValid())
+    if(!IsPositionValid())
     {
         sLog.outError("ERROR: Corpse (guidlow %d, owner %s) not created. Suggested coordinates isn't valid (X: %f Y: %f)",
             guidlow,owner->GetName(),x,y);
         return false;
     }
 
-    SetFloatValue(OBJECT_FIELD_SCALE_X, 1);
-    SetFloatValue(CORPSE_FIELD_POS_X, x);
-    SetFloatValue(CORPSE_FIELD_POS_Y, y);
-    SetFloatValue(CORPSE_FIELD_POS_Z, z);
-    SetFloatValue(CORPSE_FIELD_FACING, ang);
-    SetUInt64Value(CORPSE_FIELD_OWNER, owner->GetGUID());
+    SetFloatValue( OBJECT_FIELD_SCALE_X, 1 );
+    SetFloatValue( CORPSE_FIELD_POS_X, x );
+    SetFloatValue( CORPSE_FIELD_POS_Y, y );
+    SetFloatValue( CORPSE_FIELD_POS_Z, z );
+    SetFloatValue( CORPSE_FIELD_FACING, ang );
+    SetUInt64Value( CORPSE_FIELD_OWNER, owner->GetGUID() );
 
     m_grid = Neo::ComputeGridPair(GetPositionX(), GetPositionY());
 
@@ -108,10 +110,10 @@ void Corpse::SaveToDB()
     ss  << "INSERT INTO corpse (guid,player,position_x,position_y,position_z,orientation,zone,map,data,time,corpse_type,instance) VALUES ("
         << GetGUIDLow() << ", " << GUID_LOPART(GetOwnerGUID()) << ", " << GetPositionX() << ", " << GetPositionY() << ", " << GetPositionZ() << ", "
         << GetOrientation() << ", "  << GetZoneId() << ", "  << GetMapId() << ", '";
-    for (uint16 i = 0; i < m_valuesCount; i++ )
+    for(uint16 i = 0; i < m_valuesCount; i++ )
         ss << GetUInt32Value(i) << " ";
     ss << "'," << uint64(m_time) <<", " << uint32(GetType()) << ", " << int(GetInstanceId()) << ")";
-    CharacterDatabase.Execute(ss.str().c_str());
+    CharacterDatabase.Execute( ss.str().c_str() );
     CharacterDatabase.CommitTransaction();
 }
 
@@ -131,7 +133,7 @@ void Corpse::DeleteBonesFromWorld()
 
 void Corpse::DeleteFromDB()
 {
-    if (GetType() == CORPSE_BONES)
+    if(GetType() == CORPSE_BONES)
         // only specific bones
         CharacterDatabase.PExecute("DELETE FROM corpse WHERE guid = '%d'", GetGUIDLow());
     else
@@ -141,20 +143,24 @@ void Corpse::DeleteFromDB()
 
 bool Corpse::LoadFromDB(uint32 guid, QueryResult_AutoPtr result, uint32 InstanceId)
 {
-    if (result == QueryResult_AutoPtr(NULL))
+    bool external = (result != NULL);
+    if (!external)
         //                                        0          1          2          3           4   5    6    7           8
         result = CharacterDatabase.PQuery("SELECT position_x,position_y,position_z,orientation,map,data,time,corpse_type,instance FROM corpse WHERE guid = '%u'",guid);
 
-    if (! result )
+    if( ! result )
     {
-        sLog.outError("ERROR: Corpse (GUID: %u) not found in table corpse, can't load. ",guid);
+        sLog.outError("ERROR: Corpse (GUID: %u) not found in table `corpse`, can't load. ",guid);
         return false;
     }
 
     Field *fields = result->Fetch();
 
-    if (!LoadFromDB(guid,fields))
+    if(!LoadFromDB(guid,fields))
+    {
+        if (!external) 
         return false;
+    }
 
     return true;
 }
@@ -169,15 +175,15 @@ bool Corpse::LoadFromDB(uint32 guid, Field *fields)
     float ort       = fields[3].GetFloat();
     uint32 mapid    = fields[4].GetUInt32();
 
-    if (!LoadValues(fields[5].GetString() ))
+    if(!LoadValues( fields[5].GetString() ))
     {
-        sLog.outError("ERROR: Corpse #%d have broken data in data field. Can't be loaded.",guid);
+        sLog.outError("ERROR: Corpse #%d have broken data in `data` field. Can't be loaded.",guid);
         return false;
     }
 
     m_time             = time_t(fields[6].GetUInt64());
     m_type             = CorpseType(fields[7].GetUInt32());
-    if (m_type >= MAX_CORPSE_TYPE)
+    if(m_type >= MAX_CORPSE_TYPE)
     {
         sLog.outError("ERROR: Corpse (guidlow %d, owner %d) have wrong corpse type, not load.",GetGUIDLow(),GUID_LOPART(GetOwnerGUID()));
         return false;
@@ -192,7 +198,7 @@ bool Corpse::LoadFromDB(uint32 guid, Field *fields)
     SetMapId(mapid);
     Relocate(positionX,positionY,positionZ,ort);
 
-    if (!IsPositionValid())
+    if(!IsPositionValid())
     {
         sLog.outError("ERROR: Corpse (guidlow %d, owner %d) not created. Suggested coordinates isn't valid (X: %f Y: %f)",
             GetGUIDLow(),GUID_LOPART(GetOwnerGUID()),GetPositionX(),GetPositionY());

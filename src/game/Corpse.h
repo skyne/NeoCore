@@ -1,7 +1,9 @@
 /*
  * Copyright (C) 2005-2008 MaNGOS <http://www.mangosproject.org/>
  *
- * Copyright (C) 2008 Trinity <http://www.trinitycore.org/>
+ * Copyright (C) 2008 Neo <http://www.neocore.org/>
+ *
+ * Copyright (C) 2009-2010 NeoZero <http://www.neozero.org/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -51,14 +53,14 @@ enum CorpseFlags
 class Corpse : public WorldObject
 {
     public:
-        explicit Corpse(CorpseType type = CORPSE_BONES);
-        ~Corpse();
+        explicit Corpse( CorpseType type = CORPSE_BONES );
+        ~Corpse( );
 
         void AddToWorld();
         void RemoveFromWorld();
 
-        bool Create(uint32 guidlow);
-        bool Create(uint32 guidlow, Player *owner, uint32 mapid, float x, float y, float z, float ang);
+        bool Create( uint32 guidlow );
+        bool Create( uint32 guidlow, Player *owner, uint32 mapid, float x, float y, float z, float ang );
 
         void SaveToDB();
         bool LoadFromDB(uint32 guid, QueryResult_AutoPtr result, uint32 InstanceId);

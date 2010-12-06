@@ -1,6 +1,6 @@
+#include "AuctionHouseBot.h"
 #include "ObjectMgr.h"
 #include "AuctionHouseMgr.h"
-#include "AuctionHouseBot.h"
 #include <vector>
 
 #include "Policies/SingletonImp.h"
@@ -23,6 +23,7 @@ vector<uint32> blueItemsBin;
 vector<uint32> purpleItemsBin;
 vector<uint32> orangeItemsBin;
 vector<uint32> yellowItemsBin;
+
 AuctionHouseBot::AuctionHouseBot()
 {
     debug_Out = false;
@@ -35,9 +36,6 @@ AuctionHouseBot::AuctionHouseBot()
     Vendor_Items = false;
     Loot_Items = false;
     Other_Items = false;
-    Vendor_TGs = false;
-    Loot_TGs = false;
-    Other_TGs = false;
 
     No_Bind = false;
     Bind_When_Picked_Up = false;
@@ -251,11 +249,11 @@ void AuctionHouseBot::addNewAuctions(Player *AHBplayer, AHBConfig *config)
     }
 
     // only insert a few at a time, so as not to peg the processor
-    for (uint32 cnt = 1; cnt <= items; cnt++)
+    for (uint32 cnt = 1;cnt <= items;cnt++)
     {
         uint32 itemID = 0;
-        uint32 itemColor = 99;
         uint32 loopBreaker = 0;
+        uint32 itemColor = 99;
         while (itemID == 0 && loopBreaker < 50)
         {
             uint32 choice = urand(0, 13);
@@ -367,7 +365,6 @@ void AuctionHouseBot::addNewAuctions(Player *AHBplayer, AHBConfig *config)
                 }
                 ++loopBreaker;
             }
-
             if (itemID == 0)
             {
                 if (debug_Out) sLog.outError("AHSeller: Item::CreateItem() - ItemID is 0");
@@ -382,12 +379,12 @@ void AuctionHouseBot::addNewAuctions(Player *AHBplayer, AHBConfig *config)
             }
 
             Item* item = Item::CreateItem(itemID, 1, AHBplayer);
+            item->AddToUpdateQueueOf(AHBplayer);
             if (item == NULL)
             {
                 if (debug_Out) sLog.outError("AHSeller: Item::CreateItem() returned NULL");
                 break;
             }
-            item->AddToUpdateQueueOf(AHBplayer);
 
             uint32 randomPropertyId = Item::GenerateItemRandomPropertyId(itemID);
             if (randomPropertyId != 0)
@@ -550,7 +547,7 @@ void AuctionHouseBot::addNewAuctionBuyerBotBid(Player *AHBplayer, AHBConfig *con
         }
     }
 
-    for (uint32 count = 1; count <= config->GetBidsPerInterval(); ++count)
+    for (uint32 count = 1;count <= config->GetBidsPerInterval();++count)
     {
         // Do we have anything to bid? If not, stop here.
         if (possibleBids.empty())
@@ -754,7 +751,7 @@ void AuctionHouseBot::Update()
     if ((!AHBSeller) && (!AHBBuyer))
         return;
 
-    WorldSession _session(AHBplayerAccount, NULL, SEC_PLAYER, true, 0, LOCALE_enUS,0);
+    WorldSession _session(AHBplayerAccount, NULL, SEC_PLAYER, 0, LOCALE_enUS);
     Player _AHBplayer(&_session);
     _AHBplayer.MinimalLoadFromDB(QueryResult_AutoPtr(NULL), AHBplayerGUID);
     ObjectAccessor::Instance().AddObject(&_AHBplayer);
@@ -806,14 +803,12 @@ void AuctionHouseBot::Initialize()
     AHBplayerGUID = sConfig.GetIntDefault("AuctionHouseBot.GUID", 0);
     ItemsPerCycle = sConfig.GetIntDefault("AuctionHouseBot.ItemsPerCycle", 200);
 
+
     //Begin Filters
 
     Vendor_Items = sConfig.GetBoolDefault("AuctionHouseBot.VendorItems", false);
     Loot_Items = sConfig.GetBoolDefault("AuctionHouseBot.LootItems", true);
     Other_Items = sConfig.GetBoolDefault("AuctionHouseBot.OtherItems", false);
-    Vendor_TGs = sConfig.GetBoolDefault("AuctionHouseBot.VendorTradeGoods", false);
-    Loot_TGs = sConfig.GetBoolDefault("AuctionHouseBot.LootTradeGoods", true);
-    Other_TGs = sConfig.GetBoolDefault("AuctionHouseBot.OtherTradeGoods", false);
 
     No_Bind = sConfig.GetBoolDefault("AuctionHouseBot.No_Bind", true);
     Bind_When_Picked_Up = sConfig.GetBoolDefault("AuctionHouseBot.Bind_When_Picked_Up", false);
@@ -873,8 +868,8 @@ void AuctionHouseBot::Initialize()
 
     if (AHBSeller)
     {
-        QueryResult_AutoPtr results = QueryResult_AutoPtr(NULL);
-        char npcQuery[] = "SELECT distinct item FROM npc_vendor";
+        QueryResult_AutoPtr results = (QueryResult_AutoPtr) NULL;
+        char npcQuery[] = "SELECT distinct `item` FROM `npc_vendor`";
         results = WorldDatabase.PQuery(npcQuery);
         if (results != NULL)
         {
@@ -884,21 +879,21 @@ void AuctionHouseBot::Initialize()
                 npcItems.push_back(fields[0].GetUInt32());
 
             } while (results->NextRow());
+
         }
         else
         {
             if (debug_Out) sLog.outString("AuctionHouseBot: \"%s\" failed", npcQuery);
         }
 
-        char lootQuery[] = "SELECT item FROM creature_loot_template UNION "
-            "SELECT item FROM disenchant_loot_template UNION "
-            "SELECT item FROM fishing_loot_template UNION "
-            "SELECT item FROM gameobject_loot_template UNION "
-            "SELECT item FROM item_loot_template UNION "
-            //"SELECT item FROM milling_loot_template UNION "
-            "SELECT item FROM pickpocketing_loot_template UNION "
-            "SELECT item FROM prospecting_loot_template UNION "
-            "SELECT item FROM skinning_loot_template";
+        char lootQuery[] = "SELECT `item` FROM `creature_loot_template` UNION "
+            "SELECT `item` FROM `disenchant_loot_template` UNION "
+            "SELECT `item` FROM `fishing_loot_template` UNION "
+            "SELECT `item` FROM `gameobject_loot_template` UNION "
+            "SELECT `item` FROM `item_loot_template` UNION "
+            //"SELECT `item` FROM `milling_loot_template` UNION "
+            "SELECT `item` FROM `pickpocketing_loot_template` UNION "
+            "SELECT `item` FROM `skinning_loot_template`";
 
         results = WorldDatabase.PQuery(lootQuery);
         if (results != NULL)
@@ -909,6 +904,7 @@ void AuctionHouseBot::Initialize()
                 lootItems.push_back(fields[0].GetUInt32());
 
             } while (results->NextRow());
+
         }
         else
         {
@@ -964,7 +960,7 @@ void AuctionHouseBot::Initialize()
             if ((prototype->Quality < 0) || (prototype->Quality > 6))
                 continue;
 
-            if ((Vendor_Items == 0) && !(prototype->Class == ITEM_CLASS_TRADE_GOODS))
+            if (Vendor_Items == 0)
             {
                 bool isVendorItem = false;
 
@@ -978,21 +974,7 @@ void AuctionHouseBot::Initialize()
                     continue;
             }
 
-            if ((Vendor_TGs == 0) && (prototype->Class == ITEM_CLASS_TRADE_GOODS))
-            {
-                bool isVendorTG = false;
-
-                for (unsigned int i = 0; (i < npcItems.size()) && (!isVendorTG); i++)
-                {
-                    if (itemID == npcItems[i])
-                        isVendorTG = true;
-                }
-
-                if (isVendorTG)
-                    continue;
-            }
-
-            if ((Loot_Items == 0) && !(prototype->Class == ITEM_CLASS_TRADE_GOODS))
+            if (Loot_Items == 0)
             {
                 bool isLootItem = false;
 
@@ -1006,21 +988,7 @@ void AuctionHouseBot::Initialize()
                     continue;
             }
 
-            if ((Loot_TGs == 0) && (prototype->Class == ITEM_CLASS_TRADE_GOODS))
-            {
-                bool isLootTG = false;
-
-                for (unsigned int i = 0; (i < lootItems.size()) && (!isLootTG); i++)
-                {
-                    if (itemID == lootItems[i])
-                        isLootTG = true;
-                }
-
-                if (isLootTG)
-                    continue;
-            }
-
-            if ((Other_Items == 0) && !(prototype->Class == ITEM_CLASS_TRADE_GOODS))
+            if (Other_Items == 0)
             {
                 bool isVendorItem = false;
                 bool isLootItem = false;
@@ -1036,25 +1004,6 @@ void AuctionHouseBot::Initialize()
                         isLootItem = true;
                 }
                 if ((!isLootItem) && (!isVendorItem))
-                    continue;
-            }
-
-            if ((Other_TGs == 0) && (prototype->Class == ITEM_CLASS_TRADE_GOODS))
-            {
-                bool isVendorTG = false;
-                bool isLootTG = false;
-
-                for (unsigned int i = 0; (i < npcItems.size()) && (!isVendorTG); i++)
-                {
-                    if (itemID == npcItems[i])
-                        isVendorTG = true;
-                }
-                for (unsigned int i = 0; (i < lootItems.size()) && (!isLootTG); i++)
-                {
-                    if (itemID == lootItems[i])
-                        isLootTG = true;
-                }
-                if ((!isLootTG) && (!isVendorTG))
                     continue;
             }
 
@@ -1389,7 +1338,6 @@ void AuctionHouseBot::Initialize()
             sLog.outError("AuctionHouseBot: No items");
             AHBSeller = 0;
         }
-
         sLog.outString("AuctionHouseBot:");
         sLog.outString("loaded %u grey trade goods", greyTradeGoodsBin.size());
         sLog.outString("loaded %u white trade goods", whiteTradeGoodsBin.size());
@@ -1406,6 +1354,8 @@ void AuctionHouseBot::Initialize()
         sLog.outString("loaded %u orange items", orangeItemsBin.size());
         sLog.outString("loaded %u yellow items", yellowItemsBin.size());
     }
+    sLog.outString("AuctionHouseBot by Paradox (original by ChrisK) has been loaded.");
+    sLog.outString("AuctionHouseBot now includes AHBuyer by Kerbe and Paradox");
 }
 
 void AuctionHouseBot::Commands(uint32 command, uint32 ahMapID, uint32 col, char* args)

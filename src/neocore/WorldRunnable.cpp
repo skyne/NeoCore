@@ -1,7 +1,9 @@
 /*
  * Copyright (C) 2005-2008 MaNGOS <http://www.mangosproject.org/>
  *
- * Copyright (C) 2008 Trinity <http://www.trinitycore.org/>
+ * Copyright (C) 2008 Neo <http://www.neocore.org/>
+ *
+ * Copyright (C) 2009-2010 NeoZero <http://www.neozero.org/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,7 +31,6 @@
 #include "Timer.h"
 #include "ObjectAccessor.h"
 #include "MapManager.h"
-#include "BattleGroundMgr.h"
 
 #include "Database/DatabaseEnv.h"
 
@@ -77,9 +78,6 @@ void WorldRunnable::run()
 
     sWorld.KickAll();                                       // save and kick all players
     sWorld.UpdateSessions( 1 );                             // real players unload required UpdateSessions call
-
-    // unload battleground templates before different singletons destroyed
-    sBattleGroundMgr.DeleteAlllBattleGrounds();
 
     sWorldSocketMgr->StopNetwork();
 

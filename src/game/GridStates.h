@@ -1,7 +1,9 @@
 /*
  * Copyright (C) 2005-2008 MaNGOS <http://www.mangosproject.org/>
  *
- * Copyright (C) 2008 Trinity <http://www.trinitycore.org/>
+ * Copyright (C) 2008 Neo <http://www.neocore.org/>
+ *
+ * Copyright (C) 2009-2010 NeoZero <http://www.neozero.org/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,7 +34,7 @@ class NEO_DLL_DECL GridState
         GridState() { i_Magic = MAGIC_TESTVAL; }
         bool checkMagic()
         {
-            if (i_Magic != MAGIC_TESTVAL)
+            if(i_Magic != MAGIC_TESTVAL)
             {
                 sLog.outError("!!! GridState: Magic value gone !!!");
                 return false;

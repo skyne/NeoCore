@@ -261,7 +261,7 @@ struct NEO_DLL_DECL boss_kelthuzadAI : public ScriptedAI
         }
     }
 
-    void EnterCombat(Unit* who)
+    void Aggro(Unit* who)
     {
         switch(rand()%3)
         {

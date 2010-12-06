@@ -1,7 +1,9 @@
 /*
  * Copyright (C) 2005-2008 MaNGOS <http://www.mangosproject.org/>
  *
- * Copyright (C) 2008 Trinity <http://www.trinitycore.org/>
+ * Copyright (C) 2008 Neo <http://www.neocore.org/>
+ *
+ * Copyright (C) 2009-2010 NeoZero <http://www.neozero.org/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,8 +23,6 @@
 #ifndef NEO_WAYPOINTMANAGER_H
 #define NEO_WAYPOINTMANAGER_H
 
-#include <ace/Singleton.h>
-#include <ace/Null_Mutex.h>
 #include <vector>
 
 struct WaypointData
@@ -36,25 +36,21 @@ struct WaypointData
 };
 
 typedef std::vector<WaypointData*> WaypointPath;
+extern UNORDERED_MAP<uint32, WaypointPath*> waypoint_map;
 
 class WaypointStore
 {
     private :
         uint32  records;
-        UNORDERED_MAP<uint32, WaypointPath*> waypoint_map;
 
     public:
-        // Null Mutex is OK because WaypointMgr is initialized in the World thread before World is initialized
-        static WaypointStore* instance() { return ACE_Singleton<WaypointStore, ACE_Null_Mutex>::instance(); }
-
-        ~WaypointStore() { Free(); }
         void UpdatePath(uint32 id);
         void Load();
         void Free();
 
         WaypointPath* GetPath(uint32 id)
         {
-            if (waypoint_map.find(id) != waypoint_map.end())
+            if(waypoint_map.find(id) != waypoint_map.end())
                 return waypoint_map[id];
             else return 0;
         }
@@ -62,7 +58,7 @@ class WaypointStore
         inline uint32 GetRecordsCount() { return records; }
 };
 
-#define sWaypointMgr WaypointStore::instance()
+extern WaypointStore WaypointMgr;
 
 #endif
 

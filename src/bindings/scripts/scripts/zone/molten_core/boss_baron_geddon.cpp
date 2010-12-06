@@ -45,7 +45,7 @@ struct NEO_DLL_DECL boss_baron_geddonAI : public ScriptedAI
         LivingBomb_Timer = 35000;
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
     }
 

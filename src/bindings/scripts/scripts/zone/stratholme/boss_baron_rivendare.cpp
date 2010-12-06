@@ -100,7 +100,7 @@ struct NEO_DLL_DECL boss_baron_rivendareAI : public ScriptedAI
         SummonSkeletons_Timer = 34000;
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
         if (pInstance)
             pInstance->SetData(TYPE_BARON,IN_PROGRESS);
@@ -176,6 +176,7 @@ CreatureAI* GetAI_boss_baron_rivendare(Creature *_Creature)
 {
     return new boss_baron_rivendareAI (_Creature);
 }
+
 
 void AddSC_boss_baron_rivendare()
 {

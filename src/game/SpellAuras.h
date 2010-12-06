@@ -1,7 +1,9 @@
 /*
  * Copyright (C) 2005-2008 MaNGOS <http://www.mangosproject.org/>
  *
- * Copyright (C) 2008 Trinity <http://www.trinitycore.org/>
+ * Copyright (C) 2008 Neo <http://www.neocore.org/>
+ *
+ * Copyright (C) 2009-2010 NeoZero <http://www.neozero.org/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -51,15 +53,15 @@ typedef void(Aura::*pAuraHandler)(bool Apply, bool Real);
 // Real == true at aura add/remove
 // Real == false at aura mod unapply/reapply; when adding/removing dependent aura/item/stat mods
 //
-// Code in aura handler can be guarded by if (Real) check if it should execution only at real add/remove of aura
+// Code in aura handler can be guarded by if(Real) check if it should execution only at real add/remove of aura
 //
-// MAIN RULE: Code MUST NOT be guarded by if (Real) check if it modifies any stats
+// MAIN RULE: Code MUST NOT be guarded by if(Real) check if it modifies any stats
 //      (percent auras, stats mods, etc)
-// Second rule: Code must be guarded by if (Real) check if it modifies object state (start/stop attack, send packets to client, etc)
+// Second rule: Code must be guarded by if(Real) check if it modifies object state (start/stop attack, send packets to client, etc)
 //
-// Other case choice: each code line moved under if (Real) check is Neo speedup,
-//      each setting object update field code line moved under if (Real) check is significant Neo speedup, and less server->client data sends
-//      each packet sending code moved under if (Real) check is _large_ Neo speedup, and lot less server->client data sends
+// Other case choice: each code line moved under if(Real) check is Neo speedup,
+//      each setting object update field code line moved under if(Real) check is significant Neo speedup, and less server->client data sends
+//      each packet sending code moved under if(Real) check is _large_ Neo speedup, and lot less server->client data sends
 
 class NEO_DLL_SPEC Aura
 {
@@ -124,7 +126,6 @@ class NEO_DLL_SPEC Aura
         void HandleAuraModStat(bool Apply, bool Real);
         void HandleAuraModIncreaseSpeed(bool Apply, bool Real);
         void HandleAuraModIncreaseMountedSpeed(bool Apply, bool Real);
-        void HandleAuraModIncreaseFlightSpeed(bool Apply, bool Real);
         void HandleAuraModDecreaseSpeed(bool Apply, bool Real);
         void HandleAuraModUseNormalSpeed(bool Apply, bool Real);
         void HandleAuraModIncreaseHealth(bool Apply, bool Real);
@@ -183,7 +184,6 @@ class NEO_DLL_SPEC Aura
         void HandleAuraModPacify(bool Apply, bool Real);
         void HandleAuraGhost(bool Apply, bool Real);
         void HandleAuraAllowFlight(bool Apply, bool Real);
-        void HandleModRating(bool apply, bool Real);
         void HandleModTargetResistance(bool apply, bool Real);
         void HandleAuraModAttackPowerPercent(bool apply, bool Real);
         void HandleAuraModRangedAttackPowerPercent(bool apply, bool Real);
@@ -201,14 +201,12 @@ class NEO_DLL_SPEC Aura
         void HandleModSpellHealingPercentFromAttackPower(bool apply, bool Real);
         void HandleAuraModPacifyAndSilence(bool Apply, bool Real);
         void HandleAuraModIncreaseMaxHealth(bool apply, bool Real);
-        void HandleAuraModExpertise(bool apply, bool Real);
         void HandleForceMoveForward(bool apply, bool Real);
         void HandleAuraModResistenceOfStatPercent(bool apply, bool Real);
         void HandleAuraPowerBurn(bool apply, bool Real);
         void HandleSchoolAbsorb(bool apply, bool Real);
         void HandlePreventFleeing(bool apply, bool Real);
         void HandleManaShield(bool apply, bool Real);
-        void HandleArenaPreparation(bool apply, bool Real);
 
         virtual ~Aura();
 
@@ -217,9 +215,36 @@ class NEO_DLL_SPEC Aura
         int32 GetModifierValuePerStack() {return m_modifier.m_amount;}
         int32 GetModifierValue() {return m_modifier.m_amount * m_stackAmount;}
         int32 GetMiscValue() {return m_spellProto->EffectMiscValue[m_effIndex];}
-        int32 GetMiscBValue() {return m_spellProto->EffectMiscValueB[m_effIndex];}
+        int32 GetMiscBValue() {return 0;}//m_spellProto->EffectMiscValueB[m_effIndex];}
 
         SpellEntry const* GetSpellProto() const { return m_spellProto; }
+                uint32 GetTameSpellId(uint32 Id)
+        {
+            switch(Id)
+            {
+                case 1515:      return 13481;
+                case 19548:     return 19597;
+                case 19674:     return 19677;
+                case 19687:     return 19676;
+                case 19688:     return 19678;
+                case 19689:     return 19679;
+                case 19692:     return 19680;
+                case 19693:     return 19684;
+                case 19694:     return 19681;
+                case 19696:     return 19682;
+                case 19697:     return 19683;
+                case 19699:     return 19685;
+                case 19700:     return 19686;
+            /*  case 30646:     return 30647;        // [TZERO]These are all TBC
+                case 30653:     return 30648;
+                case 30654:     return 30652;
+                case 30099:     return 30100;
+                case 30102:     return 30103;
+                case 30105:     return 30104; */
+                default:        return 0;     
+            }
+        }
+
         uint32 GetId() const{ return m_spellProto->Id; }
         uint64 GetCastItemGUID() const { return m_castItemGuid; }
         uint32 GetEffIndex() const{ return m_effIndex; }
@@ -237,8 +262,6 @@ class NEO_DLL_SPEC Aura
                 m_permanent=false;
         }
         time_t GetAuraApplyTime() { return m_applyTime; }
-
-        bool IsExpired() const { return !GetAuraDuration() && !(IsPermanent() || IsPassive()); }
         void UpdateAuraDuration();
         void SendAuraDurationForCaster(Player* caster);
         void UpdateSlotCounterAndDuration();
@@ -275,12 +298,12 @@ class NEO_DLL_SPEC Aura
         bool IsPermanent() const { return m_permanent; }
         bool IsAreaAura() const { return m_isAreaAura; }
         bool IsPeriodic() const { return m_isPeriodic; }
+        bool IsTameSpell(uint32 SpellId) { return (GetTameSpellId(SpellId)); }
         bool IsTrigger() const { return m_isTrigger; }
         bool IsPassive() const { return m_isPassive; }
         bool IsPersistent() const { return m_isPersistent; }
         bool IsDeathPersistent() const { return m_isDeathPersist; }
         bool IsRemovedOnShapeLost() const { return m_isRemovedOnShapeLost; }
-        bool IsRemoved() const { return m_isRemoved; }
         bool IsInUse() const { return m_in_use;}
         void CleanupTriggeredSpells();
 
@@ -313,11 +336,6 @@ class NEO_DLL_SPEC Aura
 
         int32 GetStackAmount() {return m_stackAmount;}
         void SetStackAmount(int32 amount) {m_stackAmount=amount;}
-
-        // Single cast aura helpers
-        void UnregisterSingleCastAura();
-        bool IsSingleTarget() const {return m_isSingleTargetAura;}
-        void SetIsSingleTarget(bool val) { m_isSingleTargetAura = val;}
     protected:
         Aura(SpellEntry const* spellproto, uint32 eff, int32 *currentBasePoints, Unit *target, Unit *caster = NULL, Item* castItem = NULL);
 
@@ -348,13 +366,10 @@ class NEO_DLL_SPEC Aura
         bool m_isPersistent:1;
         bool m_isDeathPersist:1;
         bool m_isRemovedOnShapeLost:1;
-        bool m_isRemoved:1;
         bool m_updated:1;
         bool m_in_use:1;                                    // true while in Aura::ApplyModifier call
-        bool m_isSingleTargetAura:1;                        // true if it's a single target spell and registered at caster - can change at spell steal for example
 
         int32 m_periodicTimer;
-        int32 m_amplitude;
         uint32 m_PeriodicEventId;
         DiminishingGroup m_AuraDRGroup;
 
@@ -372,7 +387,6 @@ class NEO_DLL_SPEC AreaAura : public Aura
         AreaAura(SpellEntry const* spellproto, uint32 eff, int32 *currentBasePoints, Unit *target, Unit *caster = NULL, Item* castItem = NULL);
         ~AreaAura();
         void Update(uint32 diff);
-        bool CheckTarget(Unit *target);
     private:
         float m_radius;
         AreaAuraType m_areaAuraType;

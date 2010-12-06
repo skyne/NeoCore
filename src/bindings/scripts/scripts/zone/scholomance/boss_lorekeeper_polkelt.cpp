@@ -58,7 +58,7 @@ struct NEO_DLL_DECL boss_lorekeeperpolkeltAI : public ScriptedAI
         }
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
     }
 

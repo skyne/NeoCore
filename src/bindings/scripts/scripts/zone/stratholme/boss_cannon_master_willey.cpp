@@ -71,7 +71,7 @@ EndScriptData */
 
 #define SPELL_KNOCKAWAY    10101
 #define SPELL_PUMMEL    15615
-#define SPELL_SHOOT    16496
+#define SPELL_SHOOT    20463
 //#define SPELL_SUMMONCRIMSONRIFLEMAN    17279
 
 struct NEO_DLL_DECL boss_cannon_master_willeyAI : public ScriptedAI
@@ -102,7 +102,7 @@ struct NEO_DLL_DECL boss_cannon_master_willeyAI : public ScriptedAI
         m_creature->SummonCreature(11054,ADD_9X,ADD_9Y,ADD_9Z,ADD_9O,TEMPSUMMON_TIMED_DESPAWN,240000);
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
     }
 
@@ -209,6 +209,7 @@ CreatureAI* GetAI_boss_cannon_master_willey(Creature *_Creature)
 {
     return new boss_cannon_master_willeyAI (_Creature);
 }
+
 
 void AddSC_boss_cannon_master_willey()
 {

@@ -1,7 +1,9 @@
 /*
  * Copyright (C) 2005-2008 MaNGOS <http://www.mangosproject.org/>
  *
- * Copyright (C) 2008 Trinity <http://www.trinitycore.org/>
+ * Copyright (C) 2008 Neo <http://www.neocore.org/>
+ *
+ * Copyright (C) 2009-2010 NeoZero <http://www.neozero.org/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -64,7 +66,7 @@ class Weather
         uint32 GetZone() { return m_zone; };
         bool Update(time_t diff);
     private:
-        WeatherState GetWeatherState() const;
+        uint32 GetSound();
         uint32 m_zone;
         WeatherType m_type;
         float m_grade;

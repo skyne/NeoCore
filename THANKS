@@ -8,10 +8,13 @@ similar to this one:
 
  Neo Core THANKS file
 
- Neo Core is a derivation/rewrite of Trinity Core, which was originally written
- by the MaNGOS team. Many people further helped Neo Core
+ Neo Core is a derivation/rewrite of MaNGOS, which was originally written
+ by Team Python and the WoW Daemon Team. Many people further helped Neo Core
  by submitting bug reports, code patches, and suggestions. Thanks to the
  community!
+
+ Special thanks should go out to the WowwoW team. We have gained help from
+ them many times in the creation of this project. Keep up the good work guys.
 
  Thanks to the ImpConfig developer (dythzer) for the custom configuration patch.
 

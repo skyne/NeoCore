@@ -54,7 +54,7 @@ struct NEO_DLL_DECL boss_general_angerforgeAI : public ScriptedAI
         Medics = false;
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
     }
 

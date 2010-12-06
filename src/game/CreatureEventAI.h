@@ -1,8 +1,6 @@
 /*
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
- * Copyright (C) 2008-2009 Trinity <http://www.trinitycore.org/>
- *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -158,8 +156,8 @@ enum CastFlags
 enum EventFlags
 {
     EFLAG_REPEATABLE            = 0x01,                     //Event repeats
-    EFLAG_NORMAL                = 0x02,                     //Event only occurs in Normal instance difficulty
-    EFLAG_HEROIC                = 0x04,                     //Event only occurs in Heroic instance difficulty
+    EFLAG_RESERVED_1            = 0x02,
+    EFLAG_RESERVED_2            = 0x04,
     EFLAG_RESERVED_3            = 0x08,
     EFLAG_RESERVED_4            = 0x10,
     EFLAG_RESERVED_5            = 0x20,
@@ -596,10 +594,10 @@ class NEO_DLL_SPEC CreatureEventAI : public CreatureAI
 
         bool ProcessEvent(CreatureEventAIHolder& pHolder, Unit* pActionInvoker = NULL);
         void ProcessAction(CreatureEventAI_Action const& action, uint32 rnd, uint32 EventId, Unit* pActionInvoker);
-        uint32 GetRandActionParam(uint32 rnd, uint32 param1, uint32 param2, uint32 param3);
-        int32 GetRandActionParam(uint32 rnd, int32 param1, int32 param2, int32 param3);
-        Unit* GetTargetByType(uint32 Target, Unit* pActionInvoker);
-        Unit* SelectUnit(AttackingTarget target, uint32 position);
+        inline uint32 GetRandActionParam(uint32 rnd, uint32 param1, uint32 param2, uint32 param3);
+        inline int32 GetRandActionParam(uint32 rnd, int32 param1, int32 param2, int32 param3);
+        inline Unit* GetTargetByType(uint32 Target, Unit* pActionInvoker);
+        inline Unit* SelectUnit(AttackingTarget target, uint32 position);
 
         void DoScriptText(int32 textEntry, WorldObject* pSource, Unit* target);
         bool CanCast(Unit* Target, SpellEntry const *Spell, bool Triggered);

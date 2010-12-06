@@ -1,7 +1,9 @@
 /*
  * Copyright (C) 2005-2008 MaNGOS <http://www.mangosproject.org/>
  *
- * Copyright (C) 2008 Trinity <http://www.trinitycore.org/>
+ * Copyright (C) 2008 Neo <http://www.neocore.org/>
+ *
+ * Copyright (C) 2009-2010 NeoZero <http://www.neozero.org/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,7 +31,7 @@ Quest::Quest(Field * questRecord)
     ZoneOrSort = questRecord[2].GetInt32();
     SkillOrClass = questRecord[3].GetInt32();
     MinLevel = questRecord[4].GetUInt32();
-    QuestLevel = questRecord[5].GetInt32();
+    QuestLevel = questRecord[5].GetUInt32();
     Type = questRecord[6].GetUInt32();
     RequiredRaces = questRecord[7].GetUInt32();
     RequiredSkillValue = questRecord[8].GetUInt32();
@@ -136,15 +138,15 @@ Quest::Quest(Field * questRecord)
 
     for (int i=0; i < QUEST_OBJECTIVES_COUNT; i++)
     {
-        if (ReqItemId[i] )
+        if ( ReqItemId[i] )
             ++m_reqitemscount;
-        if (ReqCreatureOrGOId[i] )
+        if ( ReqCreatureOrGOId[i] )
             ++m_reqCreatureOrGOcount;
     }
 
     for (int i=0; i < QUEST_REWARDS_COUNT; i++)
     {
-        if (RewItemId[i] )
+        if ( RewItemId[i] )
             ++m_rewitemscount;
     }
 
@@ -155,14 +157,14 @@ Quest::Quest(Field * questRecord)
     }
 }
 
-uint32 Quest::XPValue (Player *pPlayer) const
+uint32 Quest::XPValue( Player *pPlayer ) const
 {
-    if (pPlayer)
+    if( pPlayer )
     {
-        if (RewMoneyMaxLevel > 0)
+        if( RewMoneyMaxLevel > 0 )
         {
             uint32 pLevel = pPlayer->getLevel();
-            uint32 qLevel = (QuestLevel > 0) ? QuestLevel : pLevel;
+            uint32 qLevel = QuestLevel;
             float fullxp = 0;
             if (qLevel >= 65)
                 fullxp = RewMoneyMaxLevel / 6.0f;
@@ -177,15 +179,15 @@ uint32 Quest::XPValue (Player *pPlayer) const
             else if (qLevel > 0 && qLevel <= 60)
                 fullxp = RewMoneyMaxLevel / 0.6f;
 
-            if (pLevel <= qLevel + 5)
+            if( pLevel <= qLevel +  5 )
                 return (uint32)fullxp;
-            else if (pLevel == qLevel + 6)
+            else if( pLevel == qLevel +  6 )
                 return (uint32)(fullxp * 0.8f);
-            else if (pLevel == qLevel + 7)
+            else if( pLevel == qLevel +  7 )
                 return (uint32)(fullxp * 0.6f);
-            else if (pLevel == qLevel + 8)
+            else if( pLevel == qLevel +  8 )
                 return (uint32)(fullxp * 0.4f);
-            else if (pLevel == qLevel + 9)
+            else if( pLevel == qLevel +  9 )
                 return (uint32)(fullxp * 0.2f);
             else
                 return (uint32)(fullxp * 0.1f);
@@ -194,9 +196,9 @@ uint32 Quest::XPValue (Player *pPlayer) const
     return 0;
 }
 
-int32 Quest::GetRewOrReqMoney() const
+int32  Quest::GetRewOrReqMoney() const
 {
-    if (RewOrReqMoney <= 0)
+    if(RewOrReqMoney <=0)
         return RewOrReqMoney;
 
     return int32(RewOrReqMoney * sWorld.getRate(RATE_DROP_MONEY));

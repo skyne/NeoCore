@@ -51,7 +51,7 @@ struct NEO_DLL_DECL boss_warmastervooneAI : public ScriptedAI
         ThrowAxe_Timer = 1000;
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
     }
 

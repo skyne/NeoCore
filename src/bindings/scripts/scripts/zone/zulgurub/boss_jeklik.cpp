@@ -77,7 +77,7 @@ struct NEO_DLL_DECL boss_jeklikAI : public ScriptedAI
         PhaseTwo = false;
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
         DoScriptText(SAY_AGGRO, m_creature);
         DoCast(m_creature,SPELL_BAT_FORM);
@@ -184,12 +184,13 @@ struct NEO_DLL_DECL boss_jeklikAI : public ScriptedAI
                     if(SpawnFlyingBats_Timer < diff)
                     {
                         Unit *target = SelectUnit(SELECT_TARGET_RANDOM, 0);
-                        if(!target)
-                            return;
 
                         Creature* FlyingBat = m_creature->SummonCreature(14965, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ()+15, 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
                         if(FlyingBat)
-                            FlyingBat->AI()->AttackStart(target);
+                        {
+                            if(target)
+                                FlyingBat->AI()->AttackStart(target);
+                        }
 
                         SpawnFlyingBats_Timer = 10000 + rand()%5000;
                     }else SpawnFlyingBats_Timer -=diff;
@@ -228,7 +229,7 @@ struct NEO_DLL_DECL mob_batriderAI : public ScriptedAI
         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
     }
 
-    void EnterCombat(Unit *who) {}
+    void Aggro(Unit *who) {}
 
     void UpdateAI (const uint32 diff)
     {

@@ -123,7 +123,7 @@ struct NEO_DLL_DECL flesh_tentacleAI : public Scripted_NoMovementAI
         CheckTimer = 1000;
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
     }
 
@@ -138,7 +138,7 @@ struct NEO_DLL_DECL eye_of_cthunAI : public Scripted_NoMovementAI
     {
         pInst = (ScriptedInstance*)c->GetInstanceData();
         if (!pInst)
-            error_log("TSCR: No Instance eye_of_cthunAI");
+            error_log("NeoScript: No Instance eye_of_cthunAI");
     }
 
     ScriptedInstance* pInst;
@@ -182,7 +182,7 @@ struct NEO_DLL_DECL eye_of_cthunAI : public Scripted_NoMovementAI
             pInst->SetData(DATA_CTHUN_PHASE, 0);
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
         DoZoneInCombat();
     }
@@ -437,7 +437,7 @@ struct NEO_DLL_DECL cthunAI : public Scripted_NoMovementAI
     {
         pInst = (ScriptedInstance*)c->GetInstanceData();
         if (!pInst)
-            error_log("TSCR: No Instance eye_of_cthunAI");
+            error_log("NeoScript: No Instance eye_of_cthunAI");
     }
 
     ScriptedInstance* pInst;
@@ -498,7 +498,7 @@ struct NEO_DLL_DECL cthunAI : public Scripted_NoMovementAI
             pInst->SetData(DATA_CTHUN_PHASE, 0);
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
         DoZoneInCombat();
     }
@@ -549,7 +549,7 @@ struct NEO_DLL_DECL cthunAI : public Scripted_NoMovementAI
 
         //Get random but only if we have more than one unit on threat list
         if (temp.size() > 1)
-            advance ( j , rand() % (temp.size() - 1) );
+            advance ( i , rand() % (temp.size() - 1) );
 
         return (*j);
     }
@@ -939,7 +939,7 @@ struct NEO_DLL_DECL eye_tentacleAI : public Scripted_NoMovementAI
         KillSelfTimer = 35000;
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
         DoZoneInCombat();
     }
@@ -1001,7 +1001,7 @@ struct NEO_DLL_DECL claw_tentacleAI : public Scripted_NoMovementAI
         EvadeTimer = 5000;
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
         DoZoneInCombat();
     }
@@ -1097,7 +1097,7 @@ struct NEO_DLL_DECL giant_claw_tentacleAI : public Scripted_NoMovementAI
         EvadeTimer = 5000;
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
         DoZoneInCombat();
     }
@@ -1195,7 +1195,7 @@ struct NEO_DLL_DECL giant_eye_tentacleAI : public Scripted_NoMovementAI
         BeamTimer = 500;
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
         DoZoneInCombat();
     }

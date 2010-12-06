@@ -4,10 +4,8 @@
 
 #include <cassert>
 #include <string>
-//#include "StormLib.h"
+#include "Stormlib.h"
 
-#undef min
-#undef max
 class DBCFile
 {
 public:
@@ -82,8 +80,8 @@ public:
         }
     private:
         Record(DBCFile &file, unsigned char *offset): file(file), offset(offset) {}
-        DBCFile &file;
         unsigned char *offset;
+        DBCFile &file;
 
         friend class DBCFile;
         friend class Iterator;
@@ -139,3 +137,4 @@ private:
 };
 
 #endif
+

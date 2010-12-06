@@ -23,11 +23,11 @@ EndScriptData */
 
 /* ContentData
 npc_skorn_whitecloud
-npc_kyle_frenzied
 npc_plains_vision
 EndContentData */
 
 #include "precompiled.h"
+#include "../../npc/npc_escortAI.h"
 
 /*######
 # npc_skorn_whitecloud
@@ -54,109 +54,6 @@ bool GossipSelect_npc_skorn_whitecloud(Player *player, Creature *_Creature, uint
         player->SEND_GOSSIP_MENU(523,_Creature->GetGUID());
 
     return true;
-}
-
-/*#####
-# npc_kyle_frenzied
-######*/
-
-struct NEO_DLL_DECL npc_kyle_frenziedAI : public ScriptedAI
-{
-    npc_kyle_frenziedAI(Creature *c) : ScriptedAI(c) {}
-
-    int STATE;
-    uint32 wait;
-    uint64 player;
-
-    void Reset()
-    {
-        STATE = 0;
-        m_creature->SetDefaultMovementType(WAYPOINT_MOTION_TYPE);
-        m_creature->GetMotionMaster()->Initialize();
-    }
-    void EnterCombat(Unit* who){}
-
-    void SpellHit(Unit *caster, const SpellEntry* spell)
-    {   // we can feed him without any quest
-        if(spell->Id == 42222 && caster->GetTypeId() == TYPEID_PLAYER && ((Player*)caster)->GetTeam() == HORDE)
-        {
-            STATE = 1;
-            player = caster->GetGUID();
-            float x, y, z, z2;
-            caster->GetPosition(x, y, z);
-            x = x + 3.7*cos(caster->GetOrientation());
-            y = y + 3.7*sin(caster->GetOrientation());
-            z2 = m_creature->GetBaseMap()->GetHeight(x,y,z,false);
-            z = (z2 <= INVALID_HEIGHT) ? z : z2;
-            m_creature->SetDefaultMovementType(IDLE_MOTION_TYPE);       //there is other way to stop waypoint movement?
-            m_creature->GetMotionMaster()->Initialize();
-            m_creature->RemoveUnitMovementFlag(MOVEMENTFLAG_WALK_MODE);
-            m_creature->GetMotionMaster()->MovePoint(0,x, y, z);
-        }
-    }
-
-    void MovementInform(uint32 type, uint32 id)
-    {
-        if(type == POINT_MOTION_TYPE)
-        {
-            switch(STATE)
-            {
-            case 1:
-                {
-                Unit *plr = Unit::GetUnit((*m_creature),player);
-                if(plr)
-                    m_creature->SetOrientation(m_creature->GetAngle(plr));
-                m_creature->HandleEmoteCommand(EMOTE_STATE_USESTANDING);    //eat
-                WorldPacket data;
-                m_creature->BuildHeartBeatMsg(&data);
-                m_creature->SendMessageToSet(&data,true);
-                wait = 3000;
-                STATE = 2;
-                break;
-                }
-            case 4:
-                m_creature->setDeathState(JUST_DIED);
-                m_creature->Respawn();
-                break;
-            }
-        }
-    }
-
-    void UpdateAI(const uint32 diff)
-    {
-        if (!STATE || STATE == 4)
-            return;
-        if(wait < diff)
-        {
-            switch(STATE)
-            {
-            case 2:
-                STATE = 3; wait = 7000;
-                m_creature->UpdateEntry(23622,HORDE);
-                m_creature->HandleEmoteCommand(EMOTE_ONESHOT_DANCE);
-                break;
-            case 3:
-                STATE = 4;  //go home
-                Player *plr = Unit::GetPlayer(player);
-                if(plr && plr->GetQuestStatus(11129) == QUEST_STATUS_INCOMPLETE)
-                    plr->CompleteQuest(11129);
-                float x, y, z, z2, angle;
-                angle = m_creature->GetAngle(-2146, -430);
-                m_creature->GetPosition(x,y,z);
-                x = x + 40*cos(angle);
-                y = y + 40*sin(angle);
-                z2 = m_creature->GetBaseMap()->GetHeight(x,y,MAX_HEIGHT,false);
-                z = (z2 <= INVALID_HEIGHT) ? z : z2;
-                m_creature->GetMotionMaster()->MovePoint(0,x,y,z);
-                break;
-            }
-        }else wait -= diff;
-    }
-};
-
-CreatureAI* GetAI_npc_kyle_frenzied(Creature *_Creature)
-{
-    return new npc_kyle_frenziedAI (_Creature);
 }
 
 /*#####
@@ -232,7 +129,7 @@ struct NEO_DLL_DECL npc_plains_visionAI  : public ScriptedAI
         amountWP  = 49;
     }
 
-    void EnterCombat(Unit* who){}
+    void Aggro(Unit* who){}
 
     void MovementInform(uint32 type, uint32 id)
     {
@@ -278,11 +175,6 @@ void AddSC_mulgore()
     newscript->Name="npc_skorn_whitecloud";
     newscript->pGossipHello = &GossipHello_npc_skorn_whitecloud;
     newscript->pGossipSelect = &GossipSelect_npc_skorn_whitecloud;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name="npc_kyle_frenzied";
-    newscript->GetAI = &GetAI_npc_kyle_frenzied;
     newscript->RegisterSelf();
 
     newscript = new Script;

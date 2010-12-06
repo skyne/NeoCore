@@ -1,7 +1,9 @@
 /*
  * Copyright (C) 2005-2008 MaNGOS <http://www.mangosproject.org/>
  *
- * Copyright (C) 2008 Trinity <http://www.trinitycore.org/>
+ * Copyright (C) 2008 Neo <http://www.neocore.org/>
+ *
+ * Copyright (C) 2009-2010 NeoZero <http://www.neozero.org/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,12 +27,12 @@
 #include "ObjectAccessor.h"
 #include "CreatureAI.h"
 
-TemporarySummon::TemporarySummon(uint64 summoner ) :
+TemporarySummon::TemporarySummon( uint64 summoner ) :
 Creature(), m_type(TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN), m_timer(0), m_lifetime(0), m_summoner(summoner)
 {
 }
 
-void TemporarySummon::Update(uint32 diff )
+void TemporarySummon::Update( uint32 diff )
 {
     if (m_deathState == DEAD)
     {
@@ -72,7 +74,7 @@ void TemporarySummon::Update(uint32 diff )
 
         case TEMPSUMMON_CORPSE_TIMED_DESPAWN:
         {
-            if (m_deathState == CORPSE)
+            if ( m_deathState == CORPSE)
             {
                 if (m_timer <= diff)
                 {
@@ -87,7 +89,7 @@ void TemporarySummon::Update(uint32 diff )
         case TEMPSUMMON_CORPSE_DESPAWN:
         {
             // if m_deathState is DEAD, CORPSE was skipped
-            if (m_deathState == CORPSE || m_deathState == DEAD)
+            if ( m_deathState == CORPSE || m_deathState == DEAD)
             {
                 UnSummon();
                 return;
@@ -97,7 +99,7 @@ void TemporarySummon::Update(uint32 diff )
         }
         case TEMPSUMMON_DEAD_DESPAWN:
         {
-            if (m_deathState == DEAD )
+            if ( m_deathState == DEAD )
             {
                 UnSummon();
                 return;
@@ -107,7 +109,7 @@ void TemporarySummon::Update(uint32 diff )
         case TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN:
         {
             // if m_deathState is DEAD, CORPSE was skipped
-            if (m_deathState == CORPSE || m_deathState == DEAD)
+            if ( m_deathState == CORPSE || m_deathState == DEAD)
             {
                 UnSummon();
                 return;
@@ -156,7 +158,7 @@ void TemporarySummon::Update(uint32 diff )
             break;
     }
 
-    Creature::Update(diff);
+    Creature::Update( diff );
 }
 
 void TemporarySummon::Summon(TempSummonType type, uint32 lifetime)
@@ -165,7 +167,7 @@ void TemporarySummon::Summon(TempSummonType type, uint32 lifetime)
     m_timer = lifetime;
     m_lifetime = lifetime;
 
-    MapManager::Instance().GetMap(GetMapId(), this)->Add(ToCreature());
+    MapManager::Instance().GetMap(GetMapId(), this)->Add((Creature*)this);
 
     AIM_Initialize();
 }
@@ -176,9 +178,9 @@ void TemporarySummon::UnSummon()
     AddObjectToRemoveList();
 
     Unit* sum = m_summoner ? ObjectAccessor::GetUnit(*this, m_summoner) : NULL;
-    if (sum  && sum->GetTypeId() == TYPEID_UNIT && sum->ToCreature()->IsAIEnabled)
+    if (sum  && sum->GetTypeId() == TYPEID_UNIT && ((Creature*)sum)->IsAIEnabled)
     {
-        sum->ToCreature()->AI()->SummonedCreatureDespawn(this);
+        ((Creature*)sum)->AI()->SummonedCreatureDespawn(this);
     }
 }
 

@@ -22,39 +22,10 @@ SDCategory: Areatrigger
 EndScriptData */
 
 /* ContentData
-at_legion_teleporter    4560 Teleporter TO Invasion Point: Cataclysm
 at_test                 script test only
 EndContentData */
 
 #include "precompiled.h"
-
-/*#####
-## at_legion_teleporter
-#####*/
-
-#define SPELL_TELE_A_TO   37387
-#define SPELL_TELE_H_TO   37389
-
-bool AreaTrigger_at_legion_teleporter(Player *player, AreaTriggerEntry *at)
-{
-    if (player->isAlive() && !player->isInCombat())
-    {
-        if (player->GetTeam()== ALLIANCE && player->GetQuestRewardStatus(10589))
-        {
-            player->CastSpell(player,SPELL_TELE_A_TO,false);
-            return true;
-        }
-
-        if (player->GetTeam()== HORDE && player->GetQuestRewardStatus(10604))
-        {
-            player->CastSpell(player,SPELL_TELE_H_TO,false);
-            return true;
-        }
-
-        return false;
-    }
-    return false;
-}
 
 bool ATtest(Player *player, AreaTriggerEntry *at)
 {
@@ -67,15 +38,8 @@ void AddSC_areatrigger_scripts()
     Script *newscript;
 
     newscript = new Script;
-    newscript->Name = "at_legion_teleporter";
-    newscript->pAreaTrigger = &AreaTrigger_at_legion_teleporter;
-    newscript->RegisterSelf();
-    /*
-    //Disabled to prevent "CRASH ALERT!"
-    newscript = new Script;
     newscript->Name="at_test";
     newscript->pAreaTrigger = &ATtest;
     newscript->RegisterSelf();
-    */
 }
 

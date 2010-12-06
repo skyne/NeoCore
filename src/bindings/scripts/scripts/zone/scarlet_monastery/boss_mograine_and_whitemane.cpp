@@ -68,13 +68,9 @@ struct NEO_DLL_DECL boss_scarlet_commander_mograineAI : public ScriptedAI
         Consecration3_Timer = 30000;
         BlessingOfWisdom_Timer = 45000;
         BlessingOfProtection3_Timer = 45000;
-        
-        if(pInstance)
-            pInstance->HandleGameObject(pInstance->GetData64(DATA_DOOR_WHITEMANE), false);
-
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
         DoScriptText(SAY_MO_AGGRO, m_creature);
         DoCast(m_creature,SPELL_RETRIBUTIONAURA3);
@@ -83,14 +79,6 @@ struct NEO_DLL_DECL boss_scarlet_commander_mograineAI : public ScriptedAI
     void KilledUnit(Unit *victim)
     {
         DoScriptText(SAY_MO_KILL, m_creature);
-    }
-    
-    void JustDied(Unit *who)
-    {
-        if(!pInstance)
-            return;
-            
-        pInstance->HandleGameObject(pInstance->GetData64(DATA_DOOR_WHITEMANE), true);
     }
 
     void UpdateAI(const uint32 diff)
@@ -211,7 +199,7 @@ struct NEO_DLL_DECL boss_high_inquisitor_whitemaneAI : public ScriptedAI
         MindBlast6_Timer = 6000;
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
         DoScriptText(SAY_WH_INTRO, m_creature);
     }

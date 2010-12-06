@@ -1,7 +1,9 @@
 /*
  * Copyright (C) 2005-2008 MaNGOS <http://www.mangosproject.org/>
  *
- * Copyright (C) 2008 Trinity <http://www.trinitycore.org/>
+ * Copyright (C) 2008 Neo <http://www.neocore.org/>
+ *
+ * Copyright (C) 2009-2010 NeoZero <http://www.neozero.org/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -52,14 +54,14 @@ class NEO_DLL_SPEC TargetedMovementGenerator
         void Reset(T &);
         bool Update(T &, const uint32 &);
         MovementGeneratorType GetMovementGeneratorType() { return TARGETED_MOTION_TYPE; }
-        
+
         void MovementInform(T &);
 
         Unit* GetTarget() const;
 
         bool GetDestination(float &x, float &y, float &z) const
         {
-            if (i_destinationHolder.HasArrived()) return false;
+            if(i_destinationHolder.HasArrived()) return false;
             i_destinationHolder.GetDestination(x,y,z);
             return true;
         }

@@ -26,7 +26,7 @@ npc_defias_traitor
 EndContentData */
 
 #include "precompiled.h"
-#include "escort_ai.h"
+#include "../../npc/npc_escortAI.h"
 
 #define SAY_START                   -1000101
 #define SAY_PROGRESS                -1000102
@@ -38,48 +38,77 @@ EndContentData */
 
 struct NEO_DLL_DECL npc_defias_traitorAI : public npc_escortAI
 {
-    npc_defias_traitorAI(Creature *c) : npc_escortAI(c) { Reset(); }
+    npc_defias_traitorAI(Creature *c) : npc_escortAI(c) {}
+
+    bool IsWalking;
 
     void WaypointReached(uint32 i)
     {
-        Player* pPlayer = GetPlayerForEscort();
+        Player* player = Unit::GetPlayer(PlayerGUID);
 
-        if (!pPlayer)
+        if (!player)
             return;
+
+        if (IsWalking && !m_creature->HasUnitMovementFlag(MOVEMENTFLAG_WALK_MODE))
+            m_creature->AddUnitMovementFlag(MOVEMENTFLAG_WALK_MODE);
 
         switch (i)
         {
             case 35:
-                SetRun(false);
+                IsWalking = true;
                 break;
             case 36:
-                DoScriptText(SAY_PROGRESS, m_creature, pPlayer);
+                DoScriptText(SAY_PROGRESS, m_creature, player);
                 break;
             case 44:
-                DoScriptText(SAY_END, m_creature, pPlayer);
+                DoScriptText(SAY_END, m_creature, player);
                 {
-                    if (pPlayer)
-                        pPlayer->GroupEventHappens(QUEST_DEFIAS_BROTHERHOOD,m_creature);
+                    if (player && player->GetTypeId() == TYPEID_PLAYER)
+                        ((Player*)player)->GroupEventHappens(QUEST_DEFIAS_BROTHERHOOD,m_creature);
                 }
                 break;
         }
     }
-    void EnterCombat(Unit* who)
+    void Aggro(Unit* who)
     {
-        DoScriptText(RAND(SAY_AGGRO_1,SAY_AGGRO_2), m_creature, who);
+        switch(rand()%2)
+        {
+            case 0: DoScriptText(SAY_AGGRO_1, m_creature, who); break;
+            case 1: DoScriptText(SAY_AGGRO_2, m_creature, who); break;
+        }
     }
 
-    void Reset() {}
+    void Reset()
+    {
+        if (IsWalking && !m_creature->HasUnitMovementFlag(MOVEMENTFLAG_WALK_MODE))
+        {
+            m_creature->AddUnitMovementFlag(MOVEMENTFLAG_WALK_MODE);
+            return;
+        }
+        IsWalking = false;
+    }
+
+    void JustDied(Unit* killer)
+    {
+        if (PlayerGUID)
+        {
+            if (Player* player = Unit::GetPlayer(PlayerGUID))
+                player->FailQuest(QUEST_DEFIAS_BROTHERHOOD);
+        }
+    }
+
+    void UpdateAI(const uint32 diff)
+    {
+        npc_escortAI::UpdateAI(diff);
+    }
 };
 
-bool QuestAccept_npc_defias_traitor(Player* pPlayer, Creature* pCreature, Quest const* quest)
+bool QuestAccept_npc_defias_traitor(Player* player, Creature* creature, Quest const* quest)
 {
     if (quest->GetQuestId() == QUEST_DEFIAS_BROTHERHOOD)
     {
-        if (npc_escortAI* pEscortAI = CAST_AI(npc_defias_traitorAI, pCreature->AI()))
-            pEscortAI->Start(true, true, pPlayer->GetGUID());
-
-        DoScriptText(SAY_START, pCreature, pPlayer);
+        ((npc_escortAI*)(creature->AI()))->Start(true, true, true, player->GetGUID());
+        DoScriptText(SAY_START, creature, player);
     }
 
     return true;

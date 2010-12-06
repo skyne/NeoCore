@@ -17,7 +17,7 @@
     /* ScriptData
     SDName: Boss_Four_Horsemen
     SD%Complete: 75
-    SDComment: Lady Blaumeux, Thane Korthazz, Sir Zeliek, Baron Rivendare (this script maybe is not correct for TC1)
+    SDComment: Lady Blaumeux, Thane Korthazz, Sir Zeliek
     SDCategory: Naxxramas
     EndScriptData */
 
@@ -62,7 +62,7 @@
             ShieldWall2 = true;
         }
 
-        void EnterCombat(Unit *who)
+        void Aggro(Unit *who)
         {
             DoScriptText(SAY_BLAU_AGGRO, m_creature);
         }
@@ -123,70 +123,6 @@
        return new boss_lady_blaumeuxAI (_Creature);
    }
 
-  //baron rivendare
-   #define SAY_RIVE_AGGRO1             -1533065
-   #define SAY_RIVE_AGGRO2             -1533066
-   #define SAY_RIVE_AGGRO3             -1533067
-   #define SAY_RIVE_SLAY1              -1533068
-   #define SAY_RIVE_SLAY2              -1533069
-   #define SAY_RIVE_SPECIAL            -1533070
-   #define SAY_RIVE_TAUNT1             -1533071
-   #define SAY_RIVE_TAUNT2             -1533072
-   #define SAY_RIVE_TAUNT3             -1533073
-   #define SAY_RIVE_DEATH              -1533074
-
-   #define SPELL_MARK_OF_RIVENDARE     28834
-   #define SPELL_UNHOLY_SHADOW         28882
-   #define H_SPELL_UNHOLY_SHADOW       57369
-
-   #define C_SPIRIT_OF_RIVENDARE       0                       //creature entry not known yet
-
-   struct NEO_DLL_DECL boss_rivendare_naxxAI : public ScriptedAI
-   {
-       boss_rivendare_naxxAI(Creature *c) : ScriptedAI(c) {}
-
-       void Reset()
-       {
-       }
-
-       void EnterCombat(Unit *who)
-       {
-           switch(rand()%3)
-           {
-               case 0: DoScriptText(SAY_RIVE_AGGRO1, m_creature); break;
-               case 1: DoScriptText(SAY_RIVE_AGGRO2, m_creature); break;
-               case 2: DoScriptText(SAY_RIVE_AGGRO3, m_creature); break;
-           }
-       }
-
-       void KilledUnit(Unit* Victim)
-       {
-           switch(rand()%2)
-           {
-               case 0: DoScriptText(SAY_RIVE_SLAY1, m_creature); break;
-               case 1: DoScriptText(SAY_RIVE_SLAY2, m_creature); break;
-           }
-       }
-
-       void JustDied(Unit* Killer)
-       {
-           DoScriptText(SAY_RIVE_DEATH, m_creature);
-       }
-
-       void UpdateAI(const uint32 diff)
-       {
-           if (!UpdateVictim())
-               return;
-
-           DoMeleeAttackIfReady();
-       }
-   };
-
-   CreatureAI* GetAI_boss_rivendare_naxx(Creature *_Creature)
-   {
-       return new boss_rivendare_naxxAI (_Creature);
-   }
-
    //thane korthazz
    #define SAY_KORT_AGGRO              -1533051
    #define SAY_KORT_TAUNT1             -1533052
@@ -218,7 +154,7 @@
            ShieldWall2 = true;
        }
 
-       void EnterCombat(Unit *who)
+       void Aggro(Unit *who)
        {
            DoScriptText(SAY_KORT_AGGRO, m_creature);
        }
@@ -313,7 +249,7 @@
            ShieldWall2 = true;
        }
 
-       void EnterCombat(Unit *who)
+       void Aggro(Unit *who)
        {
            DoScriptText(SAY_ZELI_AGGRO, m_creature);
        }
@@ -384,14 +320,6 @@
        newscript->GetAI = &GetAI_boss_lady_blaumeux;
        newscript->RegisterSelf();
 
-    /*
-    //Disabled to prevent "CRASH ALERT!"
-    //this boss is wrong here, only for wotlk is need it.
-       newscript = new Script;
-       newscript->Name = "boss_rivendare_naxx";
-       newscript->GetAI = &GetAI_boss_rivendare_naxx;
-       newscript->RegisterSelf();
-    */
        newscript = new Script;
        newscript->Name = "boss_thane_korthazz";
        newscript->GetAI = &GetAI_boss_thane_korthazz;

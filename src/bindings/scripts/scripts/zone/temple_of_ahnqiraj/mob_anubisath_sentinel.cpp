@@ -259,7 +259,7 @@ struct NEO_DLL_DECL aqsentinelAI : public ScriptedAI
         }
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
         if (gatherOthersWhenAggro)
             GetOtherSentinels(who);

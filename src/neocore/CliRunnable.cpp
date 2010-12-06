@@ -1,7 +1,9 @@
 /*
  * Copyright (C) 2005-2008 MaNGOS <http://www.mangosproject.org/>
  *
- * Copyright (C) 2008 Trinity <http://www.trinitycore.org/>
+ * Copyright (C) 2008 Neo <http://www.neocore.org/>
+ *
+ * Copyright (C) 2009-2010 NeoZero <http://www.neozero.org/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,72 +20,24 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-/// \addtogroup Neo
+/// \addtogroup Neod
 /// @{
 /// \file
 
 #include "Common.h"
-#include "ObjectMgr.h"
-#include "World.h"
-#include "WorldSession.h"
-#include "Config/ConfigEnv.h"
-
-#include "AccountMgr.h"
-#include "Chat.h"
-#include "CliRunnable.h"
 #include "Language.h"
 #include "Log.h"
+#include "World.h"
+#include "ScriptCalls.h"
+#include "ObjectMgr.h"
+#include "WorldSession.h"
+#include "Config/ConfigEnv.h"
+#include "Util.h"
+#include "AccountMgr.h"
+#include "CliRunnable.h"
 #include "MapManager.h"
 #include "Player.h"
-#include "Util.h"
-
-#if PLATFORM != WINDOWS
-#include <readline/readline.h>
-#include <readline/history.h>
-
-char * command_finder(const char* text, int state)
-{
-    static int idx,len;
-    const char* ret;
-    ChatCommand *cmd = ChatHandler::getCommandTable();
-
-    if(!state)
-    {
-        idx = 0;
-        len = strlen(text);
-    }
-
-    while(ret = cmd[idx].Name)
-    {
-        if(!cmd[idx].AllowConsole)
-        {
-            idx++;
-            continue;
-        }
-
-        idx++;
-        //printf("Checking %s \n", cmd[idx].Name);
-        if (strncmp(ret, text, len) == 0)
-            return strdup(ret);
-        if(cmd[idx].Name == NULL)
-            break;
-    }
-
-    return ((char*)NULL);
-}
-
-char ** cli_completion(const char * text, int start, int end)
-{
-    char ** matches;
-    matches = (char**)NULL;
-
-    if(start == 0)
-        matches = rl_completion_matches((char*)text,&command_finder);
-    else
-        rl_bind_key('\t',rl_abort);
-    return (matches);
-}
-#endif
+#include "Chat.h"
 
 void utf8print(const char* str)
 {
@@ -212,7 +166,7 @@ bool ChatHandler::HandleCharacterDeleteCommand(const char* args)
 }
 
 /// Exit the realm
-bool ChatHandler::HandleServerExitCommand(const char* /*args*/)
+bool ChatHandler::HandleServerExitCommand(const char* args)
 {
     SendSysMessage(LANG_COMMAND_EXIT);
     World::StopNow(SHUTDOWN_EXIT_CODE);
@@ -220,7 +174,7 @@ bool ChatHandler::HandleServerExitCommand(const char* /*args*/)
 }
 
 /// Display info on users currently in the realm
-bool ChatHandler::HandleAccountOnlineListCommand(const char* /*args*/)
+bool ChatHandler::HandleAccountOnlineListCommand(const char* args)
 {
     ///- Get the list of accounts ID logged to the realm
     QueryResult_AutoPtr resultDB = CharacterDatabase.Query("SELECT name,account FROM characters WHERE online > 0");
@@ -241,14 +195,15 @@ bool ChatHandler::HandleAccountOnlineListCommand(const char* /*args*/)
 
         ///- Get the username, last IP and GM level of each account
         // No SQL injection. account is uint32.
-        //                                                      0         1        2        3
-        QueryResult_AutoPtr resultLogin = LoginDatabase.PQuery("SELECT username, last_ip, gmlevel, expansion FROM account WHERE id = '%u'",account);
+        //                                                      0         1        2
+        QueryResult_AutoPtr resultLogin = LoginDatabase.PQuery("SELECT username, last_ip, gmlevel FROM account WHERE id = '%u'",account);
 
         if(resultLogin)
         {
             Field *fieldsLogin = resultLogin->Fetch();
-            PSendSysMessage("|%15s| %20s | %15s |%4d|%5d|",
-                fieldsLogin[0].GetString(),name.c_str(),fieldsLogin[1].GetString(),fieldsLogin[2].GetUInt32(),fieldsLogin[3].GetUInt32());
+            PSendSysMessage("|%15s| %20s | %15s |%4d|",
+                fieldsLogin[0].GetString(),name.c_str(),fieldsLogin[1].GetString(),fieldsLogin[2].GetUInt32());
+
         }
         else
             PSendSysMessage(LANG_ACCOUNT_LIST_ERROR,name.c_str());
@@ -271,7 +226,7 @@ bool ChatHandler::HandleAccountCreateCommand(const char* args)
     if(!szAcc || !szPassword)
         return false;
 
-    // normalized in accmgr.CreateAccount
+    // normilized in accmgr.CreateAccount
     std::string account_name = szAcc;
     std::string password = szPassword;
 
@@ -335,6 +290,7 @@ bool ChatHandler::HandleServerSetDiffTimeCommand(const char *args)
     return true;
 }
 
+
 /// @}
 
 #ifdef linux
@@ -359,71 +315,61 @@ void CliRunnable::run()
     WorldDatabase.ThreadStart();                                // let thread do safe mySQL requests
 
     char commandbuf[256];
-    bool canflush = true;
+
     ///- Display the list of available CLI functions then beep
-    sLog.outString("");
-    #if PLATFORM != WINDOWS
-    rl_attempted_completion_function = cli_completion;
-    #endif
+    sLog.outString();
+
     if(sConfig.GetBoolDefault("BeepAtStart", true))
         printf("\a");                                       // \a = Alert
 
     // print this here the first time
     // later it will be printed after command queue updates
-    printf("Neo>");
+    printf("TC>");
 
     ///- As long as the World is running (no World::m_stopEvent), get the command line and handle it
     while (!World::IsStopped())
     {
         fflush(stdout);
-
-        char *command_str ;             // = fgets(commandbuf,sizeof(commandbuf),stdin);
-
-        #if PLATFORM == WINDOWS
-        command_str = fgets(commandbuf,sizeof(commandbuf),stdin);
-        #else
-        command_str = readline("Neo>");
-        rl_bind_key('\t',rl_complete);
+        #ifdef linux
+        while (!kb_hit_return() && !World::IsStopped())
+            // With this, we limit CLI to 10commands/second
+            usleep(100);
+        if (World::IsStopped())
+            break;
         #endif
+        char *command_str = fgets(commandbuf,sizeof(commandbuf),stdin);
         if (command_str != NULL)
         {
-            for (int x=0; command_str[x]; x++)
+            for(int x=0;command_str[x];x++)
                 if(command_str[x]=='\r'||command_str[x]=='\n')
-                {
-                    command_str[x]=0;
-                    break;
-                }
+            {
+                command_str[x]=0;
+                break;
+            }
+
 
             if(!*command_str)
             {
-                #if PLATFORM == WINDOWS
-                printf("Neo>");
-                #endif
+                printf("TC>");
                 continue;
             }
 
             std::string command;
             if(!consoleToUtf8(command_str,command))         // convert from console encoding to utf8
             {
-                #if PLATFORM == WINDOWS
-                printf("Neo>");
-                #endif
+                printf("TC>");
                 continue;
             }
-            fflush(stdout);
-            sWorld.QueueCliCommand(&utf8print,command.c_str());
-            #if PLATFORM != WINDOWS
-            add_history(command.c_str());
-            #endif
 
+            sWorld.QueueCliCommand(&utf8print,command.c_str());
         }
         else if (feof(stdin))
         {
             World::StopNow(SHUTDOWN_EXIT_CODE);
         }
-
     }
 
     ///- End the database thread
     WorldDatabase.ThreadEnd();                                  // free mySQL thread resources
 }
+

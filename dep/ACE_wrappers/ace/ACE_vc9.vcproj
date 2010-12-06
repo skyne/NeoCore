@@ -56,13 +56,10 @@
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				RuntimeTypeInfo="true"
-				UsePrecompiledHeader="2"
-				PrecompiledHeaderThrough="WinAcePCH.h"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
 				DisableSpecificWarnings="4355"
-				ForcedIncludeFiles="WinAcePCH.h"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -139,12 +136,9 @@
 				PreprocessorDefinitions="ACE_BUILD_DLL;NDEBUG;WIN32;_WINDOWS;_CRT_NONSTDC_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE"
 				RuntimeLibrary="2"
 				RuntimeTypeInfo="true"
-				UsePrecompiledHeader="2"
-				PrecompiledHeaderThrough="WinAcePCH.h"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DisableSpecificWarnings="4355"
-				ForcedIncludeFiles="WinAcePCH.h"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -306,12 +300,9 @@
 				PreprocessorDefinitions="ACE_BUILD_DLL;NDEBUG;WIN32;_WINDOWS;_CRT_NONSTDC_NO_WARNINGS;_AMD64_;_WIN64;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE"
 				RuntimeLibrary="2"
 				RuntimeTypeInfo="true"
-				UsePrecompiledHeader="2"
-				PrecompiledHeaderThrough="WinAcePCH.h"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DisableSpecificWarnings="4355"
-				ForcedIncludeFiles="WinAcePCH.h"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -423,21 +414,6 @@
 			<File
 				RelativePath="Atomic_Op_Sparc.c">
 			</File>
-				<FileConfiguration
-					Name="Debug"
-				>
-					<Tool
-						Name="VCCLCompilerTool"
-						CompileAs="2"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release"
-				>
-				<Tool
-					Name="VCCLCompilerTool"
-					CompileAs="2"/>
-				</FileConfiguration>
 			<File
 				RelativePath="Auto_Event.cpp">
 			</File>
@@ -1017,21 +993,6 @@
 			<File
 				RelativePath="Rtems_init.c">
 			</File>
-			<FileConfiguration
-					Name="Debug"
-				>
-					<Tool
-						Name="VCCLCompilerTool"
-						CompileAs="2"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release"
-				>
-				<Tool
-					Name="VCCLCompilerTool"
-					CompileAs="2"/>
-				</FileConfiguration>
 			<File
 				RelativePath="RW_Mutex.cpp">
 			</File>
@@ -6671,35 +6632,7 @@
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;cnt;rtf;gif;jpg;jpeg;jpe">
 			<File
 				RelativePath="ace.rc">
-				</File>
-		</Filter>
-		<Filter
- 				Name="PrecompiledHeaders"
-				>
-		<File
-				RelativePath="..\..\PrecompiledHeaders\WinAcePCH.cpp"
-		>
-		<FileConfiguration
-				Name="Debug"
-		>
-		<Tool
-				Name="VCCLCompilerTool"
-				UsePrecompiledHeader="1"
-		/>
-		</FileConfiguration>
-		<FileConfiguration
-				Name="Release"
-		>
-		<Tool
-				Name="VCCLCompilerTool"
-				UsePrecompiledHeader="1"
-		/>
-		</FileConfiguration>
-		</File>
-		<File
-				RelativePath="..\..\PrecompiledHeaders\WinAcePCH.h"
-		>
-		</File>
+			</File>
 		</Filter>
 	</Files>
 	<Globals>

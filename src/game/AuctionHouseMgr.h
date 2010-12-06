@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
- * Copyright (C) 2008-2009 Trinity <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2009 Neo <http://www.neocore.org/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -91,13 +91,13 @@ class AuctionHouseObject
 
     void AddAuction(AuctionEntry *ah)
     {
-        ASSERT(ah);
+        ASSERT( ah );
         AuctionsMap[ah->Id] = ah;
     }
 
     AuctionEntry* GetAuction(uint32 id) const
     {
-        AuctionEntryMap::const_iterator itr = AuctionsMap.find(id);
+        AuctionEntryMap::const_iterator itr = AuctionsMap.find( id );
         return itr != AuctionsMap.end() ? itr->second : NULL;
     }
 
@@ -127,7 +127,7 @@ class AuctionHouseMgr
 
     typedef UNORDERED_MAP<uint32, Item*> ItemMap;
 
-    AuctionHouseObject* GetAuctionsMap(uint32 factionTemplateId);
+    AuctionHouseObject* GetAuctionsMap( uint32 factionTemplateId );
 
     Item* GetAItem(uint32 id)
     {
@@ -140,10 +140,10 @@ class AuctionHouseMgr
     }
 
     //auction messages
-    void SendAuctionWonMail(AuctionEntry * auction);
-    void SendAuctionSalePendingMail(AuctionEntry * auction);
-    void SendAuctionSuccessfulMail(AuctionEntry * auction);
-    void SendAuctionExpiredMail(AuctionEntry * auction);
+    void SendAuctionWonMail( AuctionEntry * auction );
+    void SendAuctionSalePendingMail( AuctionEntry * auction );
+    void SendAuctionSuccessfulMail( AuctionEntry * auction );
+    void SendAuctionExpiredMail( AuctionEntry * auction );
     static uint32 GetAuctionDeposit(AuctionHouseEntry const* entry, uint32 time, Item *pItem);
     static AuctionHouseEntry const* GetAuctionHouseEntry(uint32 factionTemplateId);
 

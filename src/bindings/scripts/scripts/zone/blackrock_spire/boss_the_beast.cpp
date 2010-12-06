@@ -42,7 +42,7 @@ struct NEO_DLL_DECL boss_thebeastAI : public ScriptedAI
         TerrifyingRoar_Timer = 23000;
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
     }
 

@@ -51,7 +51,7 @@ struct NEO_DLL_DECL boss_moira_bronzebeardAI : public ScriptedAI
         Smite_Timer = 8000;
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
     }
 

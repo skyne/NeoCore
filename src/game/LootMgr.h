@@ -1,7 +1,9 @@
 /*
  * Copyright (C) 2005-2008 MaNGOS <http://www.mangosproject.org/>
  *
- * Copyright (C) 2008 Trinity <http://www.trinitycore.org/>
+ * Copyright (C) 2008 Neo <http://www.neocore.org/>
+ *
+ * Copyright (C) 2009-2010 NeoZero <http://www.neozero.org/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -85,7 +87,6 @@ struct LootStoreItem
 struct LootItem
 {
     uint32  itemid;
-    uint32  randomSuffix;
     int32   randomPropertyId;
     uint16  conditionId       :16;                          // allow compiler pack structure
     uint8   count             : 8;
@@ -270,9 +271,7 @@ struct Loot
     void AddItem(LootStoreItem const & item);
 
     LootItem* LootItemInSlot(uint32 lootslot, Player* player, QuestItem** qitem = NULL, QuestItem** ffaitem = NULL, QuestItem** conditem = NULL);
-	uint32 GetMaxSlotInLootFor(Player* player) const;
-	
-	private:
+    private:
         std::set<uint64> PlayersLooting;
         QuestItemMap PlayerQuestItems;
         QuestItemMap PlayerFFAItems;
@@ -299,22 +298,19 @@ extern LootStore LootTemplates_Creature;
 extern LootStore LootTemplates_Fishing;
 extern LootStore LootTemplates_Gameobject;
 extern LootStore LootTemplates_Item;
-extern LootStore LootTemplates_Mail;
 extern LootStore LootTemplates_Pickpocketing;
 extern LootStore LootTemplates_Skinning;
 extern LootStore LootTemplates_Disenchant;
-extern LootStore LootTemplates_Prospecting;
+extern LootStore LootTemplates_QuestMail;
 
 void LoadLootTemplates_Creature();
 void LoadLootTemplates_Fishing();
 void LoadLootTemplates_Gameobject();
 void LoadLootTemplates_Item();
-void LoadLootTemplates_Mail();
 void LoadLootTemplates_Pickpocketing();
 void LoadLootTemplates_Skinning();
 void LoadLootTemplates_Disenchant();
-void LoadLootTemplates_Prospecting();
-
+void LoadLootTemplates_QuestMail();
 void LoadLootTemplates_Reference();
 
 inline void LoadLootTables()
@@ -323,11 +319,10 @@ inline void LoadLootTables()
     LoadLootTemplates_Fishing();
     LoadLootTemplates_Gameobject();
     LoadLootTemplates_Item();
-	LoadLootTemplates_Mail();
     LoadLootTemplates_Pickpocketing();
     LoadLootTemplates_Skinning();
     LoadLootTemplates_Disenchant();
-    LoadLootTemplates_Prospecting();    
+    LoadLootTemplates_QuestMail();
     LoadLootTemplates_Reference();
 }
 

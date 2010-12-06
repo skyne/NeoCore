@@ -16,8 +16,8 @@
 
 /* ScriptData
 SDName: Instance_Shadowfang_Keep
-SD%Complete: 100
-SDComment: Complete, Doors checked
+SD%Complete: 75
+SDComment: TODO: check what other parts would require additional code (ex: make sure door are in open state if boss dead)
 SDCategory: Shadowfang Keep
 EndScriptData */
 
@@ -30,7 +30,7 @@ struct NEO_DLL_DECL instance_shadowfang_keep : public ScriptedInstance
 {
     instance_shadowfang_keep(Map *map) : ScriptedInstance(map) {Initialize();};
 
-    uint32 Encounters[ENCOUNTERS];
+    uint32 Encounter[ENCOUNTERS];
     std::string str_data;
 
     uint64 DoorCourtyardGUID;
@@ -44,21 +44,47 @@ struct NEO_DLL_DECL instance_shadowfang_keep : public ScriptedInstance
         DoorArugalGUID = 0;
 
          for(uint8 i=0; i < ENCOUNTERS; ++i)
-             Encounters[i] = NOT_STARTED;
+             Encounter[i] = NOT_STARTED;
+    }
+
+    Player* GetPlayerInMap()
+    {
+        Map::PlayerList const& players = instance->GetPlayers();
+
+        if (!players.isEmpty())
+        {
+            for(Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+            {
+                if (Player* plr = itr->getSource())
+                    return plr;
+            }
+        }
+        debug_log("NeoScript: Instance Shadowfang Keep: GetPlayerInMap, but PlayerList is empty!");
+        return NULL;
     }
 
     void OnObjectCreate(GameObject *go)
     {
         switch(go->GetEntry())
         {
-        case 18895: DoorCourtyardGUID = go->GetGUID();
-            if(Encounters[0] == DONE) HandleGameObject(NULL,true,go); break;
-        case 18972: DoorSorcererGUID = go->GetGUID(); 
-            if(Encounters[2] == DONE) HandleGameObject(NULL,true,go); break;
-        case 18971: DoorArugalGUID = go->GetGUID(); 
-            if(Encounters[3] == DONE) HandleGameObject(NULL,true,go); break;
-
+        case 18895: DoorCourtyardGUID = go->GetGUID(); break;
+        case 18972: DoorSorcererGUID = go->GetGUID(); break;
+        case 18971: DoorArugalGUID = go->GetGUID(); break;
         }
+    }
+
+    void HandleGameObject(uint64 guid, uint32 state)
+    {
+        Player *player = GetPlayerInMap();
+
+        if (!player || !guid)
+        {
+            debug_log("NeoScript: Instance Shadowfang Keep: HandleGameObject fail");
+            return;
+        }
+
+        if (GameObject *go = GameObject::GetGameObject(*player,guid))
+            go->SetGoState(state);
     }
 
     void SetData(uint32 type, uint32 data)
@@ -67,21 +93,21 @@ struct NEO_DLL_DECL instance_shadowfang_keep : public ScriptedInstance
         {
             case TYPE_FREE_NPC:
                 if(data == DONE)
-                    HandleGameObject(DoorCourtyardGUID,true);
-                Encounters[0] = data;
+                    HandleGameObject(DoorCourtyardGUID,0);
+                Encounter[0] = data;
                 break;
             case TYPE_RETHILGORE:
-                Encounters[1] = data;
+                Encounter[1] = data;
                 break;
             case TYPE_FENRUS:
                 if(data == DONE)
-                    HandleGameObject(DoorSorcererGUID,true);
-                Encounters[2] = data;
+                    HandleGameObject(DoorSorcererGUID,0);
+                Encounter[2] = data;
                 break;
             case TYPE_NANDOS:
                 if(data == DONE)
-                    HandleGameObject(DoorArugalGUID,true);
-                Encounters[3] = data;
+                    HandleGameObject(DoorArugalGUID,0);
+                Encounter[3] = data;
                 break;
         }
 
@@ -90,7 +116,7 @@ struct NEO_DLL_DECL instance_shadowfang_keep : public ScriptedInstance
             OUT_SAVE_INST_DATA;
 
             std::ostringstream saveStream;
-            saveStream << Encounters[0] << " " << Encounters[1] << " " << Encounters[2] << " " << Encounters[3];
+            saveStream << Encounter[0] << " " << Encounter[1] << " " << Encounter[2] << " " << Encounter[3];
 
             str_data = saveStream.str();
 
@@ -104,13 +130,13 @@ struct NEO_DLL_DECL instance_shadowfang_keep : public ScriptedInstance
         switch(type)
         {
             case TYPE_FREE_NPC:
-                return Encounters[0];
+                return Encounter[0];
             case TYPE_RETHILGORE:
-                return Encounters[1];
+                return Encounter[1];
             case TYPE_FENRUS:
-                return Encounters[2];
+                return Encounter[2];
             case TYPE_NANDOS:
-                return Encounters[3];
+                return Encounter[3];
         }
         return 0;
     }
@@ -131,14 +157,11 @@ struct NEO_DLL_DECL instance_shadowfang_keep : public ScriptedInstance
         OUT_LOAD_INST_DATA(in);
 
         std::istringstream loadStream(in);
-        loadStream >> Encounters[0] >> Encounters[1] >> Encounters[2] >> Encounters[3];
+        loadStream >> Encounter[0] >> Encounter[1] >> Encounter[2] >> Encounter[3];
 
         for(uint8 i = 0; i < ENCOUNTERS; ++i)
-        {
-            if (Encounters[i] == IN_PROGRESS)
-                Encounters[i] = NOT_STARTED;
-
-        }
+            if (Encounter[i] == IN_PROGRESS)
+                Encounter[i] = NOT_STARTED;
 
         OUT_LOAD_INST_DATA_COMPLETE;
     }

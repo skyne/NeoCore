@@ -36,7 +36,7 @@ npc_rocknot
 EndContentData */
 
 #include "precompiled.h"
-#include "escort_ai.h"
+#include "../../npc/npc_escortAI.h"
 #include "def_blackrock_depths.h"
 
 #define C_GRIMSTONE         10096
@@ -137,14 +137,14 @@ struct NEO_DLL_DECL npc_grimstoneAI : public npc_escortAI
         CanWalk = false;
     }
 
-    void EnterCombat(Unit *who) { }
+    void Aggro(Unit *who) { }
 
     void DoGate(uint32 id, uint32 state)
     {
         if (GameObject *go = GameObject::GetGameObject(*m_creature,pInstance->GetData64(id)))
             go->SetGoState(state);
 
-        debug_log("TSCR: npc_grimstone, arena gate update state.");
+        debug_log("NeoScript: npc_grimstone, arena gate update state.");
     }
 
     //TODO: move them to center
@@ -197,7 +197,7 @@ struct NEO_DLL_DECL npc_grimstoneAI : public npc_escortAI
             if (pInstance)
             {
                 pInstance->SetData(TYPE_RING_OF_LAW,DONE);
-                debug_log("TSCR: npc_grimstone: event reached end and set complete.");
+                debug_log("NeoScript: npc_grimstone: event reached end and set complete.");
             }
             break;
         }
@@ -353,7 +353,7 @@ struct NEO_DLL_DECL mob_phalanxAI : public ScriptedAI
         MightyBlow_Timer = 15000;
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
     }
 
@@ -558,7 +558,7 @@ struct NEO_DLL_DECL npc_dughal_stormwingAI : public npc_escortAI
         }
     }
 
-    void EnterCombat(Unit* who) { }
+    void Aggro(Unit* who) { }
     void Reset() {}
 
     void JustDied(Unit* killer)
@@ -691,7 +691,7 @@ struct NEO_DLL_DECL npc_marshal_windsorAI : public npc_escortAI
         }
     }
 
-    void EnterCombat(Unit* who)
+    void Aggro(Unit* who)
         {
         switch(rand()%3)
             {
@@ -887,7 +887,7 @@ struct NEO_DLL_DECL npc_marshal_reginald_windsorAI : public npc_escortAI
         }
     }
 
-    void EnterCombat(Unit* who)
+    void Aggro(Unit* who)
         {
         switch(rand()%3)
             {
@@ -1003,7 +1003,7 @@ struct NEO_DLL_DECL npc_tobias_seecherAI : public npc_escortAI
 {
     npc_tobias_seecherAI(Creature *c) :npc_escortAI(c) {}
 
-    void EnterCombat(Unit* who) { }
+    void Aggro(Unit* who) { }
     void Reset() {}
 
     void JustDied(Unit* killer)
@@ -1134,14 +1134,14 @@ struct NEO_DLL_DECL npc_rocknotAI : public npc_escortAI
 
     void Reset()
     {
-        if (HasEscortState(STATE_ESCORT_ESCORTING))
+        if (IsBeingEscorted)
             return;
 
         BreakKeg_Timer = 0;
         BreakDoor_Timer = 0;
     }
 
-    void EnterCombat(Unit *who) { }
+    void Aggro(Unit *who) { }
 
     void DoGo(uint32 id, uint32 state)
     {
@@ -1245,8 +1245,7 @@ bool ChooseReward_npc_rocknot(Player *player, Creature *_Creature, const Quest *
         {
             DoScriptText(SAY_GOT_BEER, _Creature);
             _Creature->CastSpell(_Creature,SPELL_DRUNKEN_RAGE,false);
-            if (npc_escortAI* pEscortAI = CAST_AI(npc_rocknotAI, _Creature->AI()))
-                pEscortAI->Start(false, false);
+            ((npc_escortAI*)(_Creature->AI()))->Start(false, false, false);
         }
     }
 

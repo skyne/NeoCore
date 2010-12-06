@@ -26,8 +26,11 @@
 #include "Map.h"
 #include "ObjectMgr.h"
 
-int num_sc_scripts;
+//uint8 loglevel = 0;
+int nrscripts;
 Script *m_scripts[MAX_SCRIPTS];
+InstanceDataScript* m_instance_scripts[MAX_INSTANCE_SCRIPTS];
+int num_inst_scripts;
 
 // -- Scripts to be added --
 extern void AddSC_default();
@@ -36,18 +39,26 @@ extern void AddSC_default();
 TRINITY_DLL_EXPORT
 void ScriptsFree()
 {                                                           // Free resources before library unload
-    for(int i = 0; i < num_sc_scripts; i++)
+    for(int i=0;i<nrscripts;i++)
         delete m_scripts[i];
 
-    num_sc_scripts = 0;
+    for(int i=0;i<num_inst_scripts;i++)
+        delete m_instance_scripts[i];
+
+    nrscripts = 0;
+    num_inst_scripts = 0;
 }
 
 TRINITY_DLL_EXPORT
-void ScriptsInit(char const* cfg_file = "trinitycore.conf")
+void ScriptsInit()
 {
-    num_sc_scripts = 0;
+    nrscripts = 0;
+    num_inst_scripts = 0;
     for(int i=0;i<MAX_SCRIPTS;i++)
-        m_scripts[i]=NULL;
+    {
+         m_scripts[i]=NULL;
+         m_instance_scripts[i]=NULL;
+    }
 
     // -- Inicialize the Scripts to be Added --
     AddSC_default();
@@ -67,19 +78,6 @@ Script* GetScriptByName(std::string Name)
     return NULL;
 }
 
-//*********************************
-//*** Functions used internally ***
-
-void Script::RegisterSelf()
-{
-    int id = GetScriptId(Name.c_str());
-    if(id)
-    {
-        m_scripts[id] = this;
-        ++num_sc_scripts;
-    }
-}
-
 //********************************
 //*** Functions to be Exported ***
 
@@ -88,7 +86,6 @@ char const* ScriptsVersion()
 {
     return "Default Trinity scripting library";
 }
-
 TRINITY_DLL_EXPORT
 bool GossipHello ( Player * player, Creature *_Creature )
 {
@@ -121,34 +118,6 @@ bool GossipSelectWithCode( Player *player, Creature *_Creature, uint32 sender, u
 
     player->PlayerTalkClass->ClearMenus();
     return tmpscript->pGossipSelectWithCode(player,_Creature,sender,action,sCode);
-}
-
-TRINITY_DLL_EXPORT
-bool GOSelect( Player *player, GameObject *_GO, uint32 sender, uint32 action )
-{
-    if(!_GO)
-    return false;
-    debug_log("TSCR: Gossip selection, sender: %d, action: %d",sender, action);
-
-    Script *tmpscript = m_scripts[_GO->GetGOInfo()->ScriptId];
-    if(!tmpscript || !tmpscript->pGOSelect) return false;
-
-    player->PlayerTalkClass->ClearMenus();
-    return tmpscript->pGOSelect(player,_GO,sender,action);
-}
-
-TRINITY_DLL_EXPORT
-bool GOSelectWithCode( Player *player, GameObject *_GO, uint32 sender, uint32 action, const char* sCode )
-{
-    if(!_GO)
-    return false;
-    debug_log("TSCR: Gossip selection, sender: %d, action: %d",sender, action);
-
-    Script *tmpscript = m_scripts[_GO->GetGOInfo()->ScriptId];
-    if(!tmpscript || !tmpscript->pGOSelectWithCode) return false;
-
-    player->PlayerTalkClass->ClearMenus();
-    return tmpscript->pGOSelectWithCode(player,_GO,sender,action,sCode);
 }
 
 TRINITY_DLL_EXPORT
@@ -297,7 +266,7 @@ bool ReceiveEmote( Player *player, Creature *_Creature, uint32 emote )
     return tmpscript->pReceiveEmote(player, _Creature, emote);
 }
 
-TRINITY_DLL_EXPORT
+/*TRINITY_DLL_EXPORT
 InstanceData* CreateInstanceData(Map *map)
 {
     if (!map->IsDungeon()) return NULL;
@@ -307,4 +276,48 @@ InstanceData* CreateInstanceData(Map *map)
 
     return tmpscript->GetInstanceData(map);
 }
+
+void ScriptedAI::UpdateAI(const uint32)
+{
+    //Check if we have a current target
+    if( m_creature->isAlive() && m_creature->SelectHostilTarget() && m_creature->getVictim())
+    {
+        //If we are within range melee the target
+        if( m_creature->IsWithinDistInMap(m_creature->getVictim(), ATTACK_DISTANCE))
+        {
+            if( m_creature->isAttackReady() )
+            {
+                m_creature->AttackerStateUpdate(m_creature->getVictim());
+                m_creature->resetAttackTimer();
+            }
+        }
+    }
+}
+
+void ScriptedAI::EnterEvadeMode()
+{
+    if( m_creature->isAlive() )
+        DoGoHome();
+}
+
+void ScriptedAI::DoStartAttack(Unit* victim)
+{
+    if( m_creature->Attack(victim, true) )
+        m_creature->GetMotionMaster()->MoveChase(victim);
+}
+
+void ScriptedAI::DoStopAttack()
+{
+    if( m_creature->getVictim() != NULL )
+    {
+        m_creature->AttackStop();
+    }
+}
+
+void ScriptedAI::DoGoHome()
+{
+    if( !m_creature->getVictim() && m_creature->isAlive() )
+        m_creature->GetMotionMaster()->MoveTargetedHome();
+}
+*/
 

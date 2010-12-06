@@ -46,7 +46,7 @@ struct NEO_DLL_DECL boss_halyconAI : public ScriptedAI
         Summoned = false;
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
     }
 

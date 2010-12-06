@@ -1,7 +1,9 @@
 /*
  * Copyright (C) 2005-2008 MaNGOS <http://www.mangosproject.org/>
  *
- * Copyright (C) 2008 Trinity <http://www.trinitycore.org/>
+ * Copyright (C) 2008 Neo <http://www.neocore.org/>
+ *
+ * Copyright (C) 2009-2010 NeoZero <http://www.neozero.org/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,84 +32,64 @@
 
 void WorldSession::HandleDuelAcceptedOpcode(WorldPacket& recvPacket)
 {
-    sLog.outDebug("WORLD: received CMSG_DUEL_ACCEPTED");
+    CHECK_PACKET_SIZE(recvPacket,8);
 
     uint64 guid;
-    Player* player;
-    Player* target;
+    Player *pl;
+    Player *plTarget;
 
-    if (!GetPlayer()->duel)
+    if(!GetPlayer()->duel)                                  // ignore accept from duel-sender
         return;
 
     recvPacket >> guid;
 
-    player = GetPlayer();
-    target = player->duel->opponent;
+    pl       = GetPlayer();
+    plTarget = pl->duel->opponent;
 
-    if (player == player->duel->initiator || !target || player == target || player->duel->startTime != 0 || target->duel->startTime != 0)
+    if(pl == pl->duel->initiator || !plTarget || pl == plTarget || pl->duel->startTime != 0 || plTarget->duel->startTime != 0)
         return;
 
-    sLog.outDebug("Player 1 is: %u (%s)", player->GetGUIDLow(), player->GetName());
-    sLog.outDebug("Player 2 is: %u (%s)", target->GetGUIDLow(), target->GetName());
+    //sLog.outDebug( "WORLD: received CMSG_DUEL_ACCEPTED" );
+    DEBUG_LOG("Player 1 is: %u (%s)", pl->GetGUIDLow(),pl->GetName());
+    DEBUG_LOG("Player 2 is: %u (%s)", plTarget->GetGUIDLow(),plTarget->GetName());
 
     time_t now = time(NULL);
-    player->duel->startTimer = now;
-    target->duel->startTimer = now;
+    pl->duel->startTimer = now;
+    plTarget->duel->startTimer = now;
 
     WorldPacket data(SMSG_DUEL_COUNTDOWN, 4);
-    data << (uint32)3000;
-    player->GetSession()->SendPacket(&data);
-    target->GetSession()->SendPacket(&data);
-
-    //Duel System
-    if (sWorld.getConfig(CONFIG_DUEL_SYSTEM))
-    {
-        player->RemoveAllSpellCooldown();
-        target->RemoveAllSpellCooldown();
-        player->SetHealth(player->GetMaxHealth());
-        target->SetHealth(target->GetMaxHealth());
-
-        if(player->getPowerType() == POWER_MANA)
-            player->SetPower(POWER_MANA, player->GetMaxPower(POWER_MANA));
-        
-        if(target->getPowerType() == POWER_MANA)
-            target->SetPower(POWER_MANA, target->GetMaxPower(POWER_MANA));
-    }
+    data << (uint32)3000;                                   // 3 seconds
+    pl->GetSession()->SendPacket(&data);
+    plTarget->GetSession()->SendPacket(&data);
 }
 
 void WorldSession::HandleDuelCancelledOpcode(WorldPacket& recvPacket)
 {
-    sLog.outDebug("WORLD: received CMSG_DUEL_CANCELLED");
+    CHECK_PACKET_SIZE(recvPacket,8);
 
-    Player* player = GetPlayer();
+    //sLog.outDebug( "WORLD: received CMSG_DUEL_CANCELLED" );
 
-    if(!player)
+    // no duel requested
+    if(!GetPlayer()->duel)
         return;
 
-    if(!player->GetSession())
-        return;
-
-    if (!player->duel)
-        return;
-
-    if (player->duel->startTime != 0)
+    // player surrendered in a duel using /forfeit
+    if(GetPlayer()->duel->startTime != 0)
     {
-        player->CombatStopWithPets(true);
+        GetPlayer()->CombatStopWithPets(true);
+        if(GetPlayer()->duel->opponent)
+            GetPlayer()->duel->opponent->CombatStopWithPets(true);
 
-        if (player->duel->opponent)
-            player->duel->opponent->CombatStopWithPets(true);
-
-        player->CastSpell(player, 7267, true);
-        player->DuelComplete(DUEL_WON);
+        GetPlayer()->CastSpell(GetPlayer(), 7267, true);    // beg
+        GetPlayer()->DuelComplete(DUEL_WON);
         return;
     }
 
     // player either discarded the duel using the "discard button"
     // or used "/forfeit" before countdown reached 0
-
     uint64 guid;
     recvPacket >> guid;
 
-    player->DuelComplete(DUEL_INTERUPTED);
+    GetPlayer()->DuelComplete(DUEL_INTERUPTED);
 }
 

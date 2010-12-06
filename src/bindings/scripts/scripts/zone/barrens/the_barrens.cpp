@@ -30,7 +30,7 @@ npc_wizzlecrank_shredder
 EndContentData */
 
 #include "precompiled.h"
-#include "escort_ai.h"
+#include "../../npc/npc_escortAI.h"
 
 /*######
 ## npc_beaten_corpse
@@ -136,7 +136,7 @@ struct NEO_DLL_DECL npc_taskmaster_fizzuleAI : public ScriptedAI
         }
     }
 
-    void EnterCombat(Unit* who) { }
+    void Aggro(Unit* who) { }
 
     void UpdateAI(const uint32 diff)
     {
@@ -145,7 +145,6 @@ struct NEO_DLL_DECL npc_taskmaster_fizzuleAI : public ScriptedAI
             if( Reset_Timer < diff )
             {
                 EnterEvadeMode();
-                return;
             } else Reset_Timer -= diff;
         }
 
@@ -227,7 +226,7 @@ struct NEO_DLL_DECL npc_twiggy_flatheadAI : public ScriptedAI
         BigWill = 0;
     }
 
-    void EnterCombat(Unit *who) { }
+    void Aggro(Unit *who) { }
 
     void MoveInLineOfSight(Unit *who)
     {
@@ -392,154 +391,95 @@ CreatureAI* GetAI_npc_twiggy_flathead(Creature *_Creature)
 ## npc_wizzlecrank_shredder
 #####*/
 
-enum eEnums_Wizzlecrank
-{
-    SAY_START           = -1000272,
-    SAY_STARTUP1        = -1000273,
-    SAY_STARTUP2        = -1000274,
-    SAY_MERCENARY       = -1000275,
-    SAY_PROGRESS_1      = -1000276,
-    SAY_PROGRESS_2      = -1000277,
-    SAY_PROGRESS_3      = -1000278,
-    SAY_END             = -1000279,
+#define SAY_PROGRESS_1  -1000272
+#define SAY_PROGRESS_2  -1000273
+#define SAY_PROGRESS_3  -1000274
 
-    QUEST_ESCAPE        = 863,
-    FACTION_RATCHET     = 637,
-    NPC_PILOT_WIZZ      = 3451,
-    NPC_MERCENARY       = 3282,
-};
+#define SAY_MERCENARY_4 -1000275
+
+#define SAY_PROGRESS_5  -1000276
+#define SAY_PROGRESS_6  -1000277
+#define SAY_PROGRESS_7  -1000278
+#define SAY_PROGRESS_8  -1000279
+
+#define QUEST_ESCAPE    863
+#define NPC_PILOT       3451
+#define MOB_MERCENARY   3282
 
 struct NEO_DLL_DECL npc_wizzlecrank_shredderAI : public npc_escortAI
 {
-    npc_wizzlecrank_shredderAI(Creature* pCreature) : npc_escortAI(pCreature)
-    {
-        m_bIsPostEvent = false;
-        m_uiPostEventTimer = 1000;
-        m_uiPostEventCount = 0;
-    }
+    npc_wizzlecrank_shredderAI(Creature* c) : npc_escortAI(c) {}
 
-    bool m_bIsPostEvent;
-    uint32 m_uiPostEventTimer;
-    uint32 m_uiPostEventCount;
+    bool Completed;
+
+    void WaypointReached(uint32 i)
+    {
+        Player* player = Unit::GetPlayer(PlayerGUID);
+
+        if(!player)
+            return;
+
+        switch(i)
+        {
+        case 0: DoScriptText(SAY_PROGRESS_1, m_creature);
+            m_creature->RemoveUnitMovementFlag(MOVEMENTFLAG_WALK_MODE); break;
+        case 1: DoScriptText(SAY_PROGRESS_2, m_creature); break;
+        case 10: DoScriptText(SAY_PROGRESS_3, m_creature, player);
+            m_creature->AddUnitMovementFlag(MOVEMENTFLAG_WALK_MODE); break;
+        case 20:{
+            Unit* Mercenary = FindCreature(MOB_MERCENARY, 99, m_creature);
+            if(Mercenary)
+            {
+                DoScriptText(SAY_MERCENARY_4, Mercenary);
+                ((Creature*)Mercenary)->AI()->AttackStart(m_creature);
+                AttackStart(Mercenary);
+            }
+                }break;
+        case 21: DoScriptText(SAY_PROGRESS_5, m_creature);
+            m_creature->RemoveUnitMovementFlag(MOVEMENTFLAG_WALK_MODE); break;
+        case 28: DoScriptText(SAY_PROGRESS_6, m_creature); break;
+        case 29: DoScriptText(SAY_PROGRESS_7, m_creature); break;
+        case 30: DoScriptText(SAY_PROGRESS_8, m_creature); break;
+        case 31: m_creature->SummonCreature(NPC_PILOT, 1088.77, -2985.39, 91.84, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 300000);
+            m_creature->setDeathState(JUST_DIED);
+            Completed = true;
+            if (player && player->GetTypeId() == TYPEID_PLAYER)
+                    ((Player*)player)->GroupEventHappens(QUEST_ESCAPE, m_creature);
+            break;
+        }
+    }
 
     void Reset()
     {
-        if (!HasEscortState(STATE_ESCORT_ESCORTING))
+        m_creature->setDeathState(ALIVE);
+        Completed = false;
+        m_creature->setFaction(69);
+    }
+
+    void Aggro(Unit* who){}
+
+    void JustDied(Unit* killer)
+    {
+        if (PlayerGUID && !Completed)
         {
-            m_creature->setDeathState(ALIVE);
-            m_bIsPostEvent = false;
-            m_uiPostEventTimer = 1000;
-            m_uiPostEventCount = 0;
+            Player* player = Unit::GetPlayer(PlayerGUID);
+            if (player)
+                ((Player*)player)->FailQuest(QUEST_ESCAPE);
         }
     }
 
-    void WaypointReached(uint32 uiPointId)
+    void UpdateAI(const uint32 diff)
     {
-        Player* pPlayer = GetPlayerForEscort();
-
-        if (!pPlayer)
-            return;
-
-        switch(uiPointId)
-        {
-        case 0:
-            DoScriptText(SAY_STARTUP1, m_creature);
-            break;
-        case 9:
-            SetRun(false);
-            break;
-        case 17:
-            if (Creature* pTemp = m_creature->SummonCreature(NPC_MERCENARY, 1128.489f, -3037.611f, 92.701f, 1.472f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 120000))
-            {
-                DoScriptText(SAY_MERCENARY, pTemp);
-                m_creature->SummonCreature(NPC_MERCENARY, 1160.172f, -2980.168f, 97.313f, 3.690f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 120000);
-            }
-            break;
-        case 24:
-            m_bIsPostEvent = true;
-            break;
-        }
-    }
-
-    void WaypointStart(uint32 uiPointId)
-    {
-        Player* pPlayer = GetPlayerForEscort();
-
-        if (!pPlayer)
-            return;
-
-        switch(uiPointId)
-        {
-            case 9:
-                DoScriptText(SAY_STARTUP2, m_creature, pPlayer);
-                break;
-            case 18:
-                DoScriptText(SAY_PROGRESS_1, m_creature, pPlayer);
-                SetRun();
-                break;
-        }
-    }
-
-    void JustSummoned(Creature* pSummoned)
-    {
-        if (pSummoned->GetEntry() == NPC_PILOT_WIZZ)
-            m_creature->setDeathState(JUST_DIED);
-
-        if (pSummoned->GetEntry() == NPC_MERCENARY)
-            pSummoned->AI()->AttackStart(m_creature);
-    }
-
-    void EnterCombat(Unit* who){}
-
-    void UpdateEscortAI(const uint32 uiDiff)
-    {
-        if (!UpdateVictim())
-        {
-            if (m_bIsPostEvent)
-            {
-                if (m_uiPostEventTimer < uiDiff)
-                {
-                    switch(m_uiPostEventCount)
-                    {
-                        case 0:
-                            DoScriptText(SAY_PROGRESS_2, m_creature);
-                            break;
-                        case 1:
-                            DoScriptText(SAY_PROGRESS_3, m_creature);
-                            break;
-                        case 2:
-                            DoScriptText(SAY_END, m_creature);
-                            break;
-                        case 3:
-                            if (Player* pPlayer = GetPlayerForEscort())
-                            {
-                                pPlayer->GroupEventHappens(QUEST_ESCAPE, m_creature);
-                                m_creature->SummonCreature(NPC_PILOT_WIZZ, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 180000);
-                            }
-                            break;
-                    }
-
-                    ++m_uiPostEventCount;
-                    m_uiPostEventTimer = 5000;
-                }
-                else
-                    m_uiPostEventTimer -= uiDiff;
-            }
-
-            return;
-        }
-
-        DoMeleeAttackIfReady();
+        npc_escortAI::UpdateAI(diff);
     }
 };
 
-bool QuestAccept_npc_wizzlecrank_shredder(Player* pPlayer, Creature* pCreature, Quest const* quest)
+bool QuestAccept_npc_wizzlecrank_shredder(Player* player, Creature* creature, Quest const* quest)
 {
     if (quest->GetQuestId() == QUEST_ESCAPE)
     {
-        pCreature->setFaction(FACTION_RATCHET);
-        if (npc_escortAI* pEscortAI = CAST_AI(npc_wizzlecrank_shredderAI, pCreature->AI()))
-            pEscortAI->Start(true, false, pPlayer->GetGUID());
+        ((npc_escortAI*)(creature->AI()))->Start(true, true, false, player->GetGUID());
+        creature->setFaction(113);
     }
     return true;
 }

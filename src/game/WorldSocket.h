@@ -1,7 +1,9 @@
 /*
  * Copyright (C) 2005-2008 MaNGOS <http://www.mangosproject.org/>
  *
- * Copyright (C) 2008 Trinity <http://www.trinitycore.org/>
+ * Copyright (C) 2008 Neo <http://www.neocore.org/>
+ *
+ * Copyright (C) 2009-2010 NeoZero <http://www.neozero.org/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -114,7 +116,6 @@ class WorldSocket : protected WorldHandler
 
         /// Get address of connected peer.
         const std::string& GetRemoteAddress (void) const;
-		const std::string& GetRemoteHost (void) const;
 
         /// Send A packet on the socket, this function is reentrant.
         /// @param pct packet to send
@@ -178,7 +179,7 @@ class WorldSocket : protected WorldHandler
 
         /// Flush m_PacketQueue if there are packets in it
         /// Need to be called with m_OutBufferLock lock held
-        /// @return true if it wrote to the buffer (AKA you need
+        /// @return true if it wrote to the buffer ( AKA you need
         /// to mark the socket for output ).
         bool iFlushPacketQueue ();
 
@@ -191,7 +192,6 @@ class WorldSocket : protected WorldHandler
 
         /// Address of the remote peer
         std::string m_Address;
-		std::string m_Host;
 
         /// Class used for managing encryption of the headers
         AuthCrypt m_Crypt;

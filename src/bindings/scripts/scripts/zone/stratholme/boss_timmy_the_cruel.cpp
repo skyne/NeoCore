@@ -40,13 +40,13 @@ struct NEO_DLL_DECL boss_timmy_the_cruelAI : public ScriptedAI
         HasYelled = false;
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
-        if (!HasYelled)
-        {
-            DoYell(SAY_SPAWN,LANG_UNIVERSAL,NULL);
-            HasYelled = true;
-        }
+                if (!HasYelled)
+                {
+                    DoYell(SAY_SPAWN,LANG_UNIVERSAL,NULL);
+                    HasYelled = true;
+                }
     }
 
     void UpdateAI(const uint32 diff)
@@ -71,6 +71,7 @@ CreatureAI* GetAI_boss_timmy_the_cruel(Creature *_Creature)
 {
     return new boss_timmy_the_cruelAI (_Creature);
 }
+
 
 void AddSC_boss_timmy_the_cruel()
 {

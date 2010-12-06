@@ -58,7 +58,7 @@ struct NEO_DLL_DECL boss_bloodmage_thalnosAI : public ScriptedAI
         FireNova_Timer = 10000;
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
         DoYell(SAY_AGGRO,LANG_UNIVERSAL,NULL);
         DoPlaySoundToSet(m_creature,SOUND_AGGRO);

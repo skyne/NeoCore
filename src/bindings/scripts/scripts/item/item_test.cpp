@@ -33,13 +33,11 @@ bool ItemUse_item_test(Player *player, Item* _Item, SpellCastTargets const& targ
 
 void AddSC_item_test()
 {
-    /*
-    [Disabled to prevent "CRASH ALERT!"]
     Script *newscript;
+
     newscript = new Script;
     newscript->Name="item_test";
     newscript->pItemUse = &ItemUse_item_test;
     newscript->RegisterSelf();
-    */
 }
 

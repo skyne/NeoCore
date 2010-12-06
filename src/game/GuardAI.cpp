@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
- * Copyright (C) 2009 Trinity <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2009 Neo <http://www.neocore.org/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@
 
 int GuardAI::Permissible(const Creature *creature)
 {
-    if (creature->isGuard())
+    if( creature->isGuard())
         return PERMIT_BASE_SPECIAL;
 
     return PERMIT_BASE_NO;
@@ -39,16 +39,15 @@ GuardAI::GuardAI(Creature *c) : CreatureAI(c), i_victimGuid(0), i_state(STATE_NO
 
 void GuardAI::MoveInLineOfSight(Unit *u)
 {
-    // Ignore Z for flying creatures
-    if (!m_creature->canFly() && m_creature->GetDistanceZ(u) > CREATURE_Z_ATTACK_RANGE )
+    if ( m_creature->GetDistanceZ(u) > CREATURE_Z_ATTACK_RANGE )
         return;
 
-    if (!m_creature->getVictim() && m_creature->canAttack(u) &&
-        (u->IsHostileToPlayers() || m_creature->IsHostileTo(u) /*|| u->getVictim() && m_creature->IsFriendlyTo(u->getVictim())*/ ) &&
+    if( !m_creature->getVictim() && m_creature->canAttack(u) &&
+        ( u->IsHostileToPlayers() || m_creature->IsHostileTo(u) /*|| u->getVictim() && m_creature->IsFriendlyTo(u->getVictim())*/ ) &&
         u->isInAccessiblePlaceFor(m_creature))
     {
         float attackRadius = m_creature->GetAttackDistance(u);
-        if (m_creature->IsWithinDistInMap(u,attackRadius))
+        if(m_creature->IsWithinDistInMap(u,attackRadius))
         {
             //Need add code to let guard support player
             AttackStart(u);
@@ -59,7 +58,7 @@ void GuardAI::MoveInLineOfSight(Unit *u)
 
 void GuardAI::EnterEvadeMode()
 {
-    if (!m_creature->isAlive() )
+    if( !m_creature->isAlive() )
     {
         DEBUG_LOG("Creature stopped attacking because he's dead [guid=%u]", m_creature->GetGUIDLow());
         m_creature->GetMotionMaster()->MoveIdle();
@@ -72,21 +71,21 @@ void GuardAI::EnterEvadeMode()
         return;
     }
 
-    Unit* victim = ObjectAccessor::GetUnit(*m_creature, i_victimGuid);
+    Unit* victim = ObjectAccessor::GetUnit(*m_creature, i_victimGuid );
 
-    if (!victim  )
+    if( !victim  )
     {
         DEBUG_LOG("Creature stopped attacking because victim is non exist [guid=%u]", m_creature->GetGUIDLow());
     }
-    else if (!victim ->isAlive() )
+    else if( !victim ->isAlive() )
     {
         DEBUG_LOG("Creature stopped attacking because victim is dead [guid=%u]", m_creature->GetGUIDLow());
     }
-    else if (victim ->HasStealthAura() )
+    else if( victim ->HasStealthAura() )
     {
         DEBUG_LOG("Creature stopped attacking because victim is using stealth [guid=%u]", m_creature->GetGUIDLow());
     }
-    else if (victim ->isInFlight() )
+    else if( victim ->isInFlight() )
     {
         DEBUG_LOG("Creature stopped attacking because victim is flying away [guid=%u]", m_creature->GetGUIDLow());
     }
@@ -102,21 +101,21 @@ void GuardAI::EnterEvadeMode()
     i_state = STATE_NORMAL;
 
     // Remove TargetedMovementGenerator from MotionMaster stack list, and add HomeMovementGenerator instead
-    if (m_creature->GetMotionMaster()->GetCurrentMovementGeneratorType() == TARGETED_MOTION_TYPE )
+    if( m_creature->GetMotionMaster()->GetCurrentMovementGeneratorType() == TARGETED_MOTION_TYPE )
         m_creature->GetMotionMaster()->MoveTargetedHome();
 }
 
 void GuardAI::UpdateAI(const uint32 /*diff*/)
 {
     // update i_victimGuid if m_creature->getVictim() !=0 and changed
-    if (!UpdateVictim())
+    if(!UpdateVictim())
         return;
 
     i_victimGuid = m_creature->getVictim()->GetGUID();
 
-    if (m_creature->isAttackReady() )
+    if( m_creature->isAttackReady() )
     {
-        if (m_creature->IsWithinMeleeRange(m_creature->getVictim()))
+        if( m_creature->IsWithinMeleeRange(m_creature->getVictim()))
         {
             m_creature->AttackerStateUpdate(m_creature->getVictim());
             m_creature->resetAttackTimer();
@@ -132,7 +131,8 @@ bool GuardAI::IsVisible(Unit *pl) const
 
 void GuardAI::JustDied(Unit *killer)
 {
-    if (Player* pkiller = killer->GetCharmerOrOwnerPlayerOrPlayerItself())
+    if(Player* pkiller = killer->GetCharmerOrOwnerPlayerOrPlayerItself())
         m_creature->SendZoneUnderAttackMessage(pkiller);
 }
+
 

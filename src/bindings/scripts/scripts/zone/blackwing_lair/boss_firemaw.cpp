@@ -42,7 +42,7 @@ struct NEO_DLL_DECL boss_firemawAI : public ScriptedAI
         FlameBuffet_Timer = 5000;
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
         DoZoneInCombat();
     }

@@ -70,8 +70,6 @@ struct NEO_DLL_DECL boss_nefarianAI : public ScriptedAI
     uint32 ClassCall_Timer;
     bool Phase3;
 
-    uint32 DespawnTimer;
-
     void Reset()
     {
         ShadowFlame_Timer = 12000;                          //These times are probably wrong
@@ -81,8 +79,6 @@ struct NEO_DLL_DECL boss_nefarianAI : public ScriptedAI
         TailLash_Timer = 10000;
         ClassCall_Timer = 35000;                            //35-40 seconds
         Phase3 = false;
-
-        DespawnTimer = 5000;
 
         m_creature->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TAUNT, true);
         m_creature->ApplySpellImmune(1, IMMUNITY_EFFECT,SPELL_EFFECT_ATTACK_ME, true);
@@ -101,7 +97,7 @@ struct NEO_DLL_DECL boss_nefarianAI : public ScriptedAI
         DoScriptText(SAY_DEATH, m_creature);
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
         switch (rand()%3)
         {
@@ -116,17 +112,6 @@ struct NEO_DLL_DECL boss_nefarianAI : public ScriptedAI
 
     void UpdateAI(const uint32 diff)
     {
-        if(DespawnTimer < diff)
-        {
-            if(!UpdateVictim())
-            {
-                m_creature->SetHealth(0);
-                m_creature->setDeathState(JUST_DIED);
-                m_creature->RemoveCorpse();
-            }
-            DespawnTimer = 5000;
-        }else DespawnTimer -= diff;
-
         if (!UpdateVictim() )
             return;
 

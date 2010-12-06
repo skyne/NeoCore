@@ -66,7 +66,7 @@ struct NEO_DLL_DECL mob_yennikuAI : public ScriptedAI
         return;
     }
 
-    void EnterCombat(Unit *who) {}
+    void Aggro(Unit *who) {}
 
     void UpdateAI(const uint32 diff)
     {
@@ -77,7 +77,6 @@ struct NEO_DLL_DECL mob_yennikuAI : public ScriptedAI
                 EnterEvadeMode();
                 bReset = false;
                 m_creature->setFaction(28);                     //troll, bloodscalp
-                return;
             }
             else Reset_Timer -= diff;
 

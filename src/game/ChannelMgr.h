@@ -1,7 +1,9 @@
 /*
  * Copyright (C) 2005-2008 MaNGOS <http://www.mangosproject.org/>
  *
- * Copyright (C) 2008 Trinity <http://www.trinitycore.org/>
+ * Copyright (C) 2008 Neo <http://www.neocore.org/>
+ *
+ * Copyright (C) 2009-2010 NeoZero <http://www.neozero.org/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,13 +36,13 @@ class ChannelMgr
         ChannelMgr() {}
         ~ChannelMgr()
         {
-            for (ChannelMap::iterator itr = channels.begin();itr!=channels.end(); ++itr)
+            for(ChannelMap::iterator itr = channels.begin();itr!=channels.end(); ++itr)
                 delete itr->second;
             channels.clear();
         }
         Channel *GetJoinChannel(const std::string& name, uint32 channel_id)
         {
-            if (channels.count(name) == 0)
+            if(channels.count(name) == 0)
             {
                 Channel *nchan = new Channel(name,channel_id);
                 channels[name] = nchan;
@@ -51,7 +53,7 @@ class ChannelMgr
         {
             ChannelMap::const_iterator i = channels.find(name);
 
-            if (i == channels.end())
+            if(i == channels.end())
             {
                 WorldPacket data;
                 MakeNotOnPacket(&data,name);
@@ -65,12 +67,12 @@ class ChannelMgr
         {
             ChannelMap::const_iterator i = channels.find(name);
 
-            if (i == channels.end())
+            if(i == channels.end())
                 return;
 
             Channel* channel = i->second;
 
-            if (channel->GetNumPlayers() == 0 && !channel->IsConstant())
+            if(channel->GetNumPlayers() == 0 && !channel->IsConstant())
             {
                 channels.erase(name);
                 delete channel;
@@ -94,9 +96,9 @@ inline ChannelMgr* channelMgr(uint32 team)
                                                             //For Test,No Seprate Faction
         return &Neo::Singleton<AllianceChannelMgr>::Instance();
 
-    if (team==ALLIANCE)
+    if(team==ALLIANCE)
         return &Neo::Singleton<AllianceChannelMgr>::Instance();
-    if (team==HORDE)
+    if(team==HORDE)
         return &Neo::Singleton<HordeChannelMgr>::Instance();
     return NULL;
 }

@@ -1,7 +1,9 @@
 /*
  * Copyright (C) 2005-2008 MaNGOS <http://www.mangosproject.org/>
  *
- * Copyright (C) 2008 Trinity <http://www.trinitycore.org/>
+ * Copyright (C) 2008 Neo <http://www.neocore.org/>
+ *
+ * Copyright (C) 2009-2010 NeoZero <http://www.neozero.org/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -52,7 +54,6 @@ struct NEO_DLL_DECL Traveller
     float GetPositionZ() const { return i_traveller.GetPositionZ(); }
     T& GetTraveller(void) { return i_traveller; }
 
-
     float Speed(void) { assert(false); return 0.0f; }
     float GetMoveDestinationTo(float x, float y, float z);
     uint32 GetTotalTrevelTimeTo(float x, float y, float z);
@@ -78,12 +79,10 @@ inline uint32 Traveller<T>::GetTotalTrevelTimeTo(float x, float y, float z)
 template<>
 inline float Traveller<Creature>::Speed()
 {
-    if (i_traveller.hasUnitState(UNIT_STAT_CHARGING))
+    if(i_traveller.hasUnitState(UNIT_STAT_CHARGING))
         return i_traveller.m_TempSpeed;
-    else if (i_traveller.HasUnitMovementFlag(MOVEMENTFLAG_WALK_MODE))
+    if(i_traveller.HasUnitMovementFlag(MOVEMENTFLAG_WALK_MODE))
         return i_traveller.GetSpeed(MOVE_WALK);
-    else if (i_traveller.HasUnitMovementFlag(MOVEMENTFLAG_FLYING2))
-        return i_traveller.GetSpeed(MOVE_FLIGHT);
     else
         return i_traveller.GetSpeed(MOVE_RUN);
 }
@@ -101,11 +100,10 @@ inline float Traveller<Creature>::GetMoveDestinationTo(float x, float y, float z
     float dy = y - GetPositionY();
     float dz = z - GetPositionZ();
 
-	/*if (i_traveller.canFly())
-	{
-		float dz = z - GetPositionZ();*/
+    //if(i_traveller.HasUnitMovementFlag(MOVEMENTFLAG_FLYING))
         return sqrt((dx*dx) + (dy*dy) + (dz*dz));
-	//}
+    //else                                                    //Walking on the ground
+    //    return sqrt((dx*dx) + (dy*dy));
 }
 
 template<>
@@ -118,9 +116,9 @@ inline void Traveller<Creature>::MoveTo(float x, float y, float z, uint32 t)
 template<>
 inline float Traveller<Player>::Speed()
 {
-    if (i_traveller.hasUnitState(UNIT_STAT_CHARGING))
+    if(i_traveller.hasUnitState(UNIT_STAT_CHARGING))
         return i_traveller.m_TempSpeed;
-    else if (i_traveller.isInFlight())
+    else if(i_traveller.isInFlight())
         return PLAYER_FLIGHT_SPEED;
     else
         return i_traveller.GetSpeed(i_traveller.HasUnitMovementFlag(MOVEMENTFLAG_WALK_MODE) ? MOVE_WALK : MOVE_RUN);
@@ -131,10 +129,12 @@ inline float Traveller<Player>::GetMoveDestinationTo(float x, float y, float z)
 {
     float dx = x - GetPositionX();
     float dy = y - GetPositionY();
-	float dz = z - GetPositionZ();
+    float dz = z - GetPositionZ();
 
-    return sqrt((dx*dx) + (dy*dy) + (dz*dz));
-
+    //if (i_traveller.isInFlight())
+        return sqrt((dx*dx) + (dy*dy) + (dz*dz));
+    //else                                                    //Walking on the ground
+    //    return sqrt((dx*dx) + (dy*dy));
 }
 
 template<>
@@ -142,7 +142,6 @@ inline void Traveller<Player>::Relocation(float x, float y, float z, float orien
 {
     MapManager::Instance().GetMap(i_traveller.GetMapId(), &i_traveller)->PlayerRelocation(&i_traveller, x, y, z, orientation);
 }
-
 
 template<>
 inline void Traveller<Player>::MoveTo(float x, float y, float z, uint32 t)

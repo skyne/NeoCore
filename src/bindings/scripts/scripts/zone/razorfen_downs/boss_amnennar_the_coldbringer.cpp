@@ -52,7 +52,7 @@ struct NEO_DLL_DECL boss_amnennar_the_coldbringerAI : public ScriptedAI
         Spectrals = false;
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
         DoYell(SAY_0,LANG_UNIVERSAL,NULL);
         DoPlaySoundToSet(m_creature,SOUND_AGGRO);
@@ -115,12 +115,9 @@ struct NEO_DLL_DECL boss_amnennar_the_coldbringerAI : public ScriptedAI
             Unit* target = NULL;
             target = SelectUnit(SELECT_TARGET_RANDOM,0);
 
-            if(target)
-            {
-                SummonSpectrals(target);
-                SummonSpectrals(target);
-                SummonSpectrals(target);
-            }
+            SummonSpectrals(target);
+            SummonSpectrals(target);
+            SummonSpectrals(target);
             Spectrals = true;
         }
 

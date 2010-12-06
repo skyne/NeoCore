@@ -74,7 +74,7 @@ struct NEO_DLL_DECL boss_highlord_mograineAI : public ScriptedAI
 
     void InitialYell()
     {
-        if(!m_creature->isInCombat())
+        if(!InCombat)
         {
             switch(rand()%3)
             {
@@ -115,7 +115,7 @@ struct NEO_DLL_DECL boss_highlord_mograineAI : public ScriptedAI
         DoPlaySoundToSet(m_creature, SOUND_DEATH);
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
         InitialYell();
     }

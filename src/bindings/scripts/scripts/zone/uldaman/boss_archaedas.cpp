@@ -25,7 +25,7 @@ On his death the vault door opens.
 EndScriptData */
 
 #include "precompiled.h"
-#include "def_uldaman.h"
+
 
 #define SAY_AGGRO           "Who dares awaken Archaedas? Who dares the wrath of the makers!"
 #define SOUND_AGGRO         5855
@@ -75,7 +75,7 @@ struct NEO_DLL_DECL boss_archaedasAI : public ScriptedAI
         guardiansAwake = false;
         vaultWalkersAwake = false;
 
-        if (pInstance) pInstance->SetData (DATA_MINIONS, NOT_STARTED);    // respawn any dead minions
+        if (pInstance) pInstance->SetData (NULL, 5);    // respawn any dead minions
         m_creature->setFaction(35);
         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
@@ -94,7 +94,7 @@ struct NEO_DLL_DECL boss_archaedasAI : public ScriptedAI
     }
 
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
         m_creature->setFaction (14);
         m_creature->RemoveFlag (UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
@@ -120,8 +120,6 @@ struct NEO_DLL_DECL boss_archaedasAI : public ScriptedAI
 
     void UpdateAI(const uint32 diff)
     {
-        if(!pInstance)
-            return;
         // we're still doing awaken animation
         if (wakingUp && Awaken_Timer >= 0) {
             Awaken_Timer -= diff;
@@ -139,7 +137,7 @@ struct NEO_DLL_DECL boss_archaedasAI : public ScriptedAI
 
         // wake a wall minion
         if (WallMinionTimer < diff) {
-            pInstance->SetData (DATA_MINIONS, IN_PROGRESS);
+            pInstance->SetData (NULL, 2);
 
             WallMinionTimer = 10000;
         } else WallMinionTimer -= diff;
@@ -182,11 +180,8 @@ struct NEO_DLL_DECL boss_archaedasAI : public ScriptedAI
     }
 
     void JustDied (Unit *killer) {
-        if(pInstance)
-        {
-            pInstance->SetData(DATA_ANCIENT_DOOR, DONE);        // open the vault door
-            pInstance->SetData(DATA_MINIONS, SPECIAL);        // deactivate his minions
-        }
+        pInstance->SetData(NULL,3);        // open the vault door
+        pInstance->SetData(NULL,4);        // deactivate his minions
     }
 
 };
@@ -236,7 +231,7 @@ struct NEO_DLL_DECL mob_archaedas_minionsAI : public ScriptedAI
         m_creature->RemoveAllAuras();
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
         m_creature->setFaction (14);
         m_creature->RemoveAllAuras();
@@ -338,6 +333,7 @@ bool GOHello_go_altar_of_archaedas(Player *player, GameObject* go)
 
     ScriptedInstance* pInstance = ((ScriptedInstance*)player->GetInstanceData());
     if (!pInstance) return false;
+    pInstance->SetData(NULL,0);
     pInstance->SetData64(0,player->GetGUID());     // activate archaedas
 
     return false;
@@ -373,7 +369,7 @@ struct NEO_DLL_DECL mob_stonekeepersAI : public ScriptedAI
         m_creature->RemoveAllAuras();
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
         m_creature->setFaction (14);
         m_creature->RemoveFlag (UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
@@ -390,10 +386,11 @@ struct NEO_DLL_DECL mob_stonekeepersAI : public ScriptedAI
         DoMeleeAttackIfReady();
     }
 
-    void JustDied (Unit *killer) {
-        DoCast (m_creature, SPELL_SELF_DESTRUCT,true);
-        if(pInstance)
-            pInstance->SetData(DATA_STONE_KEEPERS, IN_PROGRESS);    // activate next stonekeeper
+    void DamageTaken (Unit *attacker, uint32 &damage) {
+        if (damage > m_creature->GetHealth()) {
+            DoCast (m_creature, SPELL_SELF_DESTRUCT,true);
+            pInstance->SetData(NULL, 1);    // activate next stonekeeper
+        }
     }
 
 };
@@ -462,7 +459,7 @@ bool GOHello_go_altar_of_the_keepers(Player *player, GameObject* go)
     }
 
     //error_log ("activating stone keepers");
-    pInstance->SetData(DATA_STONE_KEEPERS, IN_PROGRESS);        // activate the Stone Keepers
+    pInstance->SetData(NULL,1);        // activate the Stone Keepers
     return true;
 }
 

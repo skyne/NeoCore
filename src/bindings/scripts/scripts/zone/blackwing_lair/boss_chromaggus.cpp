@@ -183,7 +183,7 @@ struct NEO_DLL_DECL boss_chromaggusAI : public ScriptedAI
         Enraged = false;
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
     }
 

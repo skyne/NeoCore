@@ -192,11 +192,10 @@ enum LocaleConstant
     LOCALE_zhTW = 5,
     LOCALE_esES = 6,
     LOCALE_esMX = 7,
-    LOCALE_ruRU = 8,
-	LOCALE_huHU = 9
+    //LOCALE_ruRU = 8
 };
 
-const uint8 MAX_LOCALE = 10;
+const uint8 MAX_LOCALE = 8;
 
 extern char const* localeNames[MAX_LOCALE];
 

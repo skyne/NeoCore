@@ -55,7 +55,7 @@ struct NEO_DLL_DECL boss_high_inquisitor_fairbanksAI : public ScriptedAI
         MindBlast5_Timer = 20000;
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
     }
 

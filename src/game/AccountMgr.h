@@ -1,7 +1,9 @@
 /*
  * Copyright (C) 2005-2008 MaNGOS <http://www.mangosproject.org/>
  *
- * Copyright (C) 2008 Trinity <http://www.trinitycore.org/>
+ * Copyright (C) 2008 Neo <http://www.neocore.org/>
+ *
+ * Copyright (C) 2009-2010 NeoZero <http://www.neozero.org/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,10 +23,9 @@
 #ifndef _ACCMGR_H
 #define _ACCMGR_H
 
-#include <string>
-
 #include "Common.h"
 #include "Policies/Singleton.h"
+#include <string>
 
 enum AccountOpResult
 {
@@ -52,7 +53,7 @@ class AccountMgr
 
         uint32 GetId(std::string username);
         uint32 GetSecurity(uint32 acc_id);
-        uint32 GetSecurity(uint32 acc_id, int32 realm_id); 
+		uint32 GetSecurity(uint32 acc_id, int32 realm_id);
         bool GetName(uint32 acc_id, std::string &name);
 
         static bool normalizeString(std::string& utf8str);

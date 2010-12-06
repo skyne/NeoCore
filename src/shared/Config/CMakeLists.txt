@@ -1,7 +1,7 @@
 
 ########### next target ###############
 
-SET(neoconfig_STAT_SRCS
+SET(trinityconfig_STAT_SRCS
    dotconfpp/dotconfpp.cpp
    dotconfpp/dotconfpp.h
    dotconfpp/mempool.cpp
@@ -11,5 +11,5 @@ SET(neoconfig_STAT_SRCS
    ConfigEnv.h
 )
 
-add_library(neoconfig STATIC ${neoconfig_STAT_SRCS})
+add_library(trinityconfig STATIC ${trinityconfig_STAT_SRCS})
 

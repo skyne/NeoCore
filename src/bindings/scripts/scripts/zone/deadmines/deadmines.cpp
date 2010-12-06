@@ -63,9 +63,6 @@ struct NEO_DLL_DECL instance_deadmines : public ScriptedInstance
 
     virtual void Update(uint32 diff)
     {
-        if(!IronCladDoor || !DefiasCannon || !DoorLever)
-            return;
-
         switch(State)
         {
             case CANNON_GUNPOWDER_USED:
@@ -110,9 +107,6 @@ struct NEO_DLL_DECL instance_deadmines : public ScriptedInstance
 
     void MoveCreaturesInside()
     {
-        if(!DefiasPirate1 || !DefiasPirate2 || !DefiasCompanion)
-            return;
-
         MoveCreatureInside(DefiasPirate1);
         MoveCreatureInside(DefiasPirate2);
         MoveCreatureInside(DefiasCompanion);

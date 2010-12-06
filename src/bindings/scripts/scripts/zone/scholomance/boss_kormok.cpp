@@ -53,7 +53,7 @@ struct NEO_DLL_DECL boss_kormokAI : public ScriptedAI
         Mages = false;
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
     }
 
@@ -74,8 +74,7 @@ struct NEO_DLL_DECL boss_kormokAI : public ScriptedAI
         }
         Rand1 = 0;
         SummonedMinions = DoSpawnCreature(16119, Rand1X, Rand1Y, 0, 0, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 120000);
-        if(SummonedMinions)
-            ((CreatureAI*)SummonedMinions->AI())->AttackStart(victim);
+        ((CreatureAI*)SummonedMinions->AI())->AttackStart(victim);
     }
 
     void SummonMages(Unit* victim)
@@ -95,8 +94,7 @@ struct NEO_DLL_DECL boss_kormokAI : public ScriptedAI
         }
         Rand2 = 0;
         SummonedMages = DoSpawnCreature(16120, Rand2X, Rand2Y, 0, 0, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 120000);
-        if(SummonedMages)
-            ((CreatureAI*)SummonedMages->AI())->AttackStart(victim);
+        ((CreatureAI*)SummonedMages->AI())->AttackStart(victim);
     }
 
     void UpdateAI(const uint32 diff)

@@ -1,7 +1,9 @@
 /*
  * Copyright (C) 2005-2008 MaNGOS <http://www.mangosproject.org/>
  *
- * Copyright (C) 2008 Trinity <http://www.trinitycore.org/>
+ * Copyright (C) 2008 Neo <http://www.neocore.org/>
+ *
+ * Copyright (C) 2009-2010 NeoZero <http://www.neozero.org/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -139,7 +141,7 @@ enum CreatureFlagsExtra
 };
 
 // GCC have alternative #pragma pack(N) syntax and old gcc version not support pack(push,N), also any gcc version not support it at some platform
-#if defined(__GNUC__ )
+#if defined( __GNUC__ )
 #pragma pack(1)
 #else
 #pragma pack(push,1)
@@ -149,7 +151,6 @@ enum CreatureFlagsExtra
 struct CreatureInfo
 {
     uint32  Entry;
-    uint32  HeroicEntry;
     uint32  Modelid_A1;
     uint32  Modelid_A2;
     uint32  Modelid_H1;
@@ -219,9 +220,9 @@ struct CreatureInfo
     // helpers
     SkillType GetRequiredLootSkill() const
     {
-        if (type_flags & CREATURE_TYPEFLAGS_HERBLOOT)
+        if(type_flags & CREATURE_TYPEFLAGS_HERBLOOT)
             return SKILL_HERBALISM;
-        else if (type_flags & CREATURE_TYPEFLAGS_MININGLOOT)
+        else if(type_flags & CREATURE_TYPEFLAGS_MININGLOOT)
             return SKILL_MINING;
         else
             return SKILL_SKINNING;                          // normal case
@@ -271,7 +272,6 @@ struct CreatureData
     uint32 curmana;
     bool  is_dead;
     uint8 movementType;
-    uint8 spawnMask;
 };
 
 struct CreatureDataAddonAura
@@ -296,7 +296,6 @@ struct CreatureDataAddon
 
 struct CreatureModelInfo
 {
-    uint32 modelid;
     float bounding_radius;
     float combat_reach;
     uint8 gender;
@@ -307,8 +306,7 @@ enum InhabitTypeValues
 {
     INHABIT_GROUND = 1,
     INHABIT_WATER  = 2,
-    INHABIT_AIR    = 4,
-    INHABIT_ANYWHERE = INHABIT_GROUND | INHABIT_WATER | INHABIT_AIR
+    INHABIT_ANYWHERE = INHABIT_GROUND | INHABIT_WATER
 };
 
 // Enums used by StringTextData::Type (CreatureEventAI)
@@ -337,7 +335,7 @@ enum AttackingTarget
 };
 
 // GCC have alternative #pragma pack() syntax and old gcc version not support pack(pop), also any gcc version not support it at some platform
-#if defined(__GNUC__ )
+#if defined( __GNUC__ )
 #pragma pack()
 #else
 #pragma pack(pop)
@@ -347,22 +345,12 @@ enum AttackingTarget
 struct VendorItem
 {
     VendorItem(uint32 _item, uint32 _maxcount, uint32 _incrtime, uint32 _ExtendedCost)
-        : item(_item), maxcount(_maxcount), incrtime(_incrtime), ExtendedCost(_ExtendedCost)
-		{
-			minlvl = 0;
-			maxlvl = 0;
-		}
-		
-   VendorItem(uint32 _item, uint32 _maxcount, uint32 _incrtime, uint32 _ExtendedCost, uint8 _minlvl, uint8 _maxlvl)
-        : item(_item), maxcount(_maxcount), incrtime(_incrtime), ExtendedCost(_ExtendedCost), minlvl(_minlvl), maxlvl(_maxlvl) {}
-
+        : item(_item), maxcount(_maxcount), incrtime(_incrtime), ExtendedCost(_ExtendedCost) {}
 
     uint32 item;
     uint32 maxcount;                                        // 0 for infinity item amount
     uint32 incrtime;                                        // time for restore items amount if maxcount != 0
     uint32 ExtendedCost;
-    uint8 minlvl;
-    uint8 maxlvl;
 };
 typedef std::vector<VendorItem*> VendorItemList;
 
@@ -372,20 +360,16 @@ struct VendorItemData
 
     VendorItem* GetItem(uint32 slot) const
     {
-        if (slot>=m_items.size()) return NULL;
+        if(slot>=m_items.size()) return NULL;
         return m_items[slot];
     }
     bool Empty() const { return m_items.empty(); }
     uint8 GetItemCount() const { return m_items.size(); }
-    void AddItem(uint32 item, uint32 maxcount, uint32 ptime, uint32 ExtendedCost)
+    void AddItem( uint32 item, uint32 maxcount, uint32 ptime, uint32 ExtendedCost)
     {
         m_items.push_back(new VendorItem(item, maxcount, ptime, ExtendedCost));
     }
-    void AddItem(uint32 item, int32 maxcount, uint32 ptime, int32 ExtendedCost, int32 minlvl, int32 maxlvl)
-    {
-        m_items.push_back(new VendorItem(item, maxcount, ptime, ExtendedCost, minlvl, maxlvl));
-    }
-    bool RemoveItem(uint32 item_id);
+    bool RemoveItem( uint32 item_id );
     VendorItem const* FindItem(uint32 item_id) const;
     size_t FindItemSlot(uint32 item_id) const;
 
@@ -450,8 +434,6 @@ class NEO_DLL_SPEC Creature : public Unit
         void AddToWorld();
         void RemoveFromWorld();
 
-        void DisappearAndDie();
-
         bool Create (uint32 guidlow, Map *map, uint32 Entry, uint32 team, const CreatureData *data = NULL);
         bool LoadCreaturesAddon(bool reload = false);
         void SelectLevel(const CreatureInfo *cinfo);
@@ -460,7 +442,7 @@ class NEO_DLL_SPEC Creature : public Unit
         uint32 GetDBTableGUIDLow() const { return m_DBTableGuid; }
         char const* GetSubName() const { return GetCreatureInfo()->SubName; }
 
-        void Update(uint32 time);                         // overwrited Unit::Update
+        void Update( uint32 time );                         // overwrited Unit::Update
         void GetRespawnCoord(float &x, float &y, float &z, float* ori = NULL, float* dist =NULL) const;
         uint32 GetEquipmentId() const { return m_equipmentId; }
 
@@ -472,7 +454,6 @@ class NEO_DLL_SPEC Creature : public Unit
         bool isTrigger() const { return GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_TRIGGER; }
         bool canWalk() const { return GetCreatureInfo()->InhabitType & INHABIT_GROUND; }
         bool canSwim() const { return GetCreatureInfo()->InhabitType & INHABIT_WATER; }
-        bool canFly()  const { return GetCreatureInfo()->InhabitType & INHABIT_AIR; }
         void SetReactState(ReactStates st) { m_reactState = st; }
         ReactStates GetReactState() { return m_reactState; }
         bool HasReactState(ReactStates state) const { return (m_reactState == state); }
@@ -487,7 +468,7 @@ class NEO_DLL_SPEC Creature : public Unit
                                                             // redefine Unit::IsImmunedToSpellEffect
         bool isElite() const
         {
-            if (isPet())
+            if(isPet())
                 return false;
 
             uint32 rank = GetCreatureInfo()->rank;
@@ -496,7 +477,7 @@ class NEO_DLL_SPEC Creature : public Unit
 
         bool isWorldBoss() const
         {
-            if (isPet())
+            if(isPet())
                 return false;
 
             return GetCreatureInfo()->rank == CREATURE_ELITE_WORLDBOSS;
@@ -507,6 +488,7 @@ class NEO_DLL_SPEC Creature : public Unit
         bool IsInEvadeMode() const;
 
         bool AIM_Initialize(CreatureAI* ai = NULL);
+        void Motion_Initialize();
 
         void AI_SendMoveToPacket(float x, float y, float z, uint32 time, uint32 MovementFlags, uint8 type);
         CreatureAI* AI() { return (CreatureAI*)i_AI; }
@@ -517,7 +499,7 @@ class NEO_DLL_SPEC Creature : public Unit
         }
 
         SpellSchoolMask GetMeleeDamageSchoolMask() const { return m_meleeDamageSchoolMask; }
-        void SetMeleeDamageSchool(SpellSchools school) { m_meleeDamageSchoolMask = SpellSchoolMask(1 << school); }
+        void SetMeleeDamageSchool(uint32 school) { m_meleeDamageSchoolMask = SpellSchoolMask(1 << school); }
 
         void _AddCreatureSpellCooldown(uint32 spell_id, time_t end_time);
         void _AddCreatureCategoryCooldown(uint32 category, time_t apply_time);
@@ -552,8 +534,8 @@ class NEO_DLL_SPEC Creature : public Unit
         std::string GetScriptName();
         uint32 GetScriptId();
 
-        void prepareGossipMenu(Player *pPlayer, uint32 gossipid = 0);
-        void sendPreparedGossip(Player* player);
+        void prepareGossipMenu( Player *pPlayer, uint32 gossipid = 0 );
+        void sendPreparedGossip( Player* player );
         void OnGossipSelect(Player* player, uint32 option);
         void OnPoiSelect(Player* player, GossipOption const *gossip);
 
@@ -561,7 +543,7 @@ class NEO_DLL_SPEC Creature : public Unit
         uint32 GetNpcTextId();
         void LoadGossipOptions();
         void ResetGossipOptions();
-        GossipOption const* GetGossipOption(uint32 id ) const;
+        GossipOption const* GetGossipOption( uint32 id ) const;
         void addGossipOption(GossipOption const& gso) { m_goptions.push_back(gso); }
 
         void setEmoteState(uint8 emote) { m_emoteState = emote; };
@@ -583,7 +565,7 @@ class NEO_DLL_SPEC Creature : public Unit
         bool LoadFromDB(uint32 guid, Map *map);
         void SaveToDB();
                                                             // overwrited in Pet
-        virtual void SaveToDB(uint32 mapid, uint8 spawnMask);
+        virtual void SaveToDB(uint32 mapid);
         virtual void DeleteFromDB();                        // overwrited in Pet
 
         Loot loot;
@@ -614,7 +596,6 @@ class NEO_DLL_SPEC Creature : public Unit
         void SetNoCallAssistance(bool val) { m_AlreadyCallAssistance = val; }
         void SetNoSearchAssistance(bool val) { m_AlreadySearchedAssistance = val; }
         bool HasSearchedAssistance() { return m_AlreadySearchedAssistance; }
-
         bool CanAssistTo(const Unit* u, const Unit* enemy, bool checkfaction = true) const;
         void DoFleeToGetAssistance();
 
@@ -645,6 +626,9 @@ class NEO_DLL_SPEC Creature : public Unit
         // Linked Creature Respawning System
         time_t GetLinkedCreatureRespawnTime() const;
         const CreatureData* GetLinkedRespawnCreatureData() const;
+
+        uint32 m_groupLootTimer;                            // (msecs)timer used for group loot
+        uint64 lootingGroupLeaderGUID;                      // used to find group which is looting corpse
 
         void SendZoneUnderAttackMessage(Player* attacker);
 
@@ -683,15 +667,6 @@ class NEO_DLL_SPEC Creature : public Unit
 
         void SetDisableReputationGain(bool disable) { DisableReputationGain = disable; }
         bool IsReputationGainDisabled() { return DisableReputationGain; }
-        bool IsDamageEnoughForLootingAndReward() const { return m_PlayerDamageReq == 0; }
-        void LowerPlayerDamageReq(uint32 unDamage)
-        {
-            if (m_PlayerDamageReq)
-                m_PlayerDamageReq > unDamage ? m_PlayerDamageReq -= unDamage : m_PlayerDamageReq = 0;
-        }
-        void ResetPlayerDamageReq() { m_PlayerDamageReq = GetHealth() / 2; }
-        uint32 m_PlayerDamageReq;
-
     protected:
         bool CreateFromProto(uint32 guidlow,uint32 Entry,uint32 team, const CreatureData *data = NULL);
         bool InitEntry(uint32 entry, uint32 team=ALLIANCE, const CreatureData* data=NULL);
@@ -754,7 +729,7 @@ class NEO_DLL_SPEC Creature : public Unit
         CreatureGroup *m_formation;
 
         GridReference<Creature> m_gridRef;
-        CreatureInfo const* m_creatureInfo;                 // in heroic mode can different from ObjMgr::GetCreatureTemplate(GetEntry())
+        CreatureInfo const* m_creatureInfo;
 };
 
 class AssistDelayEvent : public BasicEvent

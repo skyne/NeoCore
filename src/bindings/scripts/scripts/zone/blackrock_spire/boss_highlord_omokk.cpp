@@ -54,7 +54,7 @@ struct NEO_DLL_DECL boss_highlordomokkAI : public ScriptedAI
         Slow_Timer = 24000;
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
     }
 

@@ -71,7 +71,7 @@ struct NEO_DLL_DECL boss_anubrekhanAI : public ScriptedAI
          DoScriptText(SAY_SLAY, m_creature);
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
         switch(rand()%3)
         {

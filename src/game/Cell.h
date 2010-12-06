@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2005-2008 MaNGOS <http://www.mangosproject.org/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
- * Copyright (C) 2008 Trinity <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2009 Neo <http://www.neocore.org/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@
 #define NEO_CELL_H
 
 #include <cmath>
+
 #include "GameSystem/TypeContainer.h"
 #include "GameSystem/TypeContainerVisitor.h"
 
@@ -65,6 +66,7 @@ struct NEO_DLL_DECL CellArea
     int upper_offset;
     int lower_offset;
 };
+ 
 
 struct NEO_DLL_DECL Cell
 {
@@ -80,29 +82,29 @@ struct NEO_DLL_DECL Cell
         Compute(x, y);
         cell.Compute(old_x, old_y);
 
-        if (std::abs(int(x-old_x)) > 1 || std::abs(int(y-old_y)) > 1)
+        if( std::abs(int(x-old_x)) > 1 || std::abs(int(y-old_y)) > 1)
         {
             data.Part.reserved = ALL_DISTRICT;
             cell.data.Part.reserved = ALL_DISTRICT;
             return;
         }
 
-        if (x < old_x )
+        if( x < old_x )
         {
             data.Part.reserved |= LEFT_DISTRICT;
             cell.data.Part.reserved |= RIGHT_DISTRICT;
         }
-        else if (old_x < x )
+        else if( old_x < x )
         {
             data.Part.reserved |= RIGHT_DISTRICT;
             cell.data.Part.reserved |= LEFT_DISTRICT;
         }
-        if (y < old_y )
+        if( y < old_y )
         {
             data.Part.reserved |= UPPER_DISTRICT;
             cell.data.Part.reserved |= LOWER_DISTRICT;
         }
-        else if (old_y < y )
+        else if( old_y < y )
         {
             data.Part.reserved |= LOWER_DISTRICT;
             cell.data.Part.reserved |= UPPER_DISTRICT;
@@ -117,14 +119,14 @@ struct NEO_DLL_DECL Cell
 
     bool DiffCell(const Cell &cell) const
     {
-        return(data.Part.cell_x != cell.data.Part.cell_x ||
-            data.Part.cell_y != cell.data.Part.cell_y);
+        return( data.Part.cell_x != cell.data.Part.cell_x ||
+            data.Part.cell_y != cell.data.Part.cell_y );
     }
 
     bool DiffGrid(const Cell &cell) const
     {
-        return(data.Part.grid_x != cell.data.Part.grid_x ||
-            data.Part.grid_y != cell.data.Part.grid_y);
+        return( data.Part.grid_x != cell.data.Part.grid_x ||
+            data.Part.grid_y != cell.data.Part.grid_y );
     }
 
     uint32 CellX() const { return data.Part.cell_x; }
@@ -166,12 +168,11 @@ struct NEO_DLL_DECL Cell
     template<class LOCK_TYPE, class T, class CONTAINER> void Visit(const CellLock<LOCK_TYPE> &, TypeContainerVisitor<T, CONTAINER> &visitor, Map &) const;
     template<class LOCK_TYPE, class T, class CONTAINER> void Visit(const CellLock<LOCK_TYPE> &, TypeContainerVisitor<T, CONTAINER> &visitor, Map &m, const WorldObject &obj, float radius) const;
     template<class LOCK_TYPE, class T, class CONTAINER> void Visit(const CellLock<LOCK_TYPE> &, TypeContainerVisitor<T, CONTAINER> &visitor, Map &, float radius, float x_off, float y_off) const;
-
+ 
     static CellArea CalculateCellArea(const WorldObject &obj, float radius);
-
+ 
 private:
     template<class LOCK_TYPE, class T, class CONTAINER> void VisitCircle(const CellLock<LOCK_TYPE> &, TypeContainerVisitor<T, CONTAINER> &, Map &, const CellPair& , const CellPair& ) const;
-
 };
 
 template<class T>

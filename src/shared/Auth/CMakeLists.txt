@@ -1,7 +1,7 @@
 
 ########### next target ###############
 
-SET(neoauth_STAT_SRCS
+SET(trinityauth_STAT_SRCS
    AuthCrypt.cpp
    AuthCrypt.h
    BigNumber.cpp
@@ -14,4 +14,4 @@ SET(neoauth_STAT_SRCS
    md5.h
 )
 
-add_library(neoauth STATIC ${neoauth_STAT_SRCS})
+add_library(trinityauth STATIC ${trinityauth_STAT_SRCS})

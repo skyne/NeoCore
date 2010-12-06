@@ -1,7 +1,9 @@
 /*
  * Copyright (C) 2005-2008 MaNGOS <http://www.mangosproject.org/>
  *
- * Copyright (C) 2008 Trinity <http://www.trinitycore.org/>
+ * Copyright (C) 2008 Neo <http://www.neocore.org/>
+ *
+ * Copyright (C) 2009-2010 NeoZero <http://www.neozero.org/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -92,7 +94,6 @@ class NEO_DLL_SPEC InstanceData
         virtual uint64 GetData64(uint32 /*DataId*/) { return 0; }
         virtual void SetData64(uint32 /*DataId*/, uint64 /*Value*/) {}
 
-
         //All-purpose data storage 32 bit
         virtual uint32 GetData(uint32) { return 0; }
         virtual void SetData(uint32, uint32 data) {}
@@ -113,7 +114,7 @@ class NEO_DLL_SPEC InstanceData
         std::string GetBossSave()
         {
             std::ostringstream saveStream;
-            for (std::vector<BossInfo>::iterator i = bosses.begin(); i != bosses.end(); ++i)
+            for(std::vector<BossInfo>::iterator i = bosses.begin(); i != bosses.end(); ++i)
                 saveStream << (uint32)i->state << " ";
             return saveStream.str();
         }        

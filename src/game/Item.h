@@ -1,7 +1,9 @@
 /*
  * Copyright (C) 2005-2008 MaNGOS <http://www.mangosproject.org/>
  *
- * Copyright (C) 2008 Trinity <http://www.trinitycore.org/>
+ * Copyright (C) 2008 Neo <http://www.neocore.org/>
+ *
+ * Copyright (C) 2009-2010 NeoZero <http://www.neozero.org/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,7 +27,6 @@
 #include "Object.h"
 #include "LootMgr.h"
 #include "ItemPrototype.h"
-#include "Database/QueryResult.h"
 
 struct SpellEntry;
 class Bag;
@@ -106,20 +107,18 @@ enum InventoryChangeFailure
     EQUIP_ERR_CANT_EQUIP_RANK                    = 63,
     EQUIP_ERR_CANT_EQUIP_REPUTATION              = 64,
     EQUIP_ERR_TOO_MANY_SPECIAL_BAGS              = 65,
+
+    //[TZERO] TBC Enumerations
     EQUIP_ERR_LOOT_CANT_LOOT_THAT_NOW            = 66,
     EQUIP_ERR_ITEM_UNIQUE_EQUIPABLE              = 67,
     EQUIP_ERR_VENDOR_MISSING_TURNINS             = 68,
-    EQUIP_ERR_NOT_ENOUGH_HONOR_POINTS            = 69,
-    EQUIP_ERR_NOT_ENOUGH_ARENA_POINTS            = 70,
     EQUIP_ERR_ITEM_MAX_COUNT_SOCKETED            = 71,
     EQUIP_ERR_MAIL_BOUND_ITEM                    = 72,
     EQUIP_ERR_NO_SPLIT_WHILE_PROSPECTING         = 73,
     EQUIP_ERR_ITEM_MAX_COUNT_EQUIPPED_SOCKETED   = 75,
     EQUIP_ERR_ITEM_UNIQUE_EQUIPPABLE_SOCKETED    = 76,
     EQUIP_ERR_TOO_MUCH_GOLD                      = 77,
-    EQUIP_ERR_NOT_DURING_ARENA_MATCH             = 78,
     EQUIP_ERR_CANNOT_TRADE_THAT                  = 79,
-    EQUIP_ERR_PERSONAL_ARENA_RATING_TOO_LOW      = 80
     // probably exist more
 };
 
@@ -130,7 +129,7 @@ enum BuyFailure
     BUY_ERR_NOT_ENOUGHT_MONEY                   = 2,
     BUY_ERR_SELLER_DONT_LIKE_YOU                = 4,
     BUY_ERR_DISTANCE_TOO_FAR                    = 5,
-    BUY_ERR_ITEM_SOLD_OUT                       = 7,
+    BUY_ERR_ITEM_SOLD_OUT                       = 7, //tbc?
     BUY_ERR_CANT_CARRY_MORE                     = 8,
     BUY_ERR_RANK_REQUIRE                        = 11,
     BUY_ERR_REPUTATION_REQUIRE                  = 12
@@ -141,6 +140,7 @@ enum SellFailure
     SELL_ERR_CANT_FIND_ITEM                      = 1,
     SELL_ERR_CANT_SELL_ITEM                      = 2,       // merchant doesn't like that item
     SELL_ERR_CANT_FIND_VENDOR                    = 3,       // merchant doesn't like you
+    //[TZERO] tbc enumerations [?]
     SELL_ERR_YOU_DONT_OWN_THAT_ITEM              = 4,       // you don't own that item
     SELL_ERR_UNK                                 = 5,       // nothing appears...
     SELL_ERR_ONLY_EMPTY_BAG                      = 6        // can only do with empty bags
@@ -151,21 +151,16 @@ enum EnchantmentSlot
 {
     PERM_ENCHANTMENT_SLOT       = 0,
     TEMP_ENCHANTMENT_SLOT       = 1,
-    SOCK_ENCHANTMENT_SLOT       = 2,
-    SOCK_ENCHANTMENT_SLOT_2     = 3,
-    SOCK_ENCHANTMENT_SLOT_3     = 4,
-    BONUS_ENCHANTMENT_SLOT      = 5,
-    MAX_INSPECTED_ENCHANTMENT_SLOT = 6,
+    MAX_INSPECTED_ENCHANTMENT_SLOT = 2,
 
-    PROP_ENCHANTMENT_SLOT_0     = 6,                        // used with RandomSuffix
-    PROP_ENCHANTMENT_SLOT_1     = 7,                        // used with RandomSuffix
-    PROP_ENCHANTMENT_SLOT_2     = 8,                        // used with RandomSuffix and RandomProperty
-    PROP_ENCHANTMENT_SLOT_3     = 9,                        // used with RandomProperty
-    PROP_ENCHANTMENT_SLOT_4     = 10,                       // used with RandomProperty
-    MAX_ENCHANTMENT_SLOT        = 11
+    PROP_ENCHANTMENT_SLOT_0     = 3,
+    PROP_ENCHANTMENT_SLOT_1     = 4,
+    PROP_ENCHANTMENT_SLOT_2     = 5,
+    PROP_ENCHANTMENT_SLOT_3     = 6,
+    MAX_ENCHANTMENT_SLOT        = 7
 };
 
-#define MAX_VISIBLE_ITEM_OFFSET   16                        // 16 fields per visible item (creator(2) + enchantments(12) + properties(1) + pad(1))
+#define MAX_VISIBLE_ITEM_OFFSET   12                        //
 
 enum EnchantmentOffset
 {
@@ -197,12 +192,12 @@ bool ItemCanGoIntoBag(ItemPrototype const *proto, ItemPrototype const *pBagProto
 class NEO_DLL_SPEC Item : public Object
 {
     public:
-        static Item* CreateItem(uint32 item, uint32 count, Player const* player = NULL);
-        Item* CloneItem(uint32 count, Player const* player = NULL ) const;
+        static Item* CreateItem( uint32 item, uint32 count, Player const* player = NULL );
+        Item* CloneItem( uint32 count, Player const* player = NULL ) const;
 
-        Item ();
+        Item ( );
 
-        virtual bool Create(uint32 guidlow, uint32 itemid, Player const* owner);
+        virtual bool Create( uint32 guidlow, uint32 itemid, Player const* owner);
 
         ItemPrototype const* GetProto() const;
 
@@ -226,13 +221,11 @@ class NEO_DLL_SPEC Item : public Object
         bool IsInTrade() const { return mb_in_trade; }
 
         bool IsFitToSpellRequirements(SpellEntry const* spellInfo) const;
-        bool IsLimitedToAnotherMapOrZone(uint32 cur_mapId, uint32 cur_zoneId) const;
-        bool GemsFitSockets() const;
+        bool IsLimitedToAnotherMapOrZone( uint32 cur_mapId, uint32 cur_zoneId) const;
 
         uint32 GetCount() const { return GetUInt32Value (ITEM_FIELD_STACK_COUNT); }
         void SetCount(uint32 value) { SetUInt32Value (ITEM_FIELD_STACK_COUNT, value); }
         uint32 GetMaxStackCount() const { return GetProto()->Stackable; }
-        uint8 GetGemCountWithID(uint32 GemID) const;
 
         uint8 GetSlot() const {return m_slot;}
         Bag *GetContainer() { return m_container; }
@@ -249,12 +242,10 @@ class NEO_DLL_SPEC Item : public Object
 
         // RandomPropertyId (signed but stored as unsigned)
         int32 GetItemRandomPropertyId() const { return GetInt32Value(ITEM_FIELD_RANDOM_PROPERTIES_ID); }
-        uint32 GetItemSuffixFactor() const { return GetUInt32Value(ITEM_FIELD_PROPERTY_SEED); }
         void SetItemRandomProperties(int32 randomPropId);
-        bool UpdateItemSuffixFactor();
         static int32 GenerateItemRandomPropertyId(uint32 item_id);
         void SetEnchantment(EnchantmentSlot slot, uint32 id, uint32 duration, uint32 charges);
-        void SetEnchantmentDuration(EnchantmentSlot slot, uint32 duration, Player* owner);
+        void SetEnchantmentDuration(EnchantmentSlot slot, uint32 duration);
         void SetEnchantmentCharges(EnchantmentSlot slot, uint32 charges);
         void ClearEnchantment(EnchantmentSlot slot);
         uint32 GetEnchantmentId(EnchantmentSlot slot)       const { return GetUInt32Value(ITEM_FIELD_ENCHANTMENT + slot*MAX_ENCHANTMENT_OFFSET + ENCHANTMENT_ID_OFFSET);}

@@ -73,7 +73,7 @@ struct NEO_DLL_DECL boss_magistrate_barthilasAI : public ScriptedAI
         m_creature->SetUInt32Value(UNIT_FIELD_DISPLAYID, MODEL_HUMAN);
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
     }
 
@@ -121,6 +121,7 @@ CreatureAI* GetAI_boss_magistrate_barthilas(Creature *_Creature)
 {
     return new boss_magistrate_barthilasAI (_Creature);
 }
+
 
 void AddSC_boss_magistrate_barthilas()
 {

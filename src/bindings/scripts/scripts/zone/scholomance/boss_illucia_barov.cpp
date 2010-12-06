@@ -58,7 +58,7 @@ struct NEO_DLL_DECL boss_illuciabarovAI : public ScriptedAI
         }
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
     }
 

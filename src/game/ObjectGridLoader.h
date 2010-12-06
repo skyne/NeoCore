@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
- * Copyright (C) 2008-2009 Trinity <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2009 Neo <http://www.neocore.org/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -64,9 +64,9 @@ class NEO_DLL_DECL ObjectGridUnloader
         void MoveToRespawnN();
         void UnloadN()
         {
-            for (unsigned int x=0; x < MAX_NUMBER_OF_CELLS; ++x)
+            for(unsigned int x=0; x < MAX_NUMBER_OF_CELLS; ++x)
             {
-                for (unsigned int y=0; y < MAX_NUMBER_OF_CELLS; ++y)
+                for(unsigned int y=0; y < MAX_NUMBER_OF_CELLS; ++y)
                 {
                     GridLoader<Player, AllWorldObjectTypes, AllGridObjectTypes> loader;
                     loader.Unload(i_grid(x, y), *this);
@@ -87,9 +87,9 @@ class NEO_DLL_DECL ObjectGridStoper
 
         void StopN()
         {
-            for (unsigned int x=0; x < MAX_NUMBER_OF_CELLS; ++x)
+            for(unsigned int x=0; x < MAX_NUMBER_OF_CELLS; ++x)
             {
-                for (unsigned int y=0; y < MAX_NUMBER_OF_CELLS; ++y)
+                for(unsigned int y=0; y < MAX_NUMBER_OF_CELLS; ++y)
                 {
                     GridLoader<Player, AllWorldObjectTypes, AllGridObjectTypes> loader;
                     loader.Stop(i_grid(x, y), *this);
@@ -112,9 +112,9 @@ class NEO_DLL_DECL ObjectGridCleaner
 
         void CleanN()
         {
-            for (unsigned int x=0; x < MAX_NUMBER_OF_CELLS; ++x)
+            for(unsigned int x=0; x < MAX_NUMBER_OF_CELLS; ++x)
             {
-                for (unsigned int y=0; y < MAX_NUMBER_OF_CELLS; ++y)
+                for(unsigned int y=0; y < MAX_NUMBER_OF_CELLS; ++y)
                 {
                     GridLoader<Player, AllWorldObjectTypes, AllGridObjectTypes> loader;
                     loader.Stop(i_grid(x, y), *this);

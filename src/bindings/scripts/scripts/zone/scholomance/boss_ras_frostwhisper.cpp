@@ -53,7 +53,7 @@ struct NEO_DLL_DECL boss_rasfrostAI : public ScriptedAI
         m_creature->CastSpell(m_creature,SPELL_ICEARMOR,true);
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
     }
 

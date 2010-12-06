@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
- * Copyright (C) 2008-2009 Trinity <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2009 Neo <http://www.neocore.org/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -97,7 +97,7 @@ class NEO_DLL_SPEC MotionMaster //: private std::stack<MovementGenerator *>
 
         explicit MotionMaster(Unit *unit) : i_owner(unit), m_expList(NULL), m_cleanFlag(MMCF_NONE), i_top(-1)
         {
-            for (int i = 0; i < MAX_MOTION_SLOT; ++i)
+            for(int i = 0; i < MAX_MOTION_SLOT; ++i)
             {
                 Impl[i] = NULL;
                 needInit[i] = true;
@@ -119,7 +119,7 @@ class NEO_DLL_SPEC MotionMaster //: private std::stack<MovementGenerator *>
         {
             if (m_cleanFlag & MMCF_UPDATE)
             {
-                if (reset)
+                if(reset)
                     m_cleanFlag |= MMCF_RESET;
                 else
                     m_cleanFlag &= ~MMCF_RESET;
@@ -132,7 +132,7 @@ class NEO_DLL_SPEC MotionMaster //: private std::stack<MovementGenerator *>
         {
             if (m_cleanFlag & MMCF_UPDATE)
             {
-                if (reset)
+                if(reset)
                     m_cleanFlag |= MMCF_RESET;
                 else
                     m_cleanFlag &= ~MMCF_RESET;
@@ -152,8 +152,8 @@ class NEO_DLL_SPEC MotionMaster //: private std::stack<MovementGenerator *>
         void MovePoint(uint32 id, float x,float y,float z);
         void MoveCharge(float x, float y, float z, float speed = SPEED_CHARGE, uint32 id = EVENT_CHARGE);
         void MoveFall(float z, uint32 id = 0);
-        void MoveJumpTo(float angle, float speedXY, float speedZ);
-        void MoveJump(float x, float y, float z, float speedXY, float speedZ);
+        //void MoveJumpTo(float angle, float speedXY, float speedZ);
+        //void MoveJump(float x, float y, float z, float speedXY, float speedZ);
         void MoveSeekAssistance(float x,float y,float z);
         void MoveSeekAssistanceDistract(uint32 timer);
         void MoveTaxiFlight(uint32 path, uint32 pathnode);

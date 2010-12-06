@@ -1,7 +1,9 @@
 /*
  * Copyright (C) 2005-2008 MaNGOS <http://www.mangosproject.org/>
  *
- * Copyright (C) 2008 Trinity <http://www.trinitycore.org/>
+ * Copyright (C) 2008 Neo <http://www.neocore.org/>
+ *
+ * Copyright (C) 2009-2010 NeoZero <http://www.neozero.org/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,13 +23,13 @@
 #define NEO_SPELLAURADEFINES_H
 
 #define MAX_AURAS 56
-#define MAX_POSITIVE_AURAS 40
+#define MAX_POSITIVE_AURAS 32
 
 enum AURA_FLAGS
 {
     AFLAG_NEGATIVE          = 0x09,
     AFLAG_POSITIVE          = 0x1F,
-    AFLAG_MASK              = 0xFF
+    AFLAG_MASK              = 0x09,
 };
 
 //m_schoolAbsorb
@@ -202,6 +204,8 @@ enum AuraType
     SPELL_AURA_MOD_AOE_AVOIDANCE = 160,
     SPELL_AURA_MOD_HEALTH_REGEN_IN_COMBAT = 161,
     SPELL_AURA_POWER_BURN_MANA = 162,
+
+    //[TZERO] used in 1.12 ?
     SPELL_AURA_MOD_CRIT_DAMAGE_BONUS_MELEE = 163,
     SPELL_AURA_164 = 164,
     SPELL_AURA_MELEE_ATTACK_POWER_ATTACKER_BONUS = 165,
@@ -232,6 +236,8 @@ enum AuraType
     SPELL_AURA_MOD_FACTION_REPUTATION_GAIN = 190,
     SPELL_AURA_USE_NORMAL_MOVEMENT_SPEED = 191,
     SPELL_AURA_HASTE_MELEE = 192,
+
+    //[TZERO] tbc enumerations  [?]
     SPELL_AURA_MELEE_SLOW = 193,
     SPELL_AURA_MOD_DEPRICATED_1  = 194,                     // not used now, old SPELL_AURA_MOD_SPELL_DAMAGE_OF_INTELLECT
     SPELL_AURA_MOD_DEPRICATED_2  = 195,                     // not used now, old SPELL_AURA_MOD_SPELL_HEALING_OF_INTELLECT
@@ -240,21 +246,16 @@ enum AuraType
     SPELL_AURA_MOD_ALL_WEAPON_SKILLS = 198,
     SPELL_AURA_MOD_INCREASES_SPELL_PCT_TO_HIT = 199,
     SPELL_AURA_MOD_XP_PCT = 200,
-    SPELL_AURA_FLY = 201,
     SPELL_AURA_IGNORE_COMBAT_RESULT = 202,
     SPELL_AURA_MOD_ATTACKER_MELEE_CRIT_DAMAGE = 203,
     SPELL_AURA_MOD_ATTACKER_RANGED_CRIT_DAMAGE = 204,
     SPELL_AURA_205 = 205,                                   // unused
     SPELL_AURA_MOD_SPEED_MOUNTED = 206,                     // ? used in strange spells
-    SPELL_AURA_MOD_INCREASE_FLIGHT_SPEED = 207,
-    SPELL_AURA_MOD_SPEED_FLIGHT = 208,
-    SPELL_AURA_MOD_FLIGHT_SPEED_ALWAYS = 209,
     SPELL_AURA_210 = 210,                                   // unused
     SPELL_AURA_MOD_FLIGHT_SPEED_NOT_STACK = 211,
     SPELL_AURA_MOD_RANGED_ATTACK_POWER_OF_STAT_PERCENT = 212,
     SPELL_AURA_MOD_RAGE_FROM_DAMAGE_DEALT = 213,
     SPELL_AURA_214 = 214,
-    SPELL_AURA_ARENA_PREPARATION = 215,
     SPELL_AURA_HASTE_SPELLS = 216,
     SPELL_AURA_217 = 217,
     SPELL_AURA_HASTE_RANGED = 218,

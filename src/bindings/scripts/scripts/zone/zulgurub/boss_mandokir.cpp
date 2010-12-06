@@ -123,7 +123,7 @@ struct NEO_DLL_DECL boss_mandokirAI : public ScriptedAI
         }
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
      DoScriptText(SAY_AGGRO, m_creature);
     }
@@ -281,7 +281,7 @@ struct NEO_DLL_DECL mob_ohganAI : public ScriptedAI
         SunderArmor_Timer = 5000;
     }
 
-    void EnterCombat(Unit *who) {}
+    void Aggro(Unit *who) {}
 
     void JustDied(Unit* Killer)
     {

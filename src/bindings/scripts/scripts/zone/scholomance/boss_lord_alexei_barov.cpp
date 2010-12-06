@@ -54,7 +54,7 @@ struct NEO_DLL_DECL boss_lordalexeibarovAI : public ScriptedAI
         }
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
     }
 

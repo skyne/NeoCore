@@ -1,7 +1,9 @@
 /*
  * Copyright (C) 2005-2008 MaNGOS <http://www.mangosproject.org/>
  *
- * Copyright (C) 2008 Trinity <http://www.trinitycore.org/>
+ * Copyright (C) 2008 Neo <http://www.neocore.org/>
+ *
+ * Copyright (C) 2009-2010 NeoZero <http://www.neozero.org/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -128,12 +130,6 @@ enum BG_WS_CreatureTypes
     BG_CREATURES_MAX_WS       = 2
 };
 
-enum BG_WS_CarrierDebuffs
-{
-    WS_SPELL_FOCUSED_ASSAULT   = 46392,
-    WS_SPELL_BRUTAL_ASSAULT    = 46393
-};
-
 class BattleGroundWGScore : public BattleGroundScore
 {
     public:
@@ -202,11 +198,9 @@ class BattleGroundWS : public BattleGround
         uint32 m_TeamScores[2];
         int32 m_FlagsTimer[2];
         int32 m_FlagsDropTimer[2];
-        
+
         int32 m_FlagSpellForceTimer;
         int32 m_FlagSpellBrutalTimer;
-        bool m_BothFlagsKept;
-        uint8 m_FlagDebuffState;                            // 0 - no debuffs, 1 - focused assault, 2 - brutal assault
 };
 #endif
 

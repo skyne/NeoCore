@@ -1,7 +1,9 @@
 /*
  * Copyright (C) 2005-2008 MaNGOS <http://www.mangosproject.org/>
  *
- * Copyright (C) 2008 Trinity <http://www.trinitycore.org/>
+ * Copyright (C) 2008 Neo <http://www.neocore.org/>
+ *
+ * Copyright (C) 2009-2010 NeoZero <http://www.neozero.org/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +25,6 @@
 #include "Opcodes.h"
 #include "ConfusedMovementGenerator.h"
 #include "DestinationHolderImp.h"
-#include "VMapFactory.h"
 
 template<class T>
 void
@@ -43,12 +44,10 @@ ConfusedMovementGenerator<T>::Initialize(T &unit)
     bool is_water_ok, is_land_ok;
     _InitSpecific(unit, is_water_ok, is_land_ok);
 
-    VMAP::IVMapManager *vMaps = VMAP::VMapFactory::createOrGetVMapManager();
-
-    for (unsigned int idx=0; idx < MAX_CONF_WAYPOINTS+1; ++idx)
+    for(unsigned int idx=0; idx < MAX_CONF_WAYPOINTS+1; ++idx)
     {
-      const float wanderX=wander_distance*rand_norm() - wander_distance/2;
-      const float wanderY=wander_distance*rand_norm() - wander_distance/2;
+        const float wanderX=wander_distance*rand_norm() - wander_distance/2;
+        const float wanderY=wander_distance*rand_norm() - wander_distance/2;
 
         i_waypoints[idx][0] = x + wanderX;
         i_waypoints[idx][1] = y + wanderY;
@@ -59,23 +58,13 @@ ConfusedMovementGenerator<T>::Initialize(T &unit)
 
         bool is_water = map->IsInWater(i_waypoints[idx][0],i_waypoints[idx][1],z);
         // if generated wrong path just ignore
-        if (is_water && !is_water_ok || !is_water && !is_land_ok )
+        if( is_water && !is_water_ok || !is_water && !is_land_ok )
         {
             i_waypoints[idx][0] = idx > 0 ? i_waypoints[idx-1][0] : x;
             i_waypoints[idx][1] = idx > 0 ? i_waypoints[idx-1][1] : y;
         }
-        
+        unit.UpdateGroundPositionZ(i_waypoints[idx][0],i_waypoints[idx][1],z);
         i_waypoints[idx][2] =  z;
-            unit.UpdateGroundPositionZ(i_waypoints[idx][0],i_waypoints[idx][1],i_waypoints[idx][2]);
-
-    // prevent falling down over an edge and check vmap if possible
-    if (z > i_waypoints[idx][2] + 3.0f || 
-        vMaps && !vMaps->isInLineOfSight(mapid, x, y, z + 2.0f, i_waypoints[idx][0], i_waypoints[idx][1], i_waypoints[idx][2]))
-      {
-        i_waypoints[idx][0] = idx > 0 ? i_waypoints[idx-1][0] : x;
-        i_waypoints[idx][1] = idx > 0 ? i_waypoints[idx-1][1] : y;
-        i_waypoints[idx][2] = idx > 0 ? i_waypoints[idx-1][2] : z;
-      }
     }
 
     unit.SetUInt64Value(UNIT_FIELD_TARGET, 0);
@@ -116,19 +105,19 @@ template<class T>
 bool
 ConfusedMovementGenerator<T>::Update(T &unit, const uint32 &diff)
 {
-    if (!&unit)
+    if(!&unit)
         return true;
 
-    if (unit.hasUnitState(UNIT_STAT_ROOT | UNIT_STAT_STUNNED | UNIT_STAT_DISTRACTED))
+    if(unit.hasUnitState(UNIT_STAT_ROOT | UNIT_STAT_STUNNED | UNIT_STAT_DISTRACTED))
         return true;
 
-    if (i_nextMoveTime.Passed() )
+    if( i_nextMoveTime.Passed() )
     {
         // currently moving, update location
         Traveller<T> traveller(unit);
-        if (i_destinationHolder.UpdateTraveller(traveller, diff))
+        if( i_destinationHolder.UpdateTraveller(traveller, diff))
         {
-            if (i_destinationHolder.HasArrived())
+            if( i_destinationHolder.HasArrived())
             {
                 // arrived, stop and wait a bit
                 unit.clearUnitState(UNIT_STAT_MOVE);
@@ -142,10 +131,10 @@ ConfusedMovementGenerator<T>::Update(T &unit, const uint32 &diff)
     {
         // waiting for next move
         i_nextMoveTime.Update(diff);
-        if (i_nextMoveTime.Passed() )
+        if( i_nextMoveTime.Passed() )
         {
             // start moving
-            assert(i_nextMove <= MAX_CONF_WAYPOINTS);
+            assert( i_nextMove <= MAX_CONF_WAYPOINTS );
             const float x = i_waypoints[i_nextMove][0];
             const float y = i_waypoints[i_nextMove][1];
             const float z = i_waypoints[i_nextMove][2];
@@ -162,7 +151,7 @@ ConfusedMovementGenerator<T>::Finalize(T &unit)
 {
     unit.RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_CONFUSED);
     unit.clearUnitState(UNIT_STAT_CONFUSED);
-    if (unit.GetTypeId() == TYPEID_UNIT && unit.getVictim())
+    if(unit.GetTypeId() == TYPEID_UNIT && unit.getVictim())
         unit.SetUInt64Value(UNIT_FIELD_TARGET, unit.getVictim()->GetGUID());
 }
 

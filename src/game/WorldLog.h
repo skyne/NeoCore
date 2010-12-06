@@ -1,7 +1,9 @@
 /*
  * Copyright (C) 2005-2008 MaNGOS <http://www.mangosproject.org/>
  *
- * Copyright (C) 2008 Trinity <http://www.trinitycore.org/>
+ * Copyright (C) 2008 Neo <http://www.neocore.org/>
+ *
+ * Copyright (C) 2009-2010 NeoZero <http://www.neozero.org/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,26 +37,42 @@
 class NEO_DLL_DECL WorldLog : public Neo::Singleton<WorldLog, Neo::ClassLevelLockable<WorldLog, ACE_Thread_Mutex> >
 {
     friend class Neo::OperatorNew<WorldLog>;
-    WorldLog();
+    WorldLog() : i_file(NULL) { Initialize(); }
     WorldLog(const WorldLog &);
     WorldLog& operator=(const WorldLog &);
     typedef Neo::ClassLevelLockable<WorldLog, ACE_Thread_Mutex>::Lock Guard;
 
     /// Close the file in destructor
-    ~WorldLog();
+    ~WorldLog()
+    {
+        if( i_file != NULL )
+            fclose(i_file);
+        i_file = NULL;
+    }
 
     public:
         void Initialize();
         /// Is the world logger active?
-        bool LogWorld(void) const { return (i_file != NULL); }
+        inline bool LogWorld(void) const { return (i_file != NULL); }
         /// %Log to the file
-        void outLog(char const *fmt, ...);
-        void outTimestampLog(char const *fmt, ...);
+        inline void Log(char const *fmt, ...)
+        {
+            if( LogWorld() )
+            {
+                Guard guard(*this);
+                ASSERT(i_file);
+
+                va_list args;
+                va_start(args, fmt);
+                vfprintf(i_file, fmt, args);
+                va_end(args);
+
+                fflush(i_file);
+            }
+        }
 
     private:
         FILE *i_file;
-
-        bool m_dbWorld;
 };
 
 #define sWorldLog WorldLog::Instance()

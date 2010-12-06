@@ -1,7 +1,9 @@
 /*
  * Copyright (C) 2005-2008 MaNGOS <http://www.mangosproject.org/>
  *
- * Copyright (C) 2008 Trinity <http://www.trinitycore.org/>
+ * Copyright (C) 2008 Neo <http://www.neocore.org/>
+ *
+ * Copyright (C) 2009-2010 NeoZero <http://www.neozero.org/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -76,7 +78,7 @@ enum NeoStrings
     LANG_FRIEND_IGNORE_UNKNOWN          = 48,
     LANG_LEVEL_MINREQUIRED              = 49,
     LANG_LEVEL_MINREQUIRED_AND_ITEM     = 50,
-    LANG_NPC_TAINER_HELLO               = 51,
+    LANG_NPC_TRAINER_HELLO               = 51,
     LANG_COMMAND_INVALID_ITEM_COUNT     = 52,
     LANG_COMMAND_MAIL_ITEMS_LIMIT       = 53,
     LANG_NEW_PASSWORDS_NOT_MATCH        = 54,
@@ -283,7 +285,6 @@ enum NeoStrings
     LANG_YOU_ENABLE_CHAT                = 304,
 
     LANG_COMMAND_MODIFY_REP             = 305,
-    LANG_COMMAND_MODIFY_ARENA           = 306,
     LANG_COMMAND_FACTION_NOTFOUND       = 307,
     LANG_COMMAND_FACTION_UNKNOWN        = 308,
     LANG_COMMAND_FACTION_INVPARAM       = 309,
@@ -322,9 +323,47 @@ enum NeoStrings
     LANG_CREATURE_NOT_FOLLOW_YOU_NOW    = 342,
     LANG_CREATURE_NON_TAMEABLE          = 343,
     LANG_YOU_ALREADY_HAVE_PET           = 344,
-	LANG_DEV_ON                         = 345,
-    LANG_DEV_OFF                        = 346,
-    // Room for more level 2              347-399 not used
+    // alliance ranks
+    LANG_ALI_PRIVATE                    = 345,
+    LANG_ALI_CORPORAL                   = 346,
+    LANG_ALI_SERGEANT                   = 347,               
+    LANG_ALI_MASTER_SERGEANT            = 348,        
+    LANG_ALI_SERGEANT_MAJOR             = 349,         
+    LANG_ALI_KNIGHT                     = 350,                 
+    LANG_ALI_KNIGHT_LIEUTENANT          = 351,      
+    LANG_ALI_KNIGHT_CAPTAIN             = 352,         
+    LANG_ALI_KNIGHT_CHAMPION            = 353,        
+    LANG_ALI_LIEUTENANT_COMMANDER       = 354,    
+    LANG_ALI_COMMANDER                  = 355,              
+    LANG_ALI_MARSHAL                    = 356,                
+    LANG_ALI_FIELD_MARSHAL              = 357,          
+    LANG_ALI_GRAND_MARSHAL              = 358,                     
+
+// horde ranks
+    LANG_HRD_SCOUT                      = 359,                  
+    LANG_HRD_GRUNT                      = 360,                  
+    LANG_HRD_SERGEANT                   = 361,               
+    LANG_HRD_SENIOR_SERGEANT            = 362,        
+    LANG_HRD_FIRST_SERGEANT             = 363,        
+    LANG_HRD_STONE_GUARD                = 364,             
+    LANG_HRD_BLOOD_GUARD                = 365,            
+    LANG_HRD_LEGIONNARE                 = 366,             
+    LANG_HRD_CENTURION                  = 367,              
+    LANG_HRD_CHAMPION                   = 368,               
+    LANG_HRD_LIEUTENANT_GENERAL         = 369,     
+    LANG_HRD_GENERAL                    = 370,                
+    LANG_HRD_WARLORD                    = 371,                
+    LANG_HRD_HIGH_WARLORD               = 372,
+
+    LANG_GAME_MASTER                    = 373,             
+    LANG_NO_RANK                        = 374,                    
+    LANG_RANK                           = 375,                       
+    LANG_HONOR_TODAY                    = 376,                
+    LANG_HONOR_YESTERDAY                = 377,           
+    LANG_HONOR_THIS_WEEK                = 378,            
+    LANG_HONOR_LAST_WEEK                = 379,            
+    LANG_HONOR_LIFE                     = 380,                 
+    // Room for more level 2              381-399 not used
 
     // level 3 chat
     LANG_SCRIPTS_RELOADED               = 400,
@@ -579,10 +618,6 @@ enum NeoStrings
     LANG_BG_WS_ALLIANCE_FLAG_RESPAWNED  = 614,
     LANG_BG_WS_HORDE_FLAG_RESPAWNED     = 615,
 
-    LANG_BG_EY_ONE_MINUTE               = 636,
-    LANG_BG_EY_HALF_MINUTE              = 637,
-    LANG_BG_EY_BEGIN                    = 638,
-
     LANG_BG_AB_ALLY                     = 650,
     LANG_BG_AB_HORDE                    = 651,
     LANG_BG_AB_NODE_STABLES             = 652,
@@ -601,34 +636,6 @@ enum NeoStrings
     LANG_BG_AB_H_NEAR_VICTORY           = 665,
     LANG_BG_MARK_BY_MAIL                = 666,
 
-    LANG_BG_EY_HAS_TAKEN_A_M_TOWER      = 667,
-    LANG_BG_EY_HAS_TAKEN_H_M_TOWER      = 668,
-    LANG_BG_EY_HAS_TAKEN_A_D_RUINS      = 669,
-    LANG_BG_EY_HAS_TAKEN_H_D_RUINS      = 670,
-    LANG_BG_EY_HAS_TAKEN_A_B_TOWER      = 671,
-    LANG_BG_EY_HAS_TAKEN_H_B_TOWER      = 672,
-    LANG_BG_EY_HAS_TAKEN_A_F_RUINS      = 673,
-    LANG_BG_EY_HAS_TAKEN_H_F_RUINS      = 674,
-    LANG_BG_EY_HAS_LOST_A_M_TOWER       = 675,
-    LANG_BG_EY_HAS_LOST_H_M_TOWER       = 676,
-    LANG_BG_EY_HAS_LOST_A_D_RUINS       = 677,
-    LANG_BG_EY_HAS_LOST_H_D_RUINS       = 678,
-    LANG_BG_EY_HAS_LOST_A_B_TOWER       = 679,
-    LANG_BG_EY_HAS_LOST_H_B_TOWER       = 680,
-    LANG_BG_EY_HAS_LOST_A_F_RUINS       = 681,
-    LANG_BG_EY_HAS_LOST_H_F_RUINS       = 682,
-    LANG_BG_EY_HAS_TAKEN_FLAG           = 683,
-    LANG_BG_EY_CAPTURED_FLAG_A          = 684,
-    LANG_BG_EY_CAPTURED_FLAG_H          = 685,
-    LANG_BG_EY_DROPPED_FLAG             = 686,
-    LANG_BG_EY_RESETED_FLAG             = 687,
-
-    LANG_ARENA_ONE_TOOLOW               = 700,
-    LANG_ARENA_ONE_MINUTE               = 701,
-    LANG_ARENA_THIRTY_SECONDS           = 702,
-    LANG_ARENA_FIFTEEN_SECONDS          = 703,
-    LANG_ARENA_BEGUN                    = 704,
-
     LANG_WAIT_BEFORE_SPEAKING           = 705,
     LANG_NOT_EQUIPPED_ITEM              = 706,
     LANG_PLAYER_DND                     = 707,
@@ -639,11 +646,7 @@ enum NeoStrings
     LANG_BG_QUEUE_ANNOUNCE_SELF         = 711,
     LANG_BG_QUEUE_ANNOUNCE_WORLD        = 712,
 
-
-    LANG_YOUR_ARENA_LEVEL_REQ_ERROR     = 713,
-//    LANG_HIS_ARENA_LEVEL_REQ_ERROR      = 714, an opcode exists for this
     LANG_YOUR_BG_LEVEL_REQ_ERROR        = 715,
-//    LANG_YOUR_ARENA_TEAM_FULL           = 716, an opcode exists for this
 
     LANG_BG_AV_ALLY                     = 717,
     LANG_BG_AV_HORDE                    = 718,
@@ -685,17 +688,10 @@ enum NeoStrings
 
     // Room for BG/ARENA                  751-769 not used
 
-    LANG_ARENA_TESTING                  = 785,
-
     LANG_AUTO_ANN                       = 786,
     LANG_ANNOUNCE_COLOR                 = 787,
 
     LANG_BG_GROUP_TOO_LARGE             = 1122, // "Your group is too large for this battleground. Please regroup to join."
-    LANG_ARENA_GROUP_TOO_LARGE          = 1123, // "Your group is too large for this arena. Please regroup to join."
-    LANG_ARENA_YOUR_TEAM_ONLY           = 1124, // "Your group has members not in your arena team. Please regroup to join."
-    LANG_ARENA_NOT_ENOUGH_PLAYERS       = 1125, // "Your group does not have enough players to join this match."
-    LANG_ARENA_GOLD_WINS                = 1126, // "The Gold Team wins!"
-    LANG_ARENA_GREEN_WINS               = 1127, // "The Green Team wins!"
     LANG_BATTLEGROUND_PREMATURE_FINISH_WARNING = 1128,   // The battleground will end soon, because there aren't enough players. Get more ppl or win already!
     LANG_BG_GROUP_OFFLINE_MEMBER        = 1129, // "Your group has an offline member. Please remove him before joining."
     LANG_BG_GROUP_MIXED_FACTION         = 1130, // "Your group has players from the opposing faction. You can't join the battleground as a group."
@@ -704,8 +700,8 @@ enum NeoStrings
     LANG_BG_GROUP_MEMBER_DESERTER       = 1133, // "Someone in your party is Deserter. You can't join as group."
     LANG_BG_GROUP_MEMBER_NO_FREE_QUEUE_SLOTS = 1134, // "Someone in your party is already in three battleground queues. You cannot join as group."
 
-    LANG_CANNOT_TELE_TO_BG              = 1135, // "You cannot teleport to a battleground or arena map."
-    LANG_CANNOT_SUMMON_TO_BG            = 1136, // "You cannot summon players to a battleground or arena map."
+    LANG_CANNOT_TELE_TO_BG              = 1135, // "You cannot teleport to a battleground map."
+    LANG_CANNOT_SUMMON_TO_BG            = 1136, // "You cannot summon players to a battleground map."
     LANG_CANNOT_GO_TO_BG_GM             = 1137, // "You must be in GM mode to teleport to a player in a battleground."
     LANG_CANNOT_GO_TO_BG_FROM_BG        = 1138, // "You cannot teleport to a battleground from another battleground. Please leave the current battleground first."
 
@@ -720,12 +716,7 @@ enum NeoStrings
     LANG_NEED_CHARACTER_NAME            = 807,
     LANG_PLAYER_NOT_EXIST_OR_OFFLINE    = 808,
     LANG_ACCOUNT_FOR_PLAYER_NOT_FOUND   = 809,
-    LANG_GUILD_MASTER                   = 811,
-    LANG_GUILD_OFFICER                  = 812,
-    LANG_GUILD_VETERAN                  = 813,
-    LANG_GUILD_MEMBER                   = 814,
-    LANG_GUILD_INITIATE                 = 815,
-    // Room for in-game strings           816-999 not used
+    // Room for in-game strings           810-999 not used
 
     // Level 4 (CLI only commands)
     LANG_COMMAND_EXIT                   = 1000,
@@ -810,8 +801,6 @@ enum NeoStrings
     LANG_GM_BROADCAST                    = 6613,
     LANG_GM_NOTIFY                       = 6614,
     LANG_GM_ANNOUNCE_COLOR               = 6615,
-	LANG_ADMIN_ANNOUNCE_COLOR            = 6616,
-	LANG_CUSTOM_BROADCAST                = 6617,
 
     // Use for not-in-offcial-sources patches
     //                                    10000-10999
@@ -880,12 +869,9 @@ enum NeoStrings
     LANG_NO_ENTER_HALL_OF_LEGENDS       = 10056,
     LANG_NO_ENTER_CHAMPIONS_HALL        = 10057,
 
+	LANG_INVALID_REALMID                = 11001,
+
     // Use for custom patches             11000-11999
-    // Broadcaster - was deleted in r200 because of crash in combination with new database code but may be correctly reimplemented based on TC2 r4837 + r4867
-    LANG_AUTO_BROADCAST                 = 11000,
-    LANG_INVALID_REALMID                = 11001,
-	LANG_LOCKDOWN_MESSAGE_LONG          = 11010,
-	LANG_LOCKDOWN_MESSAGE_SHORT         = 11011,
 
     // NOT RESERVED IDS                   12000-1999999999
     // `db_script_string` table index     2000000000-2000009999 (MIN_DB_SCRIPT_STRING_ID-MAX_DB_SCRIPT_STRING_ID)

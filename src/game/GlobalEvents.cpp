@@ -1,7 +1,9 @@
 /*
  * Copyright (C) 2005-2008 MaNGOS <http://www.mangosproject.org/>
  *
- * Copyright (C) 2008 Trinity <http://www.trinitycore.org/>
+ * Copyright (C) 2008 Neo <http://www.neocore.org/>
+ *
+ * Copyright (C) 2009-2010 NeoZero <http://www.neozero.org/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,7 +36,7 @@
 
 static void CorpsesEraseCallBack(QueryResult_AutoPtr result, bool bones)
 {
-    if (!result)
+    if(!result)
         return;
 
     do
@@ -51,11 +53,11 @@ static void CorpsesEraseCallBack(QueryResult_AutoPtr result, bool bones)
         sLog.outDebug("[Global event] Removing %s %u (X:%f Y:%f Map:%u).",(bones?"bones":"corpse"),guidlow,positionX,positionY,mapid);
 
         /// Resurrectable - convert corpses to bones
-        if (!bones)
+        if(!bones)
         {
-            if (!ObjectAccessor::Instance().ConvertCorpseForPlayer(player_guid))
+            if(!ObjectAccessor::Instance().ConvertCorpseForPlayer(player_guid))
             {
-                sLog.outDebug("Corpse %u not found in world or bones creating forbidden. Delete from DB.",guidlow);
+                sLog.outDebug("Corpse %u not found in world. Delete from DB.",guidlow);
                 CharacterDatabase.PExecute("DELETE FROM corpse WHERE guid = '%u'",guidlow);
             }
         }
@@ -68,6 +70,8 @@ static void CorpsesEraseCallBack(QueryResult_AutoPtr result, bool bones)
             CharacterDatabase.PExecute("DELETE FROM corpse WHERE guid = '%u'",guidlow);
         }
     } while (result->NextRow());
+
+    
 }
 
 /// Handle periodic erase of corpses and bones

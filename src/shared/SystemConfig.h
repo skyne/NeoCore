@@ -1,7 +1,9 @@
 /*
  * Copyright (C) 2005-2008 MaNGOS <http://www.mangosproject.org/>
  *
- * Copyright (C) 2008 Neo <http://www.neocore.info/>
+ * Copyright (C) 2008 Neo <http://www.neocore.org/>
+ *
+ * Copyright (C) 2009-2010 NeoZero <http://www.neozero.org/>
  *
  *
  * This program is free software; you can redistribute it and/or modify
@@ -28,8 +30,8 @@
 #include "revision.h"
 
 
-#define _PACKAGENAME "NeoCore "
-#define _CODENAME "Tanja"
+#define _PACKAGENAME "NeoZero "
+#define _CODENAME "YUME"
 
 #if NEO_ENDIAN == NEO_BIGENDIAN
 # define _ENDIAN_STRING "big-endian"
@@ -39,12 +41,12 @@
 
 #if PLATFORM == PLATFORM_WINDOWS
 # ifdef _WIN64
-#  define _FULLVERSION _PACKAGENAME "Branch: " _BRANCH " Rev: " _REVISION  " (Win64," _ENDIAN_STRING ") \nCodename:" _CODENAME 
+#  define _FULLVERSION _PACKAGENAME "Rev: " _REVISION  " Hash: " _HASH " (Win64," _ENDIAN_STRING ")"
 # else
-#  define _FULLVERSION _PACKAGENAME "Branch: " _BRANCH " Rev: " _REVISION  " (Win32," _ENDIAN_STRING ") \nCodename:" _CODENAME
+#  define _FULLVERSION _PACKAGENAME "Rev: " _REVISION  " Hash: " _HASH " (Win32," _ENDIAN_STRING ")"
 # endif
 #else
-#  define _FULLVERSION _PACKAGENAME "Branch: " _BRANCH " Rev: " _REVISION  " (Unix," _ENDIAN_STRING ") \nCodename:" _CODENAME
+#  define _FULLVERSION _PACKAGENAME "Rev: " _REVISION  " Hash: " _HASH " (Unix," _ENDIAN_STRING ")"
 #endif
 
 #define DEFAULT_PLAYER_LIMIT 100

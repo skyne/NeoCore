@@ -1,7 +1,9 @@
 /*
  * Copyright (C) 2005-2008 MaNGOS <http://www.mangosproject.org/>
  *
- * Copyright (C) 2008 Trinity <http://www.trinitycore.org/>
+ * Copyright (C) 2008 Neo <http://www.neocore.org/>
+ *
+ * Copyright (C) 2009-2010 NeoZero <http://www.neozero.org/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,7 +42,7 @@ bool ChatHandler::HandleDebugInArcCommand(const char* /*args*/)
 {
     Object *obj = getSelectedUnit();
 
-    if (!obj)
+    if(!obj)
     {
         SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
         return true;
@@ -53,17 +55,18 @@ bool ChatHandler::HandleDebugInArcCommand(const char* /*args*/)
 
 bool ChatHandler::HandleDebugSpellFailCommand(const char* args)
 {
-    if (!args)
+    if(!args)
         return false;
 
     char* px = strtok((char*)args, " ");
-    if (!px)
+    if(!px)
         return false;
 
     uint8 failnum = (uint8)atoi(px);
 
-    WorldPacket data(SMSG_CAST_FAILED, 5);
+    WorldPacket data(SMSG_CAST_FAILED, 1+4+1);
     data << uint32(133);
+    data << uint8(2);
     data << uint8(failnum);
     m_session->SendPacket(&data);
 
@@ -74,22 +77,22 @@ bool ChatHandler::HandleSetPoiCommand(const char* args)
 {
     Player *pPlayer = m_session->GetPlayer();
     Unit* target = getSelectedUnit();
-    if (!target)
+    if(!target)
     {
         SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
         return true;
     }
 
-    if (!args)
+    if(!args)
         return false;
 
     char* icon_text = strtok((char*)args, " ");
     char* flags_text = strtok(NULL, " ");
-    if (!icon_text || !flags_text)
+    if(!icon_text || !flags_text)
         return false;
 
     uint32 icon = atol(icon_text);
-    if (icon < 0 )
+    if ( icon < 0 )
         icon = 0;
 
     uint32 flags = atol(flags_text);
@@ -101,7 +104,7 @@ bool ChatHandler::HandleSetPoiCommand(const char* args)
 
 bool ChatHandler::HandleEquipErrorCommand(const char* args)
 {
-    if (!args)
+    if(!args)
         return false;
 
     uint8 msg = atoi(args);
@@ -111,7 +114,7 @@ bool ChatHandler::HandleEquipErrorCommand(const char* args)
 
 bool ChatHandler::HandleSellErrorCommand(const char* args)
 {
-    if (!args)
+    if(!args)
         return false;
 
     uint8 msg = atoi(args);
@@ -121,7 +124,7 @@ bool ChatHandler::HandleSellErrorCommand(const char* args)
 
 bool ChatHandler::HandleBuyErrorCommand(const char* args)
 {
-    if (!args)
+    if(!args)
         return false;
 
     uint8 msg = atoi(args);
@@ -136,11 +139,11 @@ bool ChatHandler::HandleSendOpcodeCommand(const char* /*args*/)
     if (!unit || (unit->GetTypeId() != TYPEID_PLAYER))
         player = m_session->GetPlayer();
     else
-        player = unit->ToPlayer();
-    if (!unit) unit = player;
+        player = (Player*)unit;
+    if(!unit) unit = player;
 
     std::ifstream ifs("opcode.txt");
-    if (ifs.bad())
+    if(ifs.bad())
         return false;
 
     uint32 opcode;
@@ -148,65 +151,65 @@ bool ChatHandler::HandleSendOpcodeCommand(const char* /*args*/)
 
     WorldPacket data(opcode, 0);
 
-    while (!ifs.eof())
+    while(!ifs.eof())
     {
         std::string type;
         ifs >> type;
 
-        if (type == "")
+        if(type == "")
             break;
 
-        if (type == "uint8")
+        if(type == "uint8")
         {
             uint16 val1;
             ifs >> val1;
             data << uint8(val1);
         }
-        else if (type == "uint16")
+        else if(type == "uint16")
         {
             uint16 val2;
             ifs >> val2;
             data << val2;
         }
-        else if (type == "uint32")
+        else if(type == "uint32")
         {
             uint32 val3;
             ifs >> val3;
             data << val3;
         }
-        else if (type == "uint64")
+        else if(type == "uint64")
         {
             uint64 val4;
             ifs >> val4;
             data << val4;
         }
-        else if (type == "float")
+        else if(type == "float")
         {
             float val5;
             ifs >> val5;
             data << val5;
         }
-        else if (type == "string")
+        else if(type == "string")
         {
             std::string val6;
             ifs >> val6;
             data << val6;
         }
-        else if (type == "pguid")
+        else if(type == "pguid")
         {
             data.append(unit->GetPackGUID());
         }
-        else if (type == "myguid")
+        else if(type == "myguid")
         {
             data.append(player->GetPackGUID());
         }
-        else if (type == "pos")
+        else if(type == "pos")
         {
             data << unit->GetPositionX();
             data << unit->GetPositionY();
             data << unit->GetPositionZ();
         }
-        else if (type == "mypos")
+        else if(type == "mypos")
         {
             data << player->GetPositionX();
             data << player->GetPositionY();
@@ -221,7 +224,7 @@ bool ChatHandler::HandleSendOpcodeCommand(const char* /*args*/)
     ifs.close();
     sLog.outDebug("Sending opcode %u", data.GetOpcode());
     data.hexlike();
-    unit->ToPlayer()->GetSession()->SendPacket(&data);
+    ((Player*)unit)->GetSession()->SendPacket(&data);
     PSendSysMessage(LANG_COMMAND_OPCODESENT, data.GetOpcode(), unit->GetName());
     return true;
 }
@@ -242,7 +245,7 @@ bool ChatHandler::HandleUpdateWorldStateCommand(const char* args)
 
 bool ChatHandler::HandlePlaySound2Command(const char* args)
 {
-    if (!args)
+    if(!args)
         return false;
 
     uint32 soundid = atoi(args);
@@ -253,7 +256,7 @@ bool ChatHandler::HandlePlaySound2Command(const char* args)
 //Send notification in channel
 bool ChatHandler::HandleSendChannelNotifyCommand(const char* args)
 {
-    if (!args)
+    if(!args)
         return false;
 
     const char *name = "test";
@@ -271,7 +274,7 @@ bool ChatHandler::HandleSendChannelNotifyCommand(const char* args)
 //Send notification in chat
 bool ChatHandler::HandleSendChatMsgCommand(const char* args)
 {
-    if (!args)
+    if(!args)
         return false;
 
     const char *msg = "testtest";
@@ -293,7 +296,7 @@ bool ChatHandler::HandleSendQuestPartyMsgCommand(const char* args)
 bool ChatHandler::HandleGetLootRecipient(const char* /*args*/)
 {
     Creature* target = getSelectedCreature();
-    if (!target)
+    if(!target)
         return false;
 
     PSendSysMessage("loot recipient: %s", target->hasLootRecipient()?(target->GetLootRecipient()?target->GetLootRecipient()->GetName():"offline"):"no loot recipient");
@@ -334,7 +337,7 @@ bool ChatHandler::HandleGetItemState(const char* args)
         SendSysMessage(state_str.c_str());
         for (uint8 i = PLAYER_SLOT_START; i < PLAYER_SLOT_END; i++)
         {
-            if (i >= BUYBACK_SLOT_START && i < BUYBACK_SLOT_END)
+            if(i >= BUYBACK_SLOT_START && i < BUYBACK_SLOT_END)
                 continue;
 
             Item *item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, i);
@@ -360,10 +363,10 @@ bool ChatHandler::HandleGetItemState(const char* args)
     if (list_queue)
     {
         std::vector<Item *> &updateQueue = player->GetItemUpdateQueue();
-        for (size_t i = 0; i < updateQueue.size(); i++)
+        for(size_t i = 0; i < updateQueue.size(); i++)
         {
             Item *item = updateQueue[i];
-            if (!item) continue;
+            if(!item) continue;
 
             Bag *container = item->GetContainer();
             uint8 bag_slot = container ? container->GetSlot() : uint8(INVENTORY_SLOT_BAG_0);
@@ -389,7 +392,7 @@ bool ChatHandler::HandleGetItemState(const char* args)
         std::vector<Item *> &updateQueue = player->GetItemUpdateQueue();
         for (uint8 i = PLAYER_SLOT_START; i < PLAYER_SLOT_END; i++)
         {
-            if (i >= BUYBACK_SLOT_START && i < BUYBACK_SLOT_END)
+            if(i >= BUYBACK_SLOT_START && i < BUYBACK_SLOT_END)
                 continue;
 
             Item *item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, i);
@@ -440,7 +443,7 @@ bool ChatHandler::HandleGetItemState(const char* args)
                 error = true; continue;
             }
 
-            if (item->IsBag())
+            if(item->IsBag())
             {
                 Bag *bag = (Bag*)item;
                 for (uint8 j = 0; j < bag->GetBagSize(); ++j)
@@ -503,10 +506,10 @@ bool ChatHandler::HandleGetItemState(const char* args)
             }
         }
 
-        for (size_t i = 0; i < updateQueue.size(); i++)
+        for(size_t i = 0; i < updateQueue.size(); i++)
         {
             Item *item = updateQueue[i];
-            if (!item) continue;
+            if(!item) continue;
 
             if (item->GetOwnerGUID() != player->GetGUID())
             {
@@ -521,7 +524,7 @@ bool ChatHandler::HandleGetItemState(const char* args)
             }
 
             if (item->GetState() == ITEM_REMOVED) continue;
-            Item *test = player->GetItemByPos(item->GetBagSlot(), item->GetSlot());
+            Item *test = player->GetItemByPos( item->GetBagSlot(), item->GetSlot());
 
             if (test == NULL)
             {
@@ -542,32 +545,20 @@ bool ChatHandler::HandleGetItemState(const char* args)
     return true;
 }
 
-bool ChatHandler::HandleDebugBattlegroundCommand(const char * /*args*/)
-{
-    sBattleGroundMgr.ToggleTesting();
-    return true;
-}
-
-bool ChatHandler::HandleDebugArenaCommand(const char * /*args*/)
-{
-    sBattleGroundMgr.ToggleArenaTesting();
-    return true;
-}
-
 bool ChatHandler::HandleDebugThreatList(const char * /*args*/)
 {
     Creature* target = getSelectedCreature();
-    if (!target || target->isTotem() || target->isPet())
+    if(!target || target->isTotem() || target->isPet())
         return false;
 
     std::list<HostilReference*>& tlist = target->getThreatManager().getThreatList();
     std::list<HostilReference*>::iterator itr;
     uint32 cnt = 0;
     PSendSysMessage("Threat list of %s (guid %u)",target->GetName(), target->GetGUIDLow());
-    for (itr = tlist.begin(); itr != tlist.end(); ++itr)
+    for(itr = tlist.begin(); itr != tlist.end(); ++itr)
     {
         Unit* unit = (*itr)->getTarget();
-        if (!unit)
+        if(!unit)
             continue;
         ++cnt;
         PSendSysMessage("   %u.   %s   (guid %u)  - threat %f",cnt,unit->GetName(), unit->GetGUIDLow(), (*itr)->getThreat());
@@ -579,14 +570,14 @@ bool ChatHandler::HandleDebugThreatList(const char * /*args*/)
 bool ChatHandler::HandleDebugHostilRefList(const char * /*args*/)
 {
     Unit* target = getSelectedUnit();
-    if (!target)
+    if(!target)
         target = m_session->GetPlayer();
     HostilReference* ref = target->getHostilRefManager().getFirst();
     uint32 cnt = 0;
     PSendSysMessage("Hostil reference list of %s (guid %u)",target->GetName(), target->GetGUIDLow());
-    while (ref)
+    while(ref)
     {
-        if (Unit * unit = ref->getSource()->getOwner())
+        if(Unit * unit = ref->getSource()->getOwner())
         {
             ++cnt;
             PSendSysMessage("   %u.   %s   (guid %u)  - threat %f",cnt,unit->GetName(), unit->GetGUIDLow(), ref->getThreat());

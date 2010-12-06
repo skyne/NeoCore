@@ -1,7 +1,9 @@
 /*
  * Copyright (C) 2005-2008 MaNGOS <http://www.mangosproject.org/>
  *
- * Copyright (C) 2008 Trinity <http://www.trinitycore.org/>
+ * Copyright (C) 2008 Neo <http://www.neocore.org/>
+ *
+ * Copyright (C) 2009-2010 NeoZero <http://www.neozero.org/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,8 +45,8 @@ enum Races
     RACE_GNOME          = 7,
     RACE_TROLL          = 8,
     //RACE_GOBLIN         = 9,
-    RACE_BLOODELF       = 10,
-    RACE_DRAENEI        = 11,
+    //RACE_BLOODELF       = 10,
+    //RACE_DRAENEI        = 11,
     //RACE_FEL_ORC        = 12,
     //RACE_NAGA           = 13,
     //RACE_BROKEN         = 14,
@@ -58,13 +60,12 @@ enum Races
 };
 
 // max+1 for player race
-#define MAX_RACES         12
+#define MAX_RACES         9
 
 #define RACEMASK_ALL_PLAYABLE \
     ((1<<(RACE_HUMAN-1))   |(1<<(RACE_ORC-1))          |(1<<(RACE_DWARF-1))   | \
     (1<<(RACE_NIGHTELF-1))|(1<<(RACE_UNDEAD_PLAYER-1))|(1<<(RACE_TAUREN-1))  | \
-    (1<<(RACE_GNOME-1))   |(1<<(RACE_TROLL-1))        |(1<<(RACE_BLOODELF-1))| \
-    (1<<(RACE_DRAENEI-1)) )
+    (1<<(RACE_GNOME-1))   |(1<<(RACE_TROLL-1)) )
 
 // Class value is index in ChrClasses.dbc
 enum Classes
@@ -74,7 +75,7 @@ enum Classes
     CLASS_HUNTER        = 3,
     CLASS_ROGUE         = 4,
     CLASS_PRIEST        = 5,
-    CLASS_DEATH_KNIGHT  = 6,
+    //CLASS_DEATH_KNIGHT  = 6,
     CLASS_SHAMAN        = 7,
     CLASS_MAGE          = 8,
     CLASS_WARLOCK       = 9,
@@ -92,7 +93,7 @@ enum Classes
 
 #define CLASSMASK_WAND_USERS ((1<<(CLASS_PRIEST-1))|(1<<(CLASS_MAGE-1))|(1<<(CLASS_WARLOCK-1)))
 
-#define PLAYER_MAX_BATTLEGROUND_QUEUES 3
+#define PLAYER_MAX_BATTLEGROUND_QUEUES 6
 
 enum ReputationRank
 {
@@ -134,7 +135,7 @@ enum Powers
     POWER_FOCUS                         = 2,
     POWER_ENERGY                        = 3,
     POWER_HAPPINESS                     = 4,
-    POWER_RUNES                         = 5,
+   // POWER_RUNES                         = 5, [TZERO]WotLK - Deathknights
     POWER_HEALTH                        = 0xFFFFFFFE    // (-2 as signed value)
 };
 
@@ -167,25 +168,31 @@ enum SpellSchoolMask
     // unions
 
     // 124, not include normal and holy damage
-    SPELL_SCHOOL_MASK_SPELL   = (SPELL_SCHOOL_MASK_FIRE   |
+    SPELL_SCHOOL_MASK_SPELL   = ( SPELL_SCHOOL_MASK_FIRE   |
                                   SPELL_SCHOOL_MASK_NATURE | SPELL_SCHOOL_MASK_FROST  |
                                   SPELL_SCHOOL_MASK_SHADOW | SPELL_SCHOOL_MASK_ARCANE ),
     // 126
-    SPELL_SCHOOL_MASK_MAGIC   = (SPELL_SCHOOL_MASK_HOLY | SPELL_SCHOOL_MASK_SPELL ),
+    SPELL_SCHOOL_MASK_MAGIC   = ( SPELL_SCHOOL_MASK_HOLY | SPELL_SCHOOL_MASK_SPELL ),
 
     // 127
-    SPELL_SCHOOL_MASK_ALL     = (SPELL_SCHOOL_MASK_NORMAL | SPELL_SCHOOL_MASK_MAGIC )
+    SPELL_SCHOOL_MASK_ALL     = ( SPELL_SCHOOL_MASK_NORMAL | SPELL_SCHOOL_MASK_MAGIC )
 };
 
 #define SPELL_SCHOOL_MASK_MAGIC                            \
-    (SPELL_SCHOOL_MASK_HOLY | SPELL_SCHOOL_MASK_FIRE | SPELL_SCHOOL_MASK_NATURE |  \
+    ( SPELL_SCHOOL_MASK_HOLY | SPELL_SCHOOL_MASK_FIRE | SPELL_SCHOOL_MASK_NATURE |  \
       SPELL_SCHOOL_MASK_FROST | SPELL_SCHOOL_MASK_SHADOW | \
       SPELL_SCHOOL_MASK_ARCANE )
 
+// it convert school value into schoolmask missing in 1.12 dbc
+inline SpellSchoolMask GetSchoolMask(uint32 school)
+{
+    return SpellSchoolMask(1 << school);
+}
+
 inline SpellSchools GetFirstSchoolInMask(SpellSchoolMask mask)
 {
-    for (int i = 0; i < MAX_SPELL_SCHOOL; ++i)
-        if (mask & (1 << i))
+    for(int i = 0; i < MAX_SPELL_SCHOOL; ++i)
+        if(mask & (1 << i))
             return SpellSchools(i);
 
     return SPELL_SCHOOL_NORMAL;
@@ -285,7 +292,7 @@ enum SpellCategory
 #define SPELL_ATTR_EX2_UNK2                       0x00000004            // 2 boss spells?
 #define SPELL_ATTR_EX2_UNK3                       0x00000008            // 3
 #define SPELL_ATTR_EX2_UNK4                       0x00000010            // 4
-#define SPELL_ATTR_EX2_AUTOREPEAT_FLAG            0x00000020            // 5
+#define SPELL_ATTR_EX2_UNK5                       0x00000020            // 5
 #define SPELL_ATTR_EX2_UNK6                       0x00000040            // 6
 #define SPELL_ATTR_EX2_UNK7                       0x00000080            // 7
 #define SPELL_ATTR_EX2_UNK8                       0x00000100            // 8 not set in 2.4.2
@@ -362,15 +369,13 @@ enum SpellCategory
 #define SPELL_ATTR_EX4_UNK13                      0x00002000            // 13
 #define SPELL_ATTR_EX4_UNK14                      0x00004000            // 14
 #define SPELL_ATTR_EX4_UNK15                      0x00008000            // 15
-#define SPELL_ATTR_EX4_NOT_USABLE_IN_ARENA        0x00010000            // 16 not usable in arena
-#define SPELL_ATTR_EX4_USABLE_IN_ARENA            0x00020000            // 17 usable in arena
 #define SPELL_ATTR_EX4_UNK18                      0x00040000            // 18
 #define SPELL_ATTR_EX4_UNK19                      0x00080000            // 19
 #define SPELL_ATTR_EX4_UNK20                      0x00100000            // 20
 #define SPELL_ATTR_EX4_UNK21                      0x00200000            // 21
 #define SPELL_ATTR_EX4_UNK22                      0x00400000            // 22
 #define SPELL_ATTR_EX4_UNK23                      0x00800000            // 23
-#define SPELL_ATTR_EX4_AUTOSHOT                   0x01000000            // 24
+#define SPELL_ATTR_EX4_UNK24                      0x01000000            // 24
 #define SPELL_ATTR_EX4_UNK25                      0x02000000            // 25 pet scaling auras
 #define SPELL_ATTR_EX4_CAST_ONLY_IN_OUTLAND       0x04000000            // 26 Can only be used in Outland.
 #define SPELL_ATTR_EX4_UNK27                      0x08000000            // 27
@@ -499,6 +504,7 @@ enum Language
     LANG_GNOMISH        = 13,
     LANG_TROLL          = 14,
     LANG_GUTTERSPEAK    = 33,
+    // [TZERO] tbc enumerations [?]
     LANG_DRAENEI        = 35,
     LANG_ZOMBIE         = 36,
     LANG_GNOMISH_BINARY = 37,
@@ -644,6 +650,8 @@ enum SpellEffects
     SPELL_EFFECT_TELEPORT_GRAVEYARD        = 120,
     SPELL_EFFECT_NORMALIZED_WEAPON_DMG     = 121,
     SPELL_EFFECT_122                       = 122,
+
+    // [TZERO] Tbc enumerations [?]
     SPELL_EFFECT_SEND_TAXI                 = 123,
     SPELL_EFFECT_PLAYER_PULL               = 124,
     SPELL_EFFECT_MODIFY_THREAT_PERCENT     = 125,
@@ -678,17 +686,19 @@ enum SpellEffects
     TOTAL_SPELL_EFFECTS                    = 154
 };
 
+
 // Spell aura states
+// _most_ of them aren't used in client in 1.12 but we can use them in core to detect if spell can be casted or not
 enum AuraState
 {   // (C) used in caster aura state     (T) used in target aura state
     // (c) used in caster aura state-not (t) used in target aura state-not
-    AURA_STATE_DEFENSE                      = 1,            // C   |
-    AURA_STATE_HEALTHLESS_20_PERCENT        = 2,            // CcT |
+    AURA_STATE_DEFENSE                      = 1,            // C   | REAL in 1.12
+    AURA_STATE_HEALTHLESS_20_PERCENT        = 2,            // CcT | REAL in 1.12
     AURA_STATE_BERSERKING                   = 3,            // C T |
     //AURA_STATE_UNKNOWN4                   = 4,            //  c t| some limitation to charge spells (?) and target test spells
-    AURA_STATE_JUDGEMENT                    = 5,            // C   |
+    AURA_STATE_JUDGEMENT                    = 5,            // C   | REAL in 1.12
     //AURA_STATE_UNKNOWN6                   = 6,            //     | not used
-    AURA_STATE_HUNTER_PARRY                 = 7,            // C   |
+    AURA_STATE_HUNTER_PARRY                 = 7,            // C   | REAL in 1.12
     AURA_STATE_ROGUE_ATTACK_FROM_STEALTH    = 7,            // C   | FIX ME: not implemented yet!
     //AURA_STATE_UNKNOWN7c                  = 7,            //  c  | random/focused bursts spells (?)
     //AURA_STATE_UNKNOWN8                   = 8,            //     | not used
@@ -737,13 +747,12 @@ enum Mechanics
     MECHANIC_INVULNERABILITY  = 25,
     MECHANIC_INTERRUPT        = 26,
     MECHANIC_DAZE             = 27,
-    MECHANIC_DISCOVERY        = 28,
     MECHANIC_IMMUNE_SHIELD    = 29,                         // Divine (Blessing) Shield/Protection and Ice Block
     MECHANIC_SAPPED           = 30
 };
 
 // Used for spell 42292 Immune Movement Impairment and Loss of Control (0x49967da6)
-#define IMMUNE_TO_MOVEMENT_IMPAIRMENT_AND_LOSS_CONTROL_MASK (\
+#define IMMUNE_TO_MOVEMENT_IMPAIRMENT_AND_LOSS_CONTROL_MASK ( \
     (1<<MECHANIC_CHARM   )|(1<<MECHANIC_CONFUSED )|(1<<MECHANIC_FEAR  )| \
     (1<<MECHANIC_ROOT    )|(1<<MECHANIC_PACIFY   )|(1<<MECHANIC_SLEEP )| \
     (1<<MECHANIC_SNARE   )|(1<<MECHANIC_STUN     )|(1<<MECHANIC_FREEZE)| \
@@ -767,7 +776,7 @@ enum DispelType
     DISPEL_ZG_TICKET    = 10
 };
 
-#define DISPEL_ALL_MASK ((1<<DISPEL_MAGIC) | (1<<DISPEL_CURSE) | (1<<DISPEL_DISEASE) | (1<<DISPEL_POISON) )
+#define DISPEL_ALL_MASK ( (1<<DISPEL_MAGIC) | (1<<DISPEL_CURSE) | (1<<DISPEL_DISEASE) | (1<<DISPEL_POISON) )
 
 //To all Immune system,if target has immunes,
 //some spell that related to ImmuneToDispel or ImmuneToSchool or ImmuneToDamage type can't cast to it,
@@ -951,13 +960,11 @@ enum GameobjectTypes
     GAMEOBJECT_TYPE_FISHINGHOLE            = 25,
     GAMEOBJECT_TYPE_FLAGDROP               = 26,
     GAMEOBJECT_TYPE_MINI_GAME              = 27,
+
+    //[TZERO] tbc enumerations [?]
     GAMEOBJECT_TYPE_LOTTERY_KIOSK          = 28,
     GAMEOBJECT_TYPE_CAPTURE_POINT          = 29,
     GAMEOBJECT_TYPE_AURA_GENERATOR         = 30,
-    GAMEOBJECT_TYPE_DUNGEON_DIFFICULTY     = 31,
-    GAMEOBJECT_TYPE_BARBER_CHAIR           = 32,
-    GAMEOBJECT_TYPE_DESTRUCTIBLE_BUILDING  = 33,
-    GAMEOBJECT_TYPE_GUILD_BANK             = 34,
 };
 
 #define MAX_GAMEOBJECT_TYPE                  35             // sending to client this or greater value can crash client.
@@ -977,6 +984,7 @@ enum GameObjectFlags
 
 enum TextEmotes
 {
+    // [TZERO] some of this enum could be only for tbc
     TEXTEMOTE_AGREE                = 1,
     TEXTEMOTE_AMAZE                = 2,
     TEXTEMOTE_ANGRY                = 3,
@@ -1153,6 +1161,7 @@ enum TextEmotes
 
 enum Emote
 {
+    // [TZERO] some of this enum could be only for tbc
     EMOTE_ONESHOT_NONE                 = 0,
     EMOTE_ONESHOT_TALK                 = 1,
     EMOTE_ONESHOT_BOW                  = 2,
@@ -1418,7 +1427,7 @@ enum Anim
     ANIM_SPELL_KNEEL_END           = 0x8E,
     ANIM_SPRINT                    = 0x8F,
     ANIM_IN_FIGHT                  = 0x90,
-
+    //[TZERO] changed in tbc
     ANIM_GAMEOBJ_SPAWN             = 145,
     ANIM_GAMEOBJ_CLOSE             = 146,
     ANIM_GAMEOBJ_CLOSED            = 147,
@@ -1527,7 +1536,7 @@ enum LockType
     LOCKTYPE_BLASTING              = 16,
     LOCKTYPE_SLOW_OPEN             = 17,
     LOCKTYPE_SLOW_CLOSE            = 18,
-    LOCKTYPE_FISHING               = 19
+    LOCKTYPE_FISHING               = 19  //tbc?
 };
 
 enum TrainerType                                            // this is important type for npcs!
@@ -1552,6 +1561,7 @@ enum CreatureType
     CREATURE_TYPE_CRITTER          = 8,
     CREATURE_TYPE_MECHANICAL       = 9,
     CREATURE_TYPE_NOT_SPECIFIED    = 10,
+    // [NEOROLLBAC] tbc enumerations [?]
     CREATURE_TYPE_TOTEM            = 11,
     CREATURE_TYPE_NON_COMBAT_PET   = 12,
     CREATURE_TYPE_GAS_CLOUD        = 13
@@ -1583,6 +1593,7 @@ enum CreatureFamily
     CREATURE_FAMILY_HYENA          = 25,
     CREATURE_FAMILY_OWL            = 26,
     CREATURE_FAMILY_WIND_SERPENT   = 27,
+    // [TZERO] tbc enumerations [?]
     CREATURE_FAMILY_REMOTE_CONTROL = 28,
     CREATURE_FAMILY_FELGUARD       = 29,
     CREATURE_FAMILY_DRAGONHAWK     = 30,
@@ -1596,25 +1607,10 @@ enum CreatureFamily
 
 enum CreatureTypeFlags
 {
-    CREATURE_TYPEFLAGS_TAMEABLE        = 0x00001,           //tameable by any hunter
-    CREATURE_TYPEFLAGS_UNK2            = 0x00002,           //? Related to spirits/ghosts in any form? Allow gossip interaction if player is also ghost? Visibility?
-    CREATURE_TYPEFLAGS_UNK3            = 0x00004,
-    CREATURE_TYPEFLAGS_UNK4            = 0x00008,
-    CREATURE_TYPEFLAGS_UNK5            = 0x00010,
-    CREATURE_TYPEFLAGS_UNK6            = 0x00020,
-    CREATURE_TYPEFLAGS_UNK7            = 0x00040,
-    CREATURE_TYPEFLAGS_UNK8            = 0x00080,
-    CREATURE_TYPEFLAGS_HERBLOOT        = 0x00100,           //can be looted by herbalist
-    CREATURE_TYPEFLAGS_MININGLOOT      = 0x00200,           //can be looted by miner
-    CREATURE_TYPEFLAGS_UNK11           = 0x00400,
-    CREATURE_TYPEFLAGS_UNK12           = 0x00800,           //? Related to mounts in some way. If mounted, fight mounted, mount appear as independant when rider dies?
-    CREATURE_TYPEFLAGS_UNK13           = 0x01000,           //? Can aid any player in combat if in range?
-    CREATURE_TYPEFLAGS_UNK14           = 0x02000,
-    CREATURE_TYPEFLAGS_UNK15           = 0x04000,           //? Possibly not in use
-    CREATURE_TYPEFLAGS_ENGINEERLOOT    = 0x08000,           //can be looted by engineer
-    CREATURE_TYPEFLAGS_EXOTIC          = 0x10000           //can be tamed by hunter as exotic pet
+    CREATURE_TYPEFLAGS_TAMEABLE   = 0x0001,
+    CREATURE_TYPEFLAGS_HERBLOOT   = 0x0100,
+    CREATURE_TYPEFLAGS_MININGLOOT = 0x0200
 };
-
 
 enum CreatureEliteType
 {
@@ -1623,7 +1619,6 @@ enum CreatureEliteType
     CREATURE_ELITE_RAREELITE       = 2,
     CREATURE_ELITE_WORLDBOSS       = 3,
     CREATURE_ELITE_RARE            = 4,
-    CREATURE_UNKNOWN               = 5                      // found in 2.2.3 for 2 mobs
 };
 
 // values based at QuestInfo.dbc
@@ -1634,15 +1629,15 @@ enum QuestTypes
     QUEST_TYPE_PVP                 = 41,
     QUEST_TYPE_RAID                = 62,
     QUEST_TYPE_DUNGEON             = 81,
-    QUEST_TYPE_WORLD_EVENT         = 82,
-    QUEST_TYPE_LEGENDARY           = 83,
-    QUEST_TYPE_ESCORT              = 84,
-    QUEST_TYPE_HEROIC              = 85,
+    QUEST_TYPE_WORLD_EVENT         = 82, // tbc ?
+    QUEST_TYPE_LEGENDARY           = 83, // tbc ?
+    QUEST_TYPE_ESCORT              = 84, // tbc ?
 };
 
 // values based at QuestSort.dbc
 enum QuestSort
 {
+    // [TZERO] some of this enum could be only for tbc
     QUEST_SORT_EPIC                = 1,
     QUEST_SORT_WAILING_CAVERNS_OLD = 21,
     QUEST_SORT_SEASONAL            = 22,
@@ -1823,19 +1818,7 @@ enum SkillType
     SKILL_RACIAL_TROLL             = 733,
     SKILL_RACIAL_GNOME             = 753,
     SKILL_RACIAL_HUMAN             = 754,
-    SKILL_JEWELCRAFTING            = 755,
-    SKILL_RACIAL_BLOODELF          = 756,
-    SKILL_PET_EVENT_RC             = 758,
-    SKILL_LANG_DRAENEI             = 759,
-    SKILL_RACIAL_DRAENEI           = 760,
-    SKILL_PET_FELGUARD             = 761,
     SKILL_RIDING                   = 762,
-    SKILL_PET_DRAGONHAWK           = 763,
-    SKILL_PET_NETHER_RAY           = 764,
-    SKILL_PET_SPOREBAT             = 765,
-    SKILL_PET_WARP_STALKER         = 766,
-    SKILL_PET_RAVAGER              = 767,
-    SKILL_PET_SERPENT              = 768,
     SKILL_INTERNAL                 = 769
 };
 
@@ -1921,43 +1904,50 @@ enum WeatherType
     WEATHER_TYPE_RAIN       = 1,
     WEATHER_TYPE_SNOW       = 2,
     WEATHER_TYPE_STORM      = 3,
-    WEATHER_TYPE_THUNDERS   = 86,
-    WEATHER_TYPE_BLACKRAIN  = 90
+    WEATHER_TYPE_THUNDERS   = 86, //tbc
+    WEATHER_TYPE_BLACKRAIN  = 90  //tbc
 };
 
 #define MAX_WEATHER_TYPE 4
 
 enum ChatMsg
 {
-    CHAT_MSG_ADDON                  = 0xFFFFFFFF,
-    CHAT_MSG_SYSTEM                 = 0x00,
-    CHAT_MSG_SAY                    = 0x01,
-    CHAT_MSG_PARTY                  = 0x02,
-    CHAT_MSG_RAID                   = 0x03,
-    CHAT_MSG_GUILD                  = 0x04,
-    CHAT_MSG_OFFICER                = 0x05,
-    CHAT_MSG_YELL                   = 0x06,
-    CHAT_MSG_WHISPER                = 0x07,
-    CHAT_MSG_WHISPER_INFORM         = 0x08,
-    CHAT_MSG_REPLY                  = 0x09,
-    CHAT_MSG_EMOTE                  = 0x0A,
-    CHAT_MSG_TEXT_EMOTE             = 0x0B,
-    CHAT_MSG_MONSTER_SAY            = 0x0C,
+    CHAT_MSG_ADDON                  = 0xFFFFFFFF, // tbc?
+
+    CHAT_MSG_SAY                                  = 0x00,
+    CHAT_MSG_PARTY                                = 0x01,
+    CHAT_MSG_RAID                                 = 0x02,
+    CHAT_MSG_RAID_LEADER                          = 0x57,
+    CHAT_MSG_RAID_WARN                            = 0x58,
+    CHAT_MSG_GUILD                                = 0x03,
+    CHAT_MSG_OFFICER                              = 0x04,
+    CHAT_MSG_YELL                                 = 0x05,
+    CHAT_MSG_WHISPER                              = 0x06,
+    CHAT_MSG_WHISPER_INFORM                       = 0x07,
+    CHAT_MSG_EMOTE                                = 0x08,
+    CHAT_MSG_TEXT_EMOTE                           = 0x09,
+    CHAT_MSG_SYSTEM                               = 0x0A,
+    CHAT_MSG_MONSTER_SAY                          = 0x0B,
+    CHAT_MSG_MONSTER_YELL                         = 0x0C,
+    CHAT_MSG_MONSTER_EMOTE                        = 0x0D,
+    CHAT_MSG_CHANNEL                              = 0x0E,
+    CHAT_MSG_CHANNEL_JOIN                         = 0x0F,
+    CHAT_MSG_CHANNEL_LEAVE                        = 0x10,
+    CHAT_MSG_CHANNEL_LIST                         = 0x11,
+    CHAT_MSG_CHANNEL_NOTICE                       = 0x12,
+    CHAT_MSG_CHANNEL_NOTICE_USER                  = 0x13,
+    CHAT_MSG_AFK                                  = 0x14,
+    CHAT_MSG_DND                                  = 0x15,
+    CHAT_MSG_IGNORED                              = 0x16,
+    CHAT_MSG_SKILL                                = 0x17,
+    CHAT_MSG_LOOT                                 = 0x18,
+
+
+  /*  CHAT_MSG_REPLY                  = 0x09,
     CHAT_MSG_MONSTER_PARTY          = 0x0D,
-    CHAT_MSG_MONSTER_YELL           = 0x0E,
-    CHAT_MSG_MONSTER_WHISPER        = 0x0F,
-    CHAT_MSG_MONSTER_EMOTE          = 0x10,
-    CHAT_MSG_CHANNEL                = 0x11,
-    CHAT_MSG_CHANNEL_JOIN           = 0x12,
-    CHAT_MSG_CHANNEL_LEAVE          = 0x13,
-    CHAT_MSG_CHANNEL_LIST           = 0x14,
-    CHAT_MSG_CHANNEL_NOTICE         = 0x15,
-    CHAT_MSG_CHANNEL_NOTICE_USER    = 0x16,
-    CHAT_MSG_AFK                    = 0x17,
-    CHAT_MSG_DND                    = 0x18,
-    CHAT_MSG_IGNORED                = 0x19,
-    CHAT_MSG_SKILL                  = 0x1A,
-    CHAT_MSG_LOOT                   = 0x1B,
+    CHAT_MSG_MONSTER_WHISPER        = 0x0F, */
+
+    //[TZERO] tbc enumerations [?]
     CHAT_MSG_MONEY                  = 0x1C,
     CHAT_MSG_OPENING                = 0x1D,
     CHAT_MSG_TRADESKILLS            = 0x1E,
@@ -1969,7 +1959,6 @@ enum ChatMsg
     CHAT_MSG_BG_SYSTEM_NEUTRAL      = 0x24,
     CHAT_MSG_BG_SYSTEM_ALLIANCE     = 0x25,
     CHAT_MSG_BG_SYSTEM_HORDE        = 0x26,
-    CHAT_MSG_RAID_LEADER            = 0x27,
     CHAT_MSG_RAID_WARNING           = 0x28,
     CHAT_MSG_RAID_BOSS_WHISPER      = 0x29,
     CHAT_MSG_RAID_BOSS_EMOTE        = 0x2A,
@@ -1979,8 +1968,9 @@ enum ChatMsg
     CHAT_MSG_RESTRICTED             = 0x2E,
 };
 
-#define MAX_CHAT_MSG_TYPE 0x2F
+#define MAX_CHAT_MSG_TYPE 45
 
+// pet defines
 // Values from ItemPetFood (power of (value-1) used for compare with CreatureFamilyEntry.petDietMask
 enum PetDiet
 {
@@ -2001,10 +1991,7 @@ enum PetDiet
 
 #define CHAIN_SPELL_JUMP_RADIUS 10
 
-// Max values for Guild & Guild Bank
-#define GUILD_BANK_MAX_TABS         6
-#define GUILD_BANK_MAX_SLOTS        98
-#define GUILD_BANK_MAX_LOGS         24
+// Max values for Guild
 #define GUILD_EVENTLOG_MAX_ENTRIES  100
 #define GUILD_MAX_RANKS             10
 
@@ -2055,25 +2042,18 @@ enum DiminishingGroup
     DIMINISHING_LIMITONLY
 };
 
-enum DungeonDifficulties
-{
-    DIFFICULTY_NORMAL = 0,
-    DIFFICULTY_HEROIC = 1,
-    TOTAL_DIFFICULTIES
-};
-
 enum SummonType
 {
     SUMMON_TYPE_CRITTER     = 41,
     SUMMON_TYPE_GUARDIAN    = 61,
-    SUMMON_TYPE_TOTEM_SLOT1 = 63,
+    SUMMON_TYPE_TOTEM_SLOT1 = 87,
     SUMMON_TYPE_WILD        = 64,
     SUMMON_TYPE_POSESSED    = 65,
     SUMMON_TYPE_DEMON       = 66,
     SUMMON_TYPE_SUMMON      = 67,
-    SUMMON_TYPE_TOTEM_SLOT2 = 81,
-    SUMMON_TYPE_TOTEM_SLOT3 = 82,
-    SUMMON_TYPE_TOTEM_SLOT4 = 83,
+    SUMMON_TYPE_TOTEM_SLOT2 = 88,
+    SUMMON_TYPE_TOTEM_SLOT3 = 89,
+    SUMMON_TYPE_TOTEM_SLOT4 = 90,
     SUMMON_TYPE_TOTEM       = 121,
     SUMMON_TYPE_UNKNOWN3    = 181,
     SUMMON_TYPE_UNKNOWN4    = 187,
@@ -2087,9 +2067,8 @@ enum SummonType
 
 enum EventId
 {
-    EVENT_SPELLCLICK        = 1001,
-    EVENT_FALL_GROUND       = 1002,
-    EVENT_CHARGE            = 1003,
+    EVENT_FALL_GROUND       = 1001,
+    EVENT_CHARGE            = 1002,
 };
 
 enum ResponseCodes
@@ -2130,70 +2109,68 @@ enum ResponseCodes
     AUTH_DB_BUSY                                           = 0x1F,
     AUTH_SUSPENDED                                         = 0x20,
     AUTH_PARENTAL_CONTROL                                  = 0x21,
-    AUTH_LOCKED_ENFORCED                                   = 0x22,
+    AUTH_LOCKED_ENFORCED                                   = 0x02, /// Unsure
 
-    REALM_LIST_IN_PROGRESS                                 = 0x23,
-    REALM_LIST_SUCCESS                                     = 0x24,
-    REALM_LIST_FAILED                                      = 0x25,
-    REALM_LIST_INVALID                                     = 0x26,
-    REALM_LIST_REALM_NOT_FOUND                             = 0x27,
+    REALM_LIST_IN_PROGRESS                                 = 0x22,
+    REALM_LIST_SUCCESS                                     = 0x23,
+    REALM_LIST_FAILED                                      = 0x24,
+    REALM_LIST_INVALID                                     = 0x25,
+    REALM_LIST_REALM_NOT_FOUND                             = 0x26,
 
-    ACCOUNT_CREATE_IN_PROGRESS                             = 0x28,
-    ACCOUNT_CREATE_SUCCESS                                 = 0x29,
-    ACCOUNT_CREATE_FAILED                                  = 0x2A,
+    ACCOUNT_CREATE_IN_PROGRESS                             = 0x27,
+    ACCOUNT_CREATE_SUCCESS                                 = 0x28,
+    ACCOUNT_CREATE_FAILED                                  = 0x29,
 
-    CHAR_LIST_RETRIEVING                                   = 0x2B,
-    CHAR_LIST_RETRIEVED                                    = 0x2C,
-    CHAR_LIST_FAILED                                       = 0x2D,
+    CHAR_LIST_RETRIEVING                                   = 0x2A,
+    CHAR_LIST_RETRIEVED                                    = 0x2B,
+    CHAR_LIST_FAILED                                       = 0x2C,
 
-    CHAR_CREATE_IN_PROGRESS                                = 0x2E,
-    CHAR_CREATE_SUCCESS                                    = 0x2F,
-    CHAR_CREATE_ERROR                                      = 0x30,
-    CHAR_CREATE_FAILED                                     = 0x31,
-    CHAR_CREATE_NAME_IN_USE                                = 0x32,
-    CHAR_CREATE_DISABLED                                   = 0x33,
-    CHAR_CREATE_PVP_TEAMS_VIOLATION                        = 0x34,
-    CHAR_CREATE_SERVER_LIMIT                               = 0x35,
-    CHAR_CREATE_ACCOUNT_LIMIT                              = 0x36,
-    CHAR_CREATE_SERVER_QUEUE                               = 0x37,
-    CHAR_CREATE_ONLY_EXISTING                              = 0x38,
-    CHAR_CREATE_EXPANSION                                  = 0x39,
+    CHAR_CREATE_IN_PROGRESS                                = 0x2D,
+    CHAR_CREATE_SUCCESS                                    = 0x2E,
+    CHAR_CREATE_ERROR                                      = 0x2F,
+    CHAR_CREATE_FAILED                                     = 0x30,
+    CHAR_CREATE_NAME_IN_USE                                = 0x31,
+    CHAR_CREATE_DISABLED                                   = 0x3A,
+    CHAR_CREATE_PVP_TEAMS_VIOLATION                        = 0x33,
+    CHAR_CREATE_SERVER_LIMIT                               = 0x34,
+    CHAR_CREATE_ACCOUNT_LIMIT                              = 0x35,
+    CHAR_CREATE_SERVER_QUEUE                               = 0x30,/// UNSURE
+    CHAR_CREATE_ONLY_EXISTING                              = 0x30,/// UNSURE
 
-    CHAR_DELETE_IN_PROGRESS                                = 0x3A,
-    CHAR_DELETE_SUCCESS                                    = 0x3B,
-    CHAR_DELETE_FAILED                                     = 0x3C,
-    CHAR_DELETE_FAILED_LOCKED_FOR_TRANSFER                 = 0x3D,
-    CHAR_DELETE_FAILED_GUILD_LEADER                        = 0x3E,
-    CHAR_DELETE_FAILED_ARENA_CAPTAIN                       = 0x3F,
+    CHAR_DELETE_IN_PROGRESS                                = 0x38,
+    CHAR_DELETE_SUCCESS                                    = 0x39,
+    CHAR_DELETE_FAILED                                     = 0x3A,
+    CHAR_DELETE_FAILED_LOCKED_FOR_TRANSFER                 = 0x3A,/// UNSURE
+    CHAR_DELETE_FAILED_GUILD_LEADER                        = 0x3A,/// UNSURE
 
-    CHAR_LOGIN_IN_PROGRESS                                 = 0x40,
-    CHAR_LOGIN_SUCCESS                                     = 0x41,
-    CHAR_LOGIN_NO_WORLD                                    = 0x42,
-    CHAR_LOGIN_DUPLICATE_CHARACTER                         = 0x43,
-    CHAR_LOGIN_NO_INSTANCES                                = 0x44,
-    CHAR_LOGIN_FAILED                                      = 0x45,
-    CHAR_LOGIN_DISABLED                                    = 0x46,
-    CHAR_LOGIN_NO_CHARACTER                                = 0x47,
-    CHAR_LOGIN_LOCKED_FOR_TRANSFER                         = 0x48,
-    CHAR_LOGIN_LOCKED_BY_BILLING                           = 0x49,
+    CHAR_LOGIN_IN_PROGRESS                                 = 0x3B,
+    CHAR_LOGIN_SUCCESS                                     = 0x3C,
+    CHAR_LOGIN_NO_WORLD                                    = 0x3D,
+    CHAR_LOGIN_DUPLICATE_CHARACTER                         = 0x3E,
+    CHAR_LOGIN_NO_INSTANCES                                = 0x3F,
+    CHAR_LOGIN_FAILED                                      = 0x40,
+    CHAR_LOGIN_DISABLED                                    = 0x41,
+    CHAR_LOGIN_NO_CHARACTER                                = 0x42,
+    CHAR_LOGIN_LOCKED_FOR_TRANSFER                         = 0x40, ///UNSURE
+    CHAR_LOGIN_LOCKED_BY_BILLING                           = 0x40, ///UNSURE
 
-    CHAR_NAME_SUCCESS                                      = 0x4A,
-    CHAR_NAME_FAILURE                                      = 0x4B,
-    CHAR_NAME_NO_NAME                                      = 0x4C,
-    CHAR_NAME_TOO_SHORT                                    = 0x4D,
-    CHAR_NAME_TOO_LONG                                     = 0x4E,
-    CHAR_NAME_INVALID_CHARACTER                            = 0x4F,
-    CHAR_NAME_MIXED_LANGUAGES                              = 0x50,
-    CHAR_NAME_PROFANE                                      = 0x51,
-    CHAR_NAME_RESERVED                                     = 0x52,
-    CHAR_NAME_INVALID_APOSTROPHE                           = 0x53,
-    CHAR_NAME_MULTIPLE_APOSTROPHES                         = 0x54,
-    CHAR_NAME_THREE_CONSECUTIVE                            = 0x55,
-    CHAR_NAME_INVALID_SPACE                                = 0x56,
-    CHAR_NAME_CONSECUTIVE_SPACES                           = 0x57,
-    CHAR_NAME_RUSSIAN_CONSECUTIVE_SILENT_CHARACTERS        = 0x58,
-    CHAR_NAME_RUSSIAN_SILENT_CHARACTER_AT_BEGINNING_OR_END = 0x59,
-    CHAR_NAME_DECLENSION_DOESNT_MATCH_BASE_NAME            = 0x5A,
+    CHAR_NAME_SUCCESS                                      = 0x50,
+    CHAR_NAME_FAILURE                                      = 0x4F,
+    CHAR_NAME_NO_NAME                                      = 0x43,
+    CHAR_NAME_TOO_SHORT                                    = 0x44,
+    CHAR_NAME_TOO_LONG                                     = 0x45,
+    CHAR_NAME_INVALID_CHARACTER                            = 0x46,
+    CHAR_NAME_MIXED_LANGUAGES                              = 0x47,
+    CHAR_NAME_PROFANE                                      = 0x48,
+    CHAR_NAME_RESERVED                                     = 0x49,
+    CHAR_NAME_INVALID_APOSTROPHE                           = 0x4A,
+    CHAR_NAME_MULTIPLE_APOSTROPHES                         = 0x4B,
+    CHAR_NAME_THREE_CONSECUTIVE                            = 0x4C,
+    CHAR_NAME_INVALID_SPACE                                = 0x4D,
+    CHAR_NAME_CONSECUTIVE_SPACES                           = 0x4E,
+    CHAR_NAME_RUSSIAN_CONSECUTIVE_SILENT_CHARACTERS        = 0x4E,///UNSURE
+    CHAR_NAME_RUSSIAN_SILENT_CHARACTER_AT_BEGINNING_OR_END = 0x4E,///UNSURE
+    CHAR_NAME_DECLENSION_DOESNT_MATCH_BASE_NAME            = 0x4E,///UNSURE
 };
 
 /// Ban function modes
@@ -2201,8 +2178,7 @@ enum BanMode
 {
     BAN_ACCOUNT,
     BAN_CHARACTER,
-    BAN_IP,
-	BAN_HOST
+    BAN_IP
 };
 
 /// Ban function return codes
@@ -2212,33 +2188,5 @@ enum BanReturn
     BAN_SYNTAX_ERROR,
     BAN_NOTFOUND
 };
-
-enum MailResponseType
-{
-    MAIL_SEND = 0,
-    MAIL_MONEY_TAKEN = 1,
-    MAIL_ITEM_TAKEN = 2,
-    MAIL_RETURNED_TO_SENDER = 3,
-    MAIL_DELETED = 4,
-    MAIL_MADE_PERMANENT = 5
-};
-
-enum MailResponseResult
-{
-    MAIL_OK = 0,
-    MAIL_ERR_EQUIP_ERROR = 1,
-    MAIL_ERR_CANNOT_SEND_TO_SELF = 2,
-    MAIL_ERR_NOT_ENOUGH_MONEY = 3,
-    MAIL_ERR_RECIPIENT_NOT_FOUND = 4,
-    MAIL_ERR_NOT_YOUR_TEAM = 5,
-    MAIL_ERR_INTERNAL_ERROR = 6,
-    MAIL_ERR_DISABLED_FOR_TRIAL_ACC = 14,
-    MAIL_ERR_RECIPIENT_CAP_REACHED = 15,
-    MAIL_ERR_CANT_SEND_WRAPPED_COD = 16,
-    MAIL_ERR_MAIL_AND_CHAT_SUSPENDED = 17,
-    MAIL_ERR_TOO_MANY_ATTACHMENTS = 18,
-    MAIL_ERR_MAIL_ATTACHMENT_INVALID = 19,
-};
-
 #endif
 

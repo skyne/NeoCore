@@ -17,22 +17,19 @@
 /* ScriptData
 SDName: Tanaris
 SD%Complete: 80
-SDComment: Quest support: 2882, 2954, 4005, 10277, 648, 10279(Special flight path). Noggenfogger vendor
+SDComment: Quest support: 2954, 4005, 10277, 648, 10279(Special flight path). Noggenfogger vendor
 SDCategory: Tanaris
 EndScriptData */
 
 /* ContentData
 mob_aquementas
-npc_custodian_of_time
 npc_marin_noggenfogger
-npc_steward_of_time
 npc_stone_watcher_of_norgannon
 npc_OOX17
-go_landmark_treasure
 EndContentData */
 
 #include "precompiled.h"
-#include "escort_ai.h"
+#include "../../npc/npc_escortAI.h"
 
 /*######
 ## mob_aquementas
@@ -79,7 +76,7 @@ struct NEO_DLL_DECL mob_aquementasAI : public ScriptedAI
         }
     }
 
-    void EnterCombat(Unit* who)
+    void Aggro(Unit* who)
     {
         DoScriptText(AGGRO_YELL_AQUE, m_creature, who);
     }
@@ -129,124 +126,6 @@ CreatureAI* GetAI_mob_aquementas(Creature *_Creature)
 }
 
 /*######
-## npc_custodian_of_time
-######*/
-
-#define WHISPER_CUSTODIAN_1     -1000150
-#define WHISPER_CUSTODIAN_2     -1000151
-#define WHISPER_CUSTODIAN_3     -1000152
-#define WHISPER_CUSTODIAN_4     -1000153
-#define WHISPER_CUSTODIAN_5     -1000154
-#define WHISPER_CUSTODIAN_6     -1000155
-#define WHISPER_CUSTODIAN_7     -1000156
-#define WHISPER_CUSTODIAN_8     -1000157
-#define WHISPER_CUSTODIAN_9     -1000158
-#define WHISPER_CUSTODIAN_10    -1000159
-#define WHISPER_CUSTODIAN_11    -1000160
-#define WHISPER_CUSTODIAN_12    -1000161
-#define WHISPER_CUSTODIAN_13    -1000162
-#define WHISPER_CUSTODIAN_14    -1000163
-
-struct NEO_DLL_DECL npc_custodian_of_timeAI : public npc_escortAI
-{
-    npc_custodian_of_timeAI(Creature *c) : npc_escortAI(c) {}
-
-    void WaypointReached(uint32 i)
-    {
-        Player *pPlayer = GetPlayerForEscort();
-        if (!pPlayer)
-            return;
-
-        switch(i)
-        {
-            case 0: DoScriptText(WHISPER_CUSTODIAN_1, m_creature, pPlayer); break;
-            case 1: DoScriptText(WHISPER_CUSTODIAN_2, m_creature, pPlayer); break;
-            case 2: DoScriptText(WHISPER_CUSTODIAN_3, m_creature, pPlayer); break;
-            case 3: DoScriptText(WHISPER_CUSTODIAN_4, m_creature, pPlayer); break;
-            case 5: DoScriptText(WHISPER_CUSTODIAN_5, m_creature, pPlayer); break;
-            case 6: DoScriptText(WHISPER_CUSTODIAN_6, m_creature, pPlayer); break;
-            case 7: DoScriptText(WHISPER_CUSTODIAN_7, m_creature, pPlayer); break;
-            case 8: DoScriptText(WHISPER_CUSTODIAN_8, m_creature, pPlayer); break;
-            case 9: DoScriptText(WHISPER_CUSTODIAN_9, m_creature, pPlayer); break;
-            case 10: DoScriptText(WHISPER_CUSTODIAN_4, m_creature, pPlayer); break;
-            case 13: DoScriptText(WHISPER_CUSTODIAN_10, m_creature, pPlayer); break;
-            case 14: DoScriptText(WHISPER_CUSTODIAN_4, m_creature, pPlayer); break;
-            case 16: DoScriptText(WHISPER_CUSTODIAN_11, m_creature, pPlayer); break;
-            case 17: DoScriptText(WHISPER_CUSTODIAN_12, m_creature, pPlayer); break;
-            case 18: DoScriptText(WHISPER_CUSTODIAN_4, m_creature, pPlayer); break;
-            case 22: DoScriptText(WHISPER_CUSTODIAN_13, m_creature, pPlayer); break;
-            case 23: DoScriptText(WHISPER_CUSTODIAN_4, m_creature, pPlayer); break;
-            case 24:
-                DoScriptText(WHISPER_CUSTODIAN_14, m_creature, pPlayer);
-                DoCast(pPlayer, 34883);
-                // below here is temporary workaround, to be removed when spell works properly
-                pPlayer->AreaExploredOrEventHappens(10277);
-                break;
-        }
-    }
-
-    void MoveInLineOfSight(Unit *who)
-    {
-        if (HasEscortState(STATE_ESCORT_ESCORTING))
-            return;
-
-        if (who->GetTypeId() == TYPEID_PLAYER)
-        {
-            if (who->HasAura(34877,1) && CAST_PLR(who)->GetQuestStatus(10277) == QUEST_STATUS_INCOMPLETE)
-            {
-                float Radius = 10.0;
-                if (m_creature->IsWithinDistInMap(who, Radius))
-                {
-                    Start(false, false, who->GetGUID());
-                }
-            }
-        }
-    }
-
-    void EnterCombat(Unit* who) { }
-    void Reset() { }
-
-    void UpdateAI(const uint32 diff)
-    {
-        npc_escortAI::UpdateAI(diff);
-    }
-};
-
-CreatureAI* GetAI_npc_custodian_of_time(Creature *_Creature)
-{
-    npc_custodian_of_timeAI* custodian_of_timeAI = new npc_custodian_of_timeAI(_Creature);
-
-    custodian_of_timeAI->AddWaypoint(0, -8374.93,-4250.21, -204.38,5000);
-    custodian_of_timeAI->AddWaypoint(1, -8374.93,-4250.21, -204.38,16000);
-    custodian_of_timeAI->AddWaypoint(2, -8374.93,-4250.21, -204.38,10000);
-    custodian_of_timeAI->AddWaypoint(3, -8374.93,-4250.21, -204.38,2000);
-    custodian_of_timeAI->AddWaypoint(4, -8439.40,-4180.05, -209.25);
-    custodian_of_timeAI->AddWaypoint(5, -8437.82,-4120.84, -208.59,10000);
-    custodian_of_timeAI->AddWaypoint(6, -8437.82,-4120.84, -208.59,16000);
-    custodian_of_timeAI->AddWaypoint(7, -8437.82,-4120.84, -208.59,13000);
-    custodian_of_timeAI->AddWaypoint(8, -8437.82,-4120.84, -208.59,18000);
-    custodian_of_timeAI->AddWaypoint(9, -8437.82,-4120.84, -208.59,15000);
-    custodian_of_timeAI->AddWaypoint(10, -8437.82,-4120.84, -208.59,2000);
-    custodian_of_timeAI->AddWaypoint(11, -8467.26,-4198.63, -214.21);
-    custodian_of_timeAI->AddWaypoint(12, -8667.76,-4252.13, -209.56);
-    custodian_of_timeAI->AddWaypoint(13, -8703.71,-4234.58, -209.5,14000);
-    custodian_of_timeAI->AddWaypoint(14, -8703.71,-4234.58, -209.5,2000);
-    custodian_of_timeAI->AddWaypoint(15, -8642.81,-4304.37, -209.57);
-    custodian_of_timeAI->AddWaypoint(16, -8649.06,-4394.36, -208.46,6000);
-    custodian_of_timeAI->AddWaypoint(17, -8649.06,-4394.36, -208.46,18000);
-    custodian_of_timeAI->AddWaypoint(18, -8649.06,-4394.36, -208.46,2000);
-    custodian_of_timeAI->AddWaypoint(19, -8468.72,-4437.67, -215.45);
-    custodian_of_timeAI->AddWaypoint(20, -8427.54,-4426, -211.13);
-    custodian_of_timeAI->AddWaypoint(21, -8364.83,-4393.32, -205.91);
-    custodian_of_timeAI->AddWaypoint(22, -8304.54,-4357.2, -208.2,18000);
-    custodian_of_timeAI->AddWaypoint(23, -8304.54,-4357.2, -208.2,2000);
-    custodian_of_timeAI->AddWaypoint(24, -8375.42,-4250.41, -205.14,5000);
-    custodian_of_timeAI->AddWaypoint(25, -8375.42,-4250.41, -205.14,5000);
-
-    return (CreatureAI*)custodian_of_timeAI;
-}
-
-/*######
 ## npc_marin_noggenfogger
 ######*/
 
@@ -267,44 +146,6 @@ bool GossipSelect_npc_marin_noggenfogger(Player *player, Creature *_Creature, ui
 {
     if( action == GOSSIP_ACTION_TRADE )
         player->SEND_VENDORLIST( _Creature->GetGUID() );
-
-    return true;
-}
-
-/*######
-## npc_steward_of_time
-######*/
-
-#define GOSSIP_ITEM_FLIGHT  "Please take me to the master's lair."
-
-bool GossipHello_npc_steward_of_time(Player *player, Creature *_Creature)
-{
-    if( _Creature->isQuestGiver() )
-        player->PrepareQuestMenu( _Creature->GetGUID() );
-
-    if( player->GetQuestStatus(10279) == QUEST_STATUS_INCOMPLETE || player->GetQuestRewardStatus(10279) )
-    {
-        player->ADD_GOSSIP_ITEM(0, GOSSIP_ITEM_FLIGHT, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-        player->SEND_GOSSIP_MENU(9978,_Creature->GetGUID());
-    }
-    else
-        player->SEND_GOSSIP_MENU(9977,_Creature->GetGUID());
-
-    return true;
-}
-
-bool QuestAccept_npc_steward_of_time(Player *player, Creature *creature, Quest const *quest )
-{
-    if( quest->GetQuestId() == 10279 )                      //Quest: To The Master's Lair
-        player->CastSpell(player,34891,true);               //(Flight through Caverns)
-
-    return false;
-}
-
-bool GossipSelect_npc_steward_of_time(Player *player, Creature *_Creature, uint32 sender, uint32 action )
-{
-    if( action == GOSSIP_ACTION_INFO_DEF + 1 )
-        player->CastSpell(player,34891,true);               //(Flight through Caverns)
 
     return true;
 }
@@ -369,21 +210,16 @@ bool GossipSelect_npc_stone_watcher_of_norgannon(Player *player, Creature *_Crea
 ## npc_OOX17
 ######*/
 
-enum e00X17
-{
-    //texts are signed for 7806
-    SAY_OOX_START           = -1060000,
-    SAY_OOX_AGGRO1          = -1060001,
-    SAY_OOX_AGGRO2          = -1060002,
-    SAY_OOX_AMBUSH          = -1060003,
-    SAY_OOX17_AMBUSH_REPLY  = -1060004,
-    SAY_OOX_END             = -1060005,
-
-    Q_OOX17                 = 648,
-    SPAWN_FIRST             = 7803,
-    SPAWN_SECOND_1          = 5617,
-    SPAWN_SECOND_2          = 7805
-};
+#define Q_OOX17             648
+#define SPAWN_FIRST         7803
+#define SPAWN_SECOND_1      5617
+#define SPAWN_SECOND_2      7805
+#define SAY_SCOFF           -1060004
+#define SAY_CHICKEN_ACC     -1060000
+#define SAY_CHICKEN_AGGRO_1 -1060001
+#define SAY_CHICKEN_AGGRO_2 -1060002
+#define SAY_CHICKEN_AMB     -1060003
+#define SAY_CHICKEN_COMP    -1060005
 
 struct NEO_DLL_DECL npc_OOX17AI : public npc_escortAI
 {
@@ -391,9 +227,9 @@ struct NEO_DLL_DECL npc_OOX17AI : public npc_escortAI
 
     void WaypointReached(uint32 i)
     {
-        Player* pPlayer = GetPlayerForEscort();
+        Player* player = Unit::GetPlayer(PlayerGUID);
 
-        if (!pPlayer)
+        if (!player)
             return;
 
         switch(i) {
@@ -401,23 +237,24 @@ struct NEO_DLL_DECL npc_OOX17AI : public npc_escortAI
                 m_creature->SummonCreature(SPAWN_FIRST, -8350.96, -4445.79, 10.10, 6.20, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 25000);
                 m_creature->SummonCreature(SPAWN_FIRST, -8355.96, -4447.79, 10.10, 6.27, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 25000);
                 m_creature->SummonCreature(SPAWN_FIRST, -8353.96, -4442.79, 10.10, 6.08, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 25000);
-                DoScriptText(SAY_OOX_AMBUSH, m_creature);
+                DoScriptText(SAY_CHICKEN_AMB, m_creature);
                 break;
 
             case 56:
                 m_creature->SummonCreature(SPAWN_SECOND_1, -7510.07, -4795.50, 9.35, 6.06, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 25000);
                 m_creature->SummonCreature(SPAWN_SECOND_2, -7515.07, -4797.50, 9.35, 6.22, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 25000);
                 m_creature->SummonCreature(SPAWN_SECOND_2, -7518.07, -4792.50, 9.35, 6.22, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 25000);
-                DoScriptText(SAY_OOX_AMBUSH, m_creature);
-                if (Unit* scoff = FindCreature(SPAWN_SECOND_2, 30, m_creature))
-                    DoScriptText(SAY_OOX17_AMBUSH_REPLY, scoff);
+                DoScriptText(SAY_CHICKEN_AMB, m_creature);
+                {Unit* scoff = FindCreature(SPAWN_SECOND_2, 30, m_creature);
+                if(scoff)
+                DoScriptText(SAY_SCOFF, scoff);}break;
                 break;
 
             case 86:
-                if (pPlayer)
+                if (player)
                 {
-                    DoScriptText(SAY_OOX_END, m_creature);
-                    pPlayer->GroupEventHappens(Q_OOX17, m_creature);
+                    DoScriptText(SAY_CHICKEN_COMP, m_creature);
+                    ((Player*)player)->GroupEventHappens(Q_OOX17, m_creature);
                 }
                 break;
         }
@@ -425,29 +262,49 @@ struct NEO_DLL_DECL npc_OOX17AI : public npc_escortAI
 
     void Reset(){}
 
-    void EnterCombat(Unit* who)
+    void Aggro(Unit* who)
     {
-        DoScriptText(RAND(SAY_OOX_AGGRO1,SAY_OOX_AGGRO2), m_creature);
+        switch (rand()%2)
+        {
+        case 0: DoScriptText(SAY_CHICKEN_AGGRO_1, m_creature); break;
+        case 1: DoScriptText(SAY_CHICKEN_AGGRO_2, m_creature); break;
+        }
     }
 
     void JustSummoned(Creature* summoned)
     {
         summoned->AI()->AttackStart(m_creature);
     }
-};
 
-bool QuestAccept_npc_OOX17(Player* pPlayer, Creature* pCreature, Quest const* quest)
+    void JustDied(Unit* killer)
+    {
+        if (PlayerGUID)
+        {
+            if (Player* player = Unit::GetPlayer(PlayerGUID))
+                ((Player*)player)->FailQuest(Q_OOX17);
+        }
+    }
+
+
+    void UpdateAI(const uint32 diff)
+    {
+        npc_escortAI::UpdateAI(diff);
+        if (!UpdateVictim())
+            return;
+    }
+    };
+
+bool QuestAccept_npc_OOX17(Player* player, Creature* creature, Quest const* quest)
 {
     if (quest->GetQuestId() == Q_OOX17)
     {
-        pCreature->setFaction(113);
-        pCreature->SetHealth(pCreature->GetMaxHealth());
-        pCreature->SetUInt32Value(UNIT_FIELD_BYTES_1,0);
-        pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_2);
-        DoScriptText(SAY_OOX_START, pCreature);
+        creature->setFaction(113);
+        creature->SetHealth(creature->GetMaxHealth());
+        creature->SetUInt32Value(UNIT_FIELD_BYTES_1,0);
+        creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_2);
+        DoScriptText(SAY_CHICKEN_ACC, creature);
+        ((npc_escortAI*)(creature->AI()))->Start(true, true, false, player->GetGUID());
 
-        if (npc_escortAI* pEscortAI = CAST_AI(npc_OOX17AI, pCreature->AI()))
-            pEscortAI->Start(true, false, pPlayer->GetGUID());
     }
     return true;
 }
@@ -548,54 +405,6 @@ CreatureAI* GetAI_npc_OOX17(Creature *_Creature)
 }
 
 /*######
-## go_landmark_treasure
-######*/
-
-#define QUEST_CUERGOS_GOLD 2882
-
-#define NPC_BUCCANEER      7902
-#define NPC_PIRATE         7899
-#define NPC_SWASHBUCKLER   7901
-
-#define GO_TREASURE        142194
-
-#define PATH_ENTRY_1       2090
-#define PATH_ENTRY_2       2091
-#define PATH_ENTRY_3       2092
-#define PATH_ENTRY_4       2093
-#define PATH_ENTRY_5       2094
-
-bool GOHello_go_landmark_treasure(Player *player, GameObject* _GO)
-{
-    if (player->GetQuestStatus(QUEST_CUERGOS_GOLD) != QUEST_STATUS_INCOMPLETE)
-        return false;
-    
-    Creature * spawn = NULL;
-    
-    spawn = player->SummonCreature(NPC_PIRATE, -10029.78, -4032.54, 19.41, 3.40, TEMPSUMMON_TIMED_DESPAWN, 340000);
-    if(spawn)
-        spawn->GetMotionMaster()->MovePath(PATH_ENTRY_1, true);
-    spawn = player->SummonCreature(NPC_PIRATE, -10031.64, -4032.14, 19.11, 3.40, TEMPSUMMON_TIMED_DESPAWN, 340000);
-    if(spawn)
-        spawn->GetMotionMaster()->MovePath(PATH_ENTRY_3, true);
-    
-    spawn = player->SummonCreature(NPC_SWASHBUCKLER, -10029.86, -4030.51, 20.02, 3.40, TEMPSUMMON_TIMED_DESPAWN, 340000);
-    if(spawn)
-        spawn->GetMotionMaster()->MovePath(PATH_ENTRY_4, true);
-    spawn = player->SummonCreature(NPC_SWASHBUCKLER, -10031.83, -4030.70, 19.52, 3.40, TEMPSUMMON_TIMED_DESPAWN, 340000);
-    if(spawn)
-        spawn->GetMotionMaster()->MovePath(PATH_ENTRY_5, true);
-    
-    spawn = player->SummonCreature(NPC_BUCCANEER, -10028.90, -4029.65, 20.53, 3.40, TEMPSUMMON_TIMED_DESPAWN, 340000);
-    if(spawn)
-        spawn->GetMotionMaster()->MovePath(PATH_ENTRY_2, true);
-    
-    player->SummonGameObject(GO_TREASURE, -10119.70, -4050.45, 5.33, 0, 0, 0, 0, 0, 240);
-
-    return true;
-};
-
-/*######
 ## AddSC
 ######*/
 
@@ -609,21 +418,9 @@ void AddSC_tanaris()
     newscript->RegisterSelf();
 
     newscript = new Script;
-    newscript->Name="npc_custodian_of_time";
-    newscript->GetAI = &GetAI_npc_custodian_of_time;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
     newscript->Name="npc_marin_noggenfogger";
     newscript->pGossipHello =  &GossipHello_npc_marin_noggenfogger;
     newscript->pGossipSelect = &GossipSelect_npc_marin_noggenfogger;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name="npc_steward_of_time";
-    newscript->pGossipHello =  &GossipHello_npc_steward_of_time;
-    newscript->pGossipSelect = &GossipSelect_npc_steward_of_time;
-    newscript->pQuestAccept =  &QuestAccept_npc_steward_of_time;
     newscript->RegisterSelf();
 
     newscript = new Script;
@@ -636,11 +433,6 @@ void AddSC_tanaris()
     newscript->Name = "npc_OOX17";
     newscript->GetAI = &GetAI_npc_OOX17;
     newscript->pQuestAccept = &QuestAccept_npc_OOX17;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "go_landmark_treasure";
-    newscript->pGOHello = &GOHello_go_landmark_treasure;
     newscript->RegisterSelf();
 }
 

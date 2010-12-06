@@ -1,7 +1,9 @@
 /*
  * Copyright (C) 2005-2008 MaNGOS <http://www.mangosproject.org/>
  *
- * Copyright (C) 2008 Neo <http://www.neocore.info/>
+ * Copyright (C) 2008 Neo <http://www.neocore.org/>
+ *
+ * Copyright (C) 2009-2010 NeoZero <http://www.neozero.org/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,7 +39,8 @@ class AuthCrypt
 
         void Init();
 
-        void SetKey(BigNumber *);
+        //void SetKey(BigNumber *);
+        void SetKey(uint8 *key, size_t len);
 
         void DecryptRecv(uint8 *, size_t);
         void EncryptSend(uint8 *, size_t);

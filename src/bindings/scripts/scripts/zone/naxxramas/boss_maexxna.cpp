@@ -75,13 +75,12 @@ struct NEO_DLL_DECL mob_webwrapAI : public ScriptedAI
             {
                 Unit* victim = NULL;
                 victim = Unit::GetUnit((*m_creature), victimGUID);
-                if(victim)
-                    victim->RemoveAurasDueToSpell(SPELL_WEBTRAP);
+                victim->RemoveAurasDueToSpell(SPELL_WEBTRAP);
             }
         }
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
     }
 
@@ -115,7 +114,7 @@ struct NEO_DLL_DECL boss_maexxnaAI : public ScriptedAI
         Enraged = false;
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
     }
 

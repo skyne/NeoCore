@@ -1,7 +1,9 @@
 /*
  * Copyright (C) 2005-2008 MaNGOS <http://www.mangosproject.org/>
  *
- * Copyright (C) 2008 Trinity <http://www.trinitycore.org/>
+ * Copyright (C) 2008 Neo <http://www.neocore.org/>
+ *
+ * Copyright (C) 2009-2010 NeoZero <http://www.neozero.org/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -42,10 +44,10 @@ HomeMovementGenerator<Creature>::Reset(Creature &)
 void
 HomeMovementGenerator<Creature>::_setTargetLocation(Creature & owner)
 {
-    if (!&owner )
+    if( !&owner )
         return;
 
-    if (owner.hasUnitState(UNIT_STAT_ROOT | UNIT_STAT_STUNNED | UNIT_STAT_DISTRACTED) )
+    if( owner.hasUnitState(UNIT_STAT_ROOT | UNIT_STAT_STUNNED | UNIT_STAT_DISTRACTED) )
         return;
 
     float x, y, z;
@@ -61,7 +63,7 @@ HomeMovementGenerator<Creature>::_setTargetLocation(Creature & owner)
 bool
 HomeMovementGenerator<Creature>::Update(Creature &owner, const uint32& time_diff)
 {
-    CreatureTraveller traveller(owner);
+    CreatureTraveller traveller( owner);
     i_destinationHolder.UpdateTraveller(traveller, time_diff);
 
     if (time_diff > i_travel_timer)
@@ -69,14 +71,14 @@ HomeMovementGenerator<Creature>::Update(Creature &owner, const uint32& time_diff
         owner.AddUnitMovementFlag(MOVEMENTFLAG_WALK_MODE);
 
         // restore orientation of not moving creature at returning to home
-        if (owner.GetDefaultMovementType()==IDLE_MOTION_TYPE)
+        if(owner.GetDefaultMovementType()==IDLE_MOTION_TYPE)
         {
             owner.SetOrientation(ori);
             WorldPacket packet;
             owner.BuildHeartBeatMsg(&packet);
             owner.SendMessageToSet(&packet, false);
         }
-
+        
         owner.AI()->JustReachedHome();
         return false;
     }
@@ -85,3 +87,4 @@ HomeMovementGenerator<Creature>::Update(Creature &owner, const uint32& time_diff
 
     return true;
 }
+

@@ -22,7 +22,6 @@ SDCategory: NPCs
 EndScriptData */
 
 #include "precompiled.h"
-#include "GameEvent.h"
 
 #define HALLOWEEN_EVENTID       12
 #define SPELL_TRICK_OR_TREATED  24755
@@ -35,16 +34,24 @@ EndScriptData */
 
 bool isEventActive()
 {
-    return isGameEventActive(HALLOWEEN_EVENTID);
+    /*
+     const GameEvent::ActiveEvents *ActiveEventsList = gameeventmgr.GetActiveEventList();
+     GameEvent::ActiveEvents::const_iterator itr;
+     for (itr = ActiveEventsList->begin(); itr != ActiveEventsList->end(); ++itr)
+     {
+         if (*itr==HALLOWEEN_EVENTID)
+         {
+             return true;
+         }
+     }*/
+    return false;
 }
 
 bool GossipHello_npc_innkeeper(Player *player, Creature *_Creature)
 {
+    if (_Creature->isQuestGiver())
+        player->PrepareQuestMenu( _Creature->GetGUID() );
 
-    player->TalkedToCreature(_Creature->GetEntry(),_Creature->GetGUID());
-
-    _Creature->prepareGossipMenu(player,0); //send innkeeper menu too
-    
     if (isEventActive()&& !player->GetAura(SPELL_TRICK_OR_TREATED,0))
     {
         char* localizedEntry;
@@ -69,6 +76,7 @@ bool GossipHello_npc_innkeeper(Player *player, Creature *_Creature)
         player->ADD_GOSSIP_ITEM(0, localizedEntry, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+HALLOWEEN_EVENTID);
     }
 
+    player->TalkedToCreature(_Creature->GetEntry(),_Creature->GetGUID());
     player->SEND_GOSSIP_MENU(_Creature->GetNpcTextId(), _Creature->GetGUID());
     return true;
 }
@@ -120,22 +128,9 @@ bool GossipSelect_npc_innkeeper(Player *player, Creature *_Creature, uint32 send
             }
             player->CastSpell(player, trickspell, true);
         }
-        return true;                                        // prevent NEO core handling
+        return true;                                        // prevent Neo core handling
     }
-    //Trininty Gossip core handling dont work...
-    else if (action == GOSSIP_OPTION_VENDOR)
-    {
-        player->SEND_VENDORLIST( _Creature->GetGUID() );
-    return true;
-    }
-    else if (action == GOSSIP_OPTION_INNKEEPER)
-    {
-        player->PlayerTalkClass->CloseGossip();
-        player->SetBindPoint( _Creature->GetGUID() );
-    return true;
-    }
-
-    return false;  // no player selection
+    return false;                                           // the player didn't select "trick or treat" or cheated, normal core handling
 }
 
 void AddSC_npc_innkeeper()

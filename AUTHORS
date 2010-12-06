@@ -7,11 +7,14 @@ have an introductory blurb similar to this one:
 
  Authors of Neo Core
 
-Current Core developers:
-Girosz, Kagebunshin, Skyne, drestor, $0undX, Speeros
+ The following contributions warranted legal paper exchanges
+ with [the Free Software Foundation | Your Name].
+ Also see files ChangeLog and THANKS
 
-Current Database developers:
-tunnr, Bromia, AximCore
+Then, list who the contributors are and what files they have worked on.
+Indicate whether they created the file, or whether they modified it. For
+example:
 
-All the time wee ned new developers!!
-If u wanna be a dev, write to me an e-mail: skyne9@gmail.com
+ Random J. Hacker:
+   entire files  -> foo1.c , foo2.c , foo3.c
+   modifications -> foo4.c , foo5.c

@@ -41,6 +41,6 @@ cls
 echo.
 echo.
 echo.
-echo Process done! Copy vmaps folder to the Oregon main directory
+echo Process done! Copy vmaps folder to the Neo main directory
 echo Press any key to exit . . .
 pause>nul

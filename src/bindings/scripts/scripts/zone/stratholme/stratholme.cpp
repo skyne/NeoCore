@@ -92,7 +92,7 @@ struct NEO_DLL_DECL mob_freed_soulAI : public ScriptedAI
         }
     }
 
-    void EnterCombat(Unit* who) { }
+    void Aggro(Unit* who) { }
 };
 
 CreatureAI* GetAI_mob_freed_soul(Creature *_Creature)
@@ -125,7 +125,7 @@ struct NEO_DLL_DECL mob_restless_soulAI : public ScriptedAI
         Tagged = false;
     }
 
-    void EnterCombat(Unit* who) { }
+    void Aggro(Unit* who) { }
 
     void SpellHit(Unit *caster, const SpellEntry *spell)
     {
@@ -187,7 +187,7 @@ struct NEO_DLL_DECL mobs_spectral_ghostly_citizenAI : public ScriptedAI
         Tagged = false;
     }
 
-    void EnterCombat(Unit* who) { }
+    void Aggro(Unit* who) { }
 
     void SpellHit(Unit *caster, const SpellEntry *spell)
     {

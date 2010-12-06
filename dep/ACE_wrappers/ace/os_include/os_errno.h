@@ -16,8 +16,6 @@
 #ifndef ACE_OS_INCLUDE_OS_ERRNO_H
 #define ACE_OS_INCLUDE_OS_ERRNO_H
 
-#pragma warning ( disable : 4005 )
-
 #include /**/ "ace/pre.h"
 
 #include "ace/config-lite.h"

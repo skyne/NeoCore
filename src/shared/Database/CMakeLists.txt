@@ -1,4 +1,4 @@
-SET(neodatabase_STAT_SRCS
+SET(trinitydatabase_STAT_SRCS
    DBCStores.cpp
    DBCStores.h
    DBCStructure.h
@@ -8,13 +8,22 @@ SET(neodatabase_STAT_SRCS
    DatabaseEnv.h
    DatabaseImpl.h
    DatabaseMysql.cpp
+   DatabasePostgre.cpp
    DatabaseMysql.h
+   DatabasePostgre.h
+   DatabaseSqlite.cpp
+   DatabaseSqlite.h
    Field.cpp
    Field.h
    MySQLDelayThread.h
+   PGSQLDelayThread.h
    QueryResult.h
    QueryResultMysql.cpp
    QueryResultMysql.h
+   QueryResultPostgre.cpp
+   QueryResultPostgre.h
+   QueryResultSqlite.cpp
+   QueryResultSqlite.h
    SQLStorage.cpp
    SQLStorage.h
    SqlDelayThread.cpp
@@ -25,4 +34,4 @@ SET(neodatabase_STAT_SRCS
    dbcfile.h
 )
 
-add_library(neodatabase STATIC ${neodatabase_STAT_SRCS})
+add_library(trinitydatabase STATIC ${trinitydatabase_STAT_SRCS})

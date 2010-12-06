@@ -45,7 +45,7 @@ struct NEO_DLL_DECL boss_ebonrocAI : public ScriptedAI
         Heal_Timer = 1000;
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
         DoZoneInCombat();
     }

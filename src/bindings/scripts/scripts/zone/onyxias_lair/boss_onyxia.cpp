@@ -102,7 +102,7 @@ struct NEO_DLL_DECL boss_onyxiaAI : public ScriptedAI
         m_creature->ApplySpellImmune(1, IMMUNITY_EFFECT,SPELL_EFFECT_ATTACK_ME, true);
     }
 
-    void EnterCombat(Unit* who)
+    void Aggro(Unit* who)
     {
         DoScriptText(SAY_AGGRO, m_creature);
         DoZoneInCombat();

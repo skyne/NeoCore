@@ -52,10 +52,10 @@ struct NEO_DLL_DECL boss_nerubenkanAI : public ScriptedAI
        CryptScarabs_Timer = 3000;
         EncasingWebs_Timer = 7000;
         PierceArmor_Timer = 19000;
-        RaiseUndeadScarab_Timer = 3000;
+         RaiseUndeadScarab_Timer = 3000;
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
     }
 
@@ -94,7 +94,9 @@ struct NEO_DLL_DECL boss_nerubenkanAI : public ScriptedAI
         //EncasingWebs
         if (EncasingWebs_Timer < diff)
         {
+
             DoCast(m_creature->getVictim(),SPELL_ENCASINGWEBS);
+
             EncasingWebs_Timer = 30000;
         }else EncasingWebs_Timer -= diff;
 
@@ -103,6 +105,7 @@ struct NEO_DLL_DECL boss_nerubenkanAI : public ScriptedAI
         {
             if (rand()%100 < 75)
                 DoCast(m_creature->getVictim(),SPELL_PIERCEARMOR);
+
             PierceArmor_Timer = 35000;
         }else PierceArmor_Timer -= diff;
 
@@ -127,6 +130,7 @@ CreatureAI* GetAI_boss_nerubenkan(Creature *_Creature)
 {
     return new boss_nerubenkanAI (_Creature);
 }
+
 
 void AddSC_boss_nerubenkan()
 {

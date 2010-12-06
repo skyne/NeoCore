@@ -47,7 +47,7 @@ struct NEO_DLL_DECL boss_shazzrahAI : public ScriptedAI
         Blink_Timer = 30000;
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
     }
 

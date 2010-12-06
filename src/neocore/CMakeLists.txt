@@ -1,7 +1,7 @@
 
 ########### next target ###############
 
-SET(neo-core_SRCS
+SET(trinity-core_SRCS
 CliRunnable.cpp 
 CliRunnable.h 
 Main.cpp 
@@ -13,43 +13,45 @@ WorldRunnable.cpp
 WorldRunnable.h
 )
 
-SET(neo-core_LINK_FLAGS "")
+SET(trinity-core_LINK_FLAGS "")
 
-add_executable(neo-core ${neo-core_SRCS})
+add_executable(trinity-core ${trinity-core_SRCS})
 add_definitions(
--D_NEO_CORE_CONFIG='"${CONF_DIR}/neocore.conf"'
+-D_TRINITY_CORE_CONFIG='"${CONF_DIR}/trinitycore.conf"'
 )
 IF (DO_MYSQL)
-    SET(neo-core_LINK_FLAGS "-pthread ${neo-core_LINK_FLAGS}")
+    SET(trinity-core_LINK_FLAGS "-pthread ${trinity-core_LINK_FLAGS}")
 ENDIF(DO_MYSQL)
+IF (DO_POSTGRESQL)
+    SET(trinity-core_LINK_FLAGS "-pthread ${trinity-core_LINK_FLAGS}")
+ENDIF(DO_POSTGRESQL)
 
 
 IF (CMAKE_SYSTEM_NAME MATCHES "Darwin")
-    SET(neo-core_LINK_FLAGS "-framework Carbon ${neo-core_LINK_FLAGS}")
+    SET(trinity-core_LINK_FLAGS "-framework Carbon ${trinity-core_LINK_FLAGS}")
     SET(SCRIPT_LIB "")
 ENDIF (CMAKE_SYSTEM_NAME MATCHES "Darwin")
 
-SET_TARGET_PROPERTIES(neo-core PROPERTIES LINK_FLAGS "${neo-core_LINK_FLAGS}")
+SET_TARGET_PROPERTIES(trinity-core PROPERTIES LINK_FLAGS "${trinity-core_LINK_FLAGS}")
 
 target_link_libraries(
-neo-core
+trinity-core
 game
 shared
 zlib
-neoframework
-neosockets
-neodatabase
-neoauth
-neoconfig
+trinityframework
+trinitysockets
+trinitydatabase
+trinityauth
+trinityconfig
 vmaps
+ZThread
 g3dlite
-pathfind
-recast
-detour
 ${READLINE_LIBRARY}
 gomp
 ${SCRIPT_LIB}
 ${MYSQL_LIBRARIES}
+${POSTGRESQL_LIBRARIES}
 ${SSLLIB}
 ${ACE_LIBRARY}
 ${ZLIB}
@@ -58,15 +60,15 @@ ${OSX_LIBS}
 
 IF (CENTOS)
     target_link_libraries(
-        neo-core
+        trinity-core
         termcap
     )
 ENDIF (CENTOS)
 
-install(TARGETS neo-core DESTINATION bin)
+install(TARGETS trinity-core DESTINATION bin)
 
 
 ########### install files ###############
 
-install(FILES  neocore.conf.dist DESTINATION etc)
+install(FILES  trinitycore.conf.dist DESTINATION etc)
 

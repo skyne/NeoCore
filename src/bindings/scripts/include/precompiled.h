@@ -12,7 +12,6 @@
 #include "GridNotifiersImpl.h"
 #include "Unit.h"
 #include "GameObject.h"
-#include "SpellMgr.h"
 #include "sc_creature.h"
 #include "sc_gossip.h"
 #include "sc_instance.h"

@@ -1,7 +1,9 @@
 /*
  * Copyright (C) 2005-2008 MaNGOS <http://www.mangosproject.org/>
  *
- * Copyright (C) 2008 Trinity <http://www.trinitycore.org/>
+ * Copyright (C) 2008 Neo <http://www.neocore.org/>
+ *
+ * Copyright (C) 2009-2010 NeoZero <http://www.neozero.org/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -41,26 +43,26 @@ typedef void(NEO_IMPORT * scriptCallScriptsInit) (char const*);
 typedef void(NEO_IMPORT * scriptCallScriptsFree) ();
 typedef char const* (NEO_IMPORT * scriptCallScriptsVersion) ();
 
-typedef bool(NEO_IMPORT * scriptCallGossipHello) (Player *player, Creature *_Creature);
+typedef bool(NEO_IMPORT * scriptCallGossipHello) (Player *player, Creature *_Creature );
 typedef bool(NEO_IMPORT * scriptCallQuestAccept) (Player *player, Creature *_Creature, Quest const *);
 typedef bool(NEO_IMPORT * scriptCallGossipSelect)(Player *player, Creature *_Creature, uint32 sender, uint32 action);
-typedef bool(NEO_IMPORT * scriptCallGossipSelectWithCode)(Player *player, Creature *_Creature, uint32 sender, uint32 action, const char* sCode);
+typedef bool(NEO_IMPORT * scriptCallGossipSelectWithCode)( Player *player, Creature *_Creature, uint32 sender, uint32 action, const char* sCode );
 typedef bool(NEO_IMPORT * scriptCallGOSelect)(Player *player, GameObject *_GO, uint32 sender, uint32 action);
-typedef bool(NEO_IMPORT * scriptCallGOSelectWithCode)(Player *player, GameObject *_GO, uint32 sender, uint32 action, const char* sCode);
-typedef bool(NEO_IMPORT * scriptCallQuestSelect)(Player *player, Creature *_Creature, Quest const*);
+typedef bool(NEO_IMPORT * scriptCallGOSelectWithCode)( Player *player, GameObject *_GO, uint32 sender, uint32 action, const char* sCode );
+typedef bool(NEO_IMPORT * scriptCallQuestSelect)( Player *player, Creature *_Creature, Quest const* );
 typedef bool(NEO_IMPORT * scriptCallQuestComplete)(Player *player, Creature *_Creature, Quest const*);
-typedef uint32(NEO_IMPORT * scriptCallNPCDialogStatus)(Player *player, Creature *_Creature);
-typedef uint32(NEO_IMPORT * scriptCallGODialogStatus)(Player *player, GameObject * _GO);
-typedef bool(NEO_IMPORT * scriptCallChooseReward)(Player *player, Creature *_Creature, Quest const*, uint32 opt);
-typedef bool(NEO_IMPORT * scriptCallItemHello)(Player *player, Item *, Quest const*);
-typedef bool(NEO_IMPORT * scriptCallGOHello)(Player *player, GameObject *);
-typedef bool(NEO_IMPORT * scriptCallAreaTrigger)(Player *player, AreaTriggerEntry const*);
+typedef uint32(NEO_IMPORT * scriptCallNPCDialogStatus)( Player *player, Creature *_Creature);
+typedef uint32(NEO_IMPORT * scriptCallGODialogStatus)( Player *player, GameObject * _GO);
+typedef bool(NEO_IMPORT * scriptCallChooseReward)( Player *player, Creature *_Creature, Quest const*, uint32 opt );
+typedef bool(NEO_IMPORT * scriptCallItemHello)( Player *player, Item *, Quest const*);
+typedef bool(NEO_IMPORT * scriptCallGOHello)( Player *player, GameObject * );
+typedef bool(NEO_IMPORT * scriptCallAreaTrigger)( Player *player, AreaTriggerEntry const* );
 typedef bool(NEO_IMPORT * scriptCallItemQuestAccept)(Player *player, Item *, Quest const*);
 typedef bool(NEO_IMPORT * scriptCallGOQuestAccept)(Player *player, GameObject *, Quest const*);
-typedef bool(NEO_IMPORT * scriptCallGOChooseReward)(Player *player, GameObject *, Quest const*, uint32 opt);
-typedef bool(NEO_IMPORT * scriptCallReceiveEmote) (Player *player, Creature *_Creature, uint32 emote);
+typedef bool(NEO_IMPORT * scriptCallGOChooseReward)(Player *player, GameObject *, Quest const*, uint32 opt );
+typedef bool(NEO_IMPORT * scriptCallReceiveEmote) ( Player *player, Creature *_Creature, uint32 emote );
 typedef bool(NEO_IMPORT * scriptCallItemUse) (Player *player, Item *_Item, SpellCastTargets const& targets);
-typedef CreatureAI* (NEO_IMPORT * scriptCallGetAI) (Creature *_Creature);
+typedef CreatureAI* (NEO_IMPORT * scriptCallGetAI) ( Creature *_Creature );
 typedef InstanceData* (NEO_IMPORT * scriptCallCreateInstanceData) (Map *map);
 
 typedef struct

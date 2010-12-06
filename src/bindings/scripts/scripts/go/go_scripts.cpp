@@ -30,7 +30,6 @@ go_field_repair_bot_74A
 go_orb_of_command
 go_tablet_of_madness
 go_tablet_of_the_seven
-go_teleporter
 EndContentData */
 
 #include "precompiled.h"
@@ -136,7 +135,7 @@ bool GOHello_go_tablet_of_madness(Player *player, GameObject* _GO)
 ## go_tablet_of_the_seven
 ######*/
 
-//TODO: use gossip option ("Transcript the Tablet") instead, if NEO adds support.
+//TODO: use gossip option ("Transcript the Tablet") instead, if Neo adds support.
 bool GOHello_go_tablet_of_the_seven(Player *player, GameObject* _GO)
 {
     if (_GO->GetGoType() != GAMEOBJECT_TYPE_QUESTGIVER)
@@ -146,52 +145,6 @@ bool GOHello_go_tablet_of_the_seven(Player *player, GameObject* _GO)
         player->CastSpell(player,15065,false);
 
     return true;
-}
-
-/*######
-## go_teleporter
-######*/
-
-bool GOHello_go_teleporter(Player *player, GameObject* _GO)
-{
-    player->TeleportTo(0, 1807.07f,336.105f,70.3975f,0.0f);
-    return false;
-}
-
-/*#####
-## go_jump_a_tron
-######*/
-
-bool GOHello_go_jump_a_tron(Player *player, GameObject* _GO)
-{
-    if (player->GetQuestStatus(10111) == QUEST_STATUS_INCOMPLETE)
-     player->CastSpell(player,33382,true);
-
-    return true;
-}
-
-/*######
-## go_ethereum_prison
-######*/
-
-float ethereum_NPC[2][7] =
-{
- {20785,20790,20789,20784,20786,20783,20788}, // hostile npc
- {22810,22811,22812,22813,22814,22815,0}      // fiendly npc (need script in acid ? only to cast spell reputation reward)
-};
-
-bool GOHello_go_ethereum_prison(Player *player, GameObject* _GO)
-{
- _GO->SetGoState(0);
- switch(rand()%2){
-    case 0:
-        _GO->SummonCreature(ethereum_NPC[0][rand()%6],_GO->GetPositionX(),_GO->GetPositionY(),_GO->GetPositionZ()+0.3, 0,TEMPSUMMON_CORPSE_TIMED_DESPAWN,10000);
-    break;
-    case 1:
-        _GO->SummonCreature(ethereum_NPC[1][rand()%5],_GO->GetPositionX(),_GO->GetPositionY(),_GO->GetPositionZ()+0.3, 0,TEMPSUMMON_TIMED_DESPAWN,10000);
-    break;
-}
-return true;
 }
 
 /*######
@@ -250,22 +203,6 @@ void AddSC_go_scripts()
     newscript = new Script;
     newscript->Name="go_tablet_of_the_seven";
     newscript->pGOHello =           &GOHello_go_tablet_of_the_seven;
-    newscript->RegisterSelf();
-    /*
-    //Disabled to prevent "CRASH ALERT!"
-    newscript = new Script;
-    newscript->Name="go_teleporter";
-    newscript->pGOHello =           &GOHello_go_teleporter;
-    newscript->RegisterSelf();
-    */
-    newscript = new Script;
-    newscript->Name="go_jump_a_tron";
-    newscript->pGOHello =           &GOHello_go_jump_a_tron;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name="go_ethereum_prison";
-    newscript->pGOHello =           &GOHello_go_ethereum_prison;
     newscript->RegisterSelf();
 
     newscript = new Script;

@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 - 2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
+/* Copyright (C) 2006 - 2008 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
 * This program is free software; you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
 * the Free Software Foundation; either version 2 of the License, or
@@ -27,7 +27,7 @@ npc_ruul_snowhoof
 EndContentData */
 
 #include "precompiled.h"
-#include "escort_ai.h"
+#include "../../npc/npc_escortAI.h"
 
 /*####
 # npc_torek
@@ -59,18 +59,18 @@ struct NEO_DLL_DECL npc_torekAI : public npc_escortAI
 
     void WaypointReached(uint32 i)
     {
-        Player* pPlayer = GetPlayerForEscort();
+        Player* player = Unit::GetPlayer(PlayerGUID);
 
-        if (!pPlayer)
+        if (!player)
             return;
 
         switch (i)
         {
         case 1:
-            DoScriptText(SAY_MOVE, m_creature, pPlayer);
+            DoScriptText(SAY_MOVE, m_creature, player);
             break;
         case 8:
-            DoScriptText(SAY_PREPARE, m_creature, pPlayer);
+            DoScriptText(SAY_PREPARE, m_creature, player);
             break;
         case 19:
             //TODO: verify location and creatures amount.
@@ -79,13 +79,13 @@ struct NEO_DLL_DECL npc_torekAI : public npc_escortAI
             m_creature->SummonCreature(ENTRY_SILVERWING_WARRIOR,1778.73,-2049.50,109.83,1.67,TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT,25000);
             break;
         case 20:
-            DoScriptText(SAY_WIN, m_creature, pPlayer);
+            DoScriptText(SAY_WIN, m_creature, player);
             Completed = true;
-            if (pPlayer)
-                pPlayer->GroupEventHappens(QUEST_TOREK_ASSULT, m_creature);
+            if (player && player->GetTypeId() == TYPEID_PLAYER)
+                ((Player*)player)->GroupEventHappens(QUEST_TOREK_ASSULT,m_creature);
             break;
         case 21:
-            DoScriptText(SAY_END, m_creature, pPlayer);
+            DoScriptText(SAY_END, m_creature, player);
             break;
         }
     }
@@ -97,11 +97,22 @@ struct NEO_DLL_DECL npc_torekAI : public npc_escortAI
         Completed = false;
     }
 
-    void EnterCombat(Unit* who) {}
+    void Aggro(Unit* who)
+    {
+    }
 
     void JustSummoned(Creature* summoned)
     {
         summoned->AI()->AttackStart(m_creature);
+    }
+
+    void JustDied(Unit* killer)
+    {
+        if (PlayerGUID && !Completed)
+        {
+            if (Player* player = Unit::GetPlayer(PlayerGUID))
+                ((Player*)player)->FailQuest(QUEST_TOREK_ASSULT);
+        }
     }
 
     void UpdateAI(const uint32 diff)
@@ -125,16 +136,14 @@ struct NEO_DLL_DECL npc_torekAI : public npc_escortAI
     }
 };
 
-bool QuestAccept_npc_torek(Player* pPlayer, Creature* pCreature, Quest const* quest)
+bool QuestAccept_npc_torek(Player* player, Creature* creature, Quest const* quest)
 {
     if (quest->GetQuestId() == QUEST_TOREK_ASSULT)
     {
         //TODO: find companions, make them follow Torek, at any time (possibly done by mangos/database in future?)
-        DoScriptText(SAY_READY, pCreature, pPlayer);
-        pCreature->setFaction(113);
-
-        if (npc_escortAI* pEscortAI = CAST_AI(npc_torekAI, pCreature->AI()))
-            pEscortAI->Start(true, true, pPlayer->GetGUID());
+        ((npc_escortAI*)(creature->AI()))->Start(true, true, true, player->GetGUID());
+        DoScriptText(SAY_READY, creature, player);
+        creature->setFaction(113);
     }
 
     return true;
@@ -184,9 +193,9 @@ struct NEO_DLL_DECL npc_ruul_snowhoofAI : public npc_escortAI
 
     void WaypointReached(uint32 i)
     {
-        Player* pPlayer = GetPlayerForEscort();
+        Player* player = Unit::GetPlayer(PlayerGUID);
 
-        if (!pPlayer)
+        if (!player)
             return;
 
         switch(i)
@@ -194,7 +203,7 @@ struct NEO_DLL_DECL npc_ruul_snowhoofAI : public npc_escortAI
         case 0:    {
                 m_creature->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
                 GameObject* Cage = FindGameObject(GO_CAGE, 20, m_creature);
-                if (Cage)
+                if(Cage)
                     Cage->SetGoState(0);
                 break;}
         case 13:
@@ -209,19 +218,22 @@ struct NEO_DLL_DECL npc_ruul_snowhoofAI : public npc_escortAI
                 break;
 
         case 21:{
-                if (pPlayer)
-                    pPlayer->GroupEventHappens(QUEST_FREEDOM_TO_RUUL, m_creature);
+                if (player && player->GetTypeId() == TYPEID_PLAYER)
+                    ((Player*)player)->GroupEventHappens(QUEST_FREEDOM_TO_RUUL,m_creature);
 
                 break;  }
         }
     }
 
-    void EnterCombat(Unit* who) {}
+    void Aggro(Unit* who) {}
 
     void Reset()
     {
+        if (!IsBeingEscorted)
+            m_creature->setFaction(1602);
+
         GameObject* Cage = FindGameObject(GO_CAGE, 20, m_creature);
-        if (Cage)
+        if(Cage)
             Cage->SetGoState(1);
     }
 
@@ -230,20 +242,28 @@ struct NEO_DLL_DECL npc_ruul_snowhoofAI : public npc_escortAI
         summoned->AI()->AttackStart(m_creature);
     }
 
+    void JustDied(Unit* killer)
+    {
+        if (PlayerGUID)
+        {
+            Player* player = Unit::GetPlayer(PlayerGUID);
+            if (player)
+                ((Player*)player)->FailQuest(QUEST_FREEDOM_TO_RUUL);
+        }
+    }
+
     void UpdateAI(const uint32 diff)
     {
         npc_escortAI::UpdateAI(diff);
     }
 };
 
-bool QuestAccept_npc_ruul_snowhoof(Player* pPlayer, Creature* pCreature, Quest const* quest)
+bool QuestAccept_npc_ruul_snowhoof(Player* player, Creature* creature, Quest const* quest)
 {
     if (quest->GetQuestId() == QUEST_FREEDOM_TO_RUUL)
     {
-        pCreature->setFaction(113);
-
-        if (npc_escortAI* pEscortAI = CAST_AI(npc_ruul_snowhoofAI, (pCreature->AI())))
-            pEscortAI->Start(true, false, pPlayer->GetGUID());
+        creature->setFaction(113);
+        ((npc_escortAI*)(creature->AI()))->Start(true, true, false, player->GetGUID());
     }
     return true;
 }

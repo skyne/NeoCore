@@ -55,7 +55,7 @@ struct NEO_DLL_DECL boss_theolenkrastinovAI : public ScriptedAI
         }
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
     }
 

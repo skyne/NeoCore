@@ -16,44 +16,37 @@
 
 /* ScriptData
 SDName: Boss_Kurinnaxx
-SD%Complete: 95
-SDComment: maybe wrong Timer
+SD%Complete: 100
+SDComment: VERIFY SCRIPT AND SQL
 SDCategory: Ruins of Ahn'Qiraj
 EndScriptData */
 
 #include "precompiled.h"
 
-#define SPELL_MORTALWOUND       25646
-#define SPELL_SANDTRAP          25648
-#define SPELL_ENRAGE            26527
-
-#define SPELL_THRASH            3391
-#define SPELL_SUMMON            26446
-#define SPELL_SLASH             25814
+#define SPELL_MORTALWOUND 25646
+#define SPELL_SANDTRAP 25656
+#define SPELL_ENRAGE 28798
 
 struct NEO_DLL_DECL boss_kurinnaxxAI : public ScriptedAI
 {
     boss_kurinnaxxAI(Creature *c) : ScriptedAI(c) {}
 
+    Unit *pTarget;
     uint32 MORTALWOUND_Timer;
     uint32 SANDTRAP_Timer;
-    uint32 THRASH_Timer;
-    uint32 SUMMON_Timer;
-    uint32 SLASH_Timer;
-
-    bool enraged;
-    bool sandtrap;
+    uint32 i;
 
     void Reset()
     {
-        MORTALWOUND_Timer = 5000;
-        SANDTRAP_Timer = 10000;
-        THRASH_Timer = 7000;
-        SLASH_Timer = 8500;
-        SUMMON_Timer = 12000;
+        i=0;
+        pTarget = NULL;
+        MORTALWOUND_Timer = 30000;
+        SANDTRAP_Timer = 30000;
+    }
 
-        sandtrap = false;
-        enraged = false;
+    void Aggro(Unit *who)
+    {
+        pTarget = who;
     }
 
     void UpdateAI(const uint32 diff)
@@ -62,79 +55,26 @@ struct NEO_DLL_DECL boss_kurinnaxxAI : public ScriptedAI
             return;
 
         //If we are <30% cast enrage
-        if (!enraged && m_creature->GetHealth()*100 / m_creature->GetMaxHealth() <= 30 && !m_creature->IsNonMeleeSpellCasted(false))
+        if (i==0 && m_creature->GetHealth()*100 / m_creature->GetMaxHealth() <= 30 && !m_creature->IsNonMeleeSpellCasted(false))
         {
-            enraged = true;
-            DoCast(m_creature,SPELL_ENRAGE,true);
-        }else if(enraged && !m_creature->HasAura(SPELL_ENRAGE,0))
-        {
-            DoCast(m_creature,SPELL_ENRAGE,true);
+            i=1;
+            DoCast(m_creature->getVictim(),SPELL_ENRAGE);
         }
-
 
         //MORTALWOUND_Timer
         if (MORTALWOUND_Timer < diff)
         {
             DoCast(m_creature->getVictim(),SPELL_MORTALWOUND);
-            MORTALWOUND_Timer = 6000 + rand()%2000;
+            MORTALWOUND_Timer = 30000;
         }else MORTALWOUND_Timer -= diff;
-
-        if(THRASH_Timer < diff)
-        {
-            DoCast(m_creature,SPELL_THRASH);
-            THRASH_Timer = 3000+ rand()%5000;
-        }else THRASH_Timer -= diff;
-
-        if(SLASH_Timer < diff)
-        {
-            DoCast(m_creature->getVictim(),SPELL_SLASH);
-            SLASH_Timer = 5000 + rand()%5000;
-        }else SLASH_Timer -= diff;
-
-        if( SUMMON_Timer < diff)
-        {
-            Unit *target = SelectUnit(SELECT_TARGET_RANDOM,1,70,true);
-            if(target)
-            {
-                DoCast(target,SPELL_SUMMON);
-            }
-            SUMMON_Timer = 8000 + rand()%2000;
-        }else SUMMON_Timer -= diff;
 
         //SANDTRAP_Timer
         if (SANDTRAP_Timer < diff)
         {
-            if(!sandtrap)
-            {
-                Unit *target = SelectUnit(SELECT_TARGET_RANDOM,0,50,true);
-
-                if(target)
-                {
-                    target->CastSpell(target,SPELL_SANDTRAP,true,0,0,m_creature->GetGUID());
-                    sandtrap = true;
-                }
-                SANDTRAP_Timer = 5000;
-            }else
-            {
-                GameObject* trap = FindGameObject(180647,100,m_creature);
-
-                if(trap)
-                {
-                    float x,y,z;
-                    trap->GetPosition(x,y,z);
-
-                    //trap->CastSpell((Unit*)trap,25656);
-                    Creature* trigger = m_creature->SummonCreature(15426,x,y,z,0,TEMPSUMMON_TIMED_DESPAWN,2000);
-
-                    trigger->CastSpell(trigger,25656,false);
-                    trap->Delete();
-                }
-                SANDTRAP_Timer = 5000;
-                sandtrap = false;
-            }
+            DoCast(m_creature->getVictim(),SPELL_SANDTRAP);
+            SANDTRAP_Timer = 30000;
         }else SANDTRAP_Timer -= diff;
 
-        
         DoMeleeAttackIfReady();
     }
 };

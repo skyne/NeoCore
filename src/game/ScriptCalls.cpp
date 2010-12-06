@@ -1,7 +1,9 @@
 /*
  * Copyright (C) 2005-2008 MaNGOS <http://www.mangosproject.org/>
  *
- * Copyright (C) 2008 Trinity <http://www.trinitycore.org/>
+ * Copyright (C) 2008 Neo <http://www.neocore.org/>
+ *
+ * Copyright (C) 2009-2010 NeoZero <http://www.neozero.org/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +24,6 @@
 #include <dlfcn.h>
 #endif
 
-#include "Common.h"
 #include "Platform/Define.h"
 #include "ScriptCalls.h"
 #include "World.h"
@@ -32,7 +33,7 @@ ScriptsSet Script=NULL;
 
 void UnloadScriptingModule()
 {
-    if (Script)
+    if(Script)
     {
         //todo: some check if some func from script library is called right now
         Script->ScriptsFree();
@@ -51,14 +52,14 @@ bool LoadScriptingModule(char const* libName)
 
     testScript->hScriptsLib=NEO_LOAD_LIBRARY(name.c_str());
 
-    if (!testScript->hScriptsLib )
+    if(!testScript->hScriptsLib )
     {
         printf("Error loading Scripts Library %s !\n",name.c_str());
         delete testScript;
         return false;
     }
 
-    if ( !(testScript->ScriptsInit         =(scriptCallScriptsInit         )NEO_GET_PROC_ADDR(testScript->hScriptsLib,"ScriptsInit"         ))
+    if(   !(testScript->ScriptsInit         =(scriptCallScriptsInit         )NEO_GET_PROC_ADDR(testScript->hScriptsLib,"ScriptsInit"         ))
         ||!(testScript->ScriptsFree         =(scriptCallScriptsFree         )NEO_GET_PROC_ADDR(testScript->hScriptsLib,"ScriptsFree"         ))
         ||!(testScript->ScriptsVersion      =(scriptCallScriptsVersion      )NEO_GET_PROC_ADDR(testScript->hScriptsLib,"ScriptsVersion"      ))
         ||!(testScript->GossipHello         =(scriptCallGossipHello         )NEO_GET_PROC_ADDR(testScript->hScriptsLib,"GossipHello"         ))

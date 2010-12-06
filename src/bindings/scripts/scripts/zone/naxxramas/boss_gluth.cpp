@@ -86,7 +86,7 @@ struct NEO_DLL_DECL boss_gluthAI : public ScriptedAI
         Summon_Timer = 10000;
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
     }
 

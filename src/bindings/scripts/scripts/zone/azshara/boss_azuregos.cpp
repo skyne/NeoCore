@@ -60,7 +60,7 @@ struct NEO_DLL_DECL boss_azuregosAI : public ScriptedAI
         Enraged = false;
     }
 
-    void EnterCombat(Unit *who) {}
+    void Aggro(Unit *who) {}
 
     void UpdateAI(const uint32 diff)
     {

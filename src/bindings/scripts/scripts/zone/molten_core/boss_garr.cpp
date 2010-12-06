@@ -49,7 +49,7 @@ struct NEO_DLL_DECL boss_garrAI : public ScriptedAI
         CheckAdds_Timer = 2000;
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
     }
 
@@ -87,7 +87,7 @@ struct NEO_DLL_DECL mob_fireswornAI : public ScriptedAI
         Immolate_Timer = 4000;                              //These times are probably wrong
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
     }
 

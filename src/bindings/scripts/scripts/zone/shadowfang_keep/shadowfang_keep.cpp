@@ -26,7 +26,7 @@ npc_shadowfang_prisoner
 EndContentData */
 
 #include "precompiled.h"
-#include "escort_ai.h"
+#include "../../npc/npc_escortAI.h"
 #include "def_shadowfang_keep.h"
 
 /*######
@@ -56,7 +56,7 @@ struct NEO_DLL_DECL npc_shadowfang_prisonerAI : public npc_escortAI
     }
 
     void Reset() {}
-    void EnterCombat(Unit* who) {}
+    void Aggro(Unit* who) {}
 };
 
 CreatureAI* GetAI_npc_shadowfang_prisoner(Creature *_Creature)
@@ -100,9 +100,7 @@ bool GossipSelect_npc_shadowfang_prisoner(Player *player, Creature *_Creature, u
     if (action == GOSSIP_ACTION_INFO_DEF+1)
     {
         player->CLOSE_GOSSIP_MENU();
-
-        if (npc_escortAI* pEscortAI = CAST_AI(npc_shadowfang_prisonerAI, _Creature->AI()))
-            pEscortAI->Start(false, false);
+        ((npc_escortAI*)(_Creature->AI()))->Start(false, false, false);
     }
     return true;
 }

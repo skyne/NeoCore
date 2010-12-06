@@ -78,7 +78,7 @@ struct NEO_DLL_DECL boss_arlokkAI : public ScriptedAI
         m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
         DoScriptText(SAY_AGGRO, m_creature);
     }
@@ -125,13 +125,13 @@ struct NEO_DLL_DECL boss_arlokkAI : public ScriptedAI
                 {
                     DoScriptText(SAY_FEAST_PANTHER, m_creature, markedTarget);
                     Panther ->AI()->AttackStart(markedTarget);
-                }else if(Panther && target) Panther ->AI()->AttackStart(target);
+                }else Panther ->AI()->AttackStart(target);
 
                 Panther = m_creature->SummonCreature(15101,-11532.9970,-1606.4840,41.2979,0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
 
                 if(markedTarget && Panther )
                     Panther ->AI()->AttackStart(markedTarget);
-                else if(Panther && target)
+                else
                      Panther ->AI()->AttackStart(target);
 
                 Counter++;
@@ -164,8 +164,7 @@ struct NEO_DLL_DECL boss_arlokkAI : public ScriptedAI
                     m_creature->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, (cinfo->mindmg +((cinfo->mindmg/100) * 35)));
                     m_creature->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, (cinfo->maxdmg +((cinfo->maxdmg/100) * 35)));
                     m_creature->UpdateDamagePhysical(BASE_ATTACK);
-                    if(target)
-                        AttackStart(target);
+                    AttackStart(target);
                     //The Panther Model
                     m_creature->SetUInt32Value(UNIT_FIELD_DISPLAYID,15215);
                     m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);

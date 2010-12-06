@@ -42,7 +42,7 @@ struct NEO_DLL_DECL boss_landslideAI : public ScriptedAI
         Landslide_Timer = 0;
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
     }
 

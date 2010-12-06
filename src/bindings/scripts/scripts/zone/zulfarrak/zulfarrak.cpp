@@ -50,7 +50,7 @@ struct NEO_DLL_DECL npc_sergeant_blyAI : public ScriptedAI
     //ScriptedInstance* pInstance;
 
     uint32 ShieldBash_Timer;
-    uint32 Revenge_Timer;                                   //this is wrong, spell should never be used unless m_creature->getVictim() dodge, parry or block attack. NEO support required.
+    uint32 Revenge_Timer;                                   //this is wrong, spell should never be used unless m_creature->getVictim() dodge, parry or block attack. Neo support required.
 
     void Reset()
     {
@@ -63,7 +63,7 @@ struct NEO_DLL_DECL npc_sergeant_blyAI : public ScriptedAI
             pInstance->SetData(0, NOT_STARTED);*/
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
         /*if( pInstance )
             pInstance->SetData(0, IN_PROGRESS);*/
@@ -152,7 +152,7 @@ struct NEO_DLL_DECL npc_weegli_blastfuseAI : public ScriptedAI
             pInstance->SetData(0, NOT_STARTED);*/
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
         /*if( pInstance )
             pInstance->SetData(0, IN_PROGRESS);*/

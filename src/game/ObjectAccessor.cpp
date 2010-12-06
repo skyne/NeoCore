@@ -1,7 +1,9 @@
 /*
  * Copyright (C) 2005-2008 MaNGOS <http://www.mangosproject.org/>
  *
- * Copyright (C) 2008 Trinity <http://www.trinitycore.org/>
+ * Copyright (C) 2008 Neo <http://www.neocore.org/>
+ *
+ * Copyright (C) 2009-2010 NeoZero <http://www.neozero.org/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,7 +40,6 @@
 #include "Opcodes.h"
 #include "ObjectDefines.h"
 #include "MapInstanced.h"
-#include "World.h"
 
 #include <cmath>
 
@@ -57,15 +58,15 @@ namespace Neo
 
         void Visit(PlayerMapType &m)
         {
-            for (PlayerMapType::iterator iter=m.begin(); iter != m.end(); ++iter)
+            for(PlayerMapType::iterator iter=m.begin(); iter != m.end(); ++iter)
             {
-                if (iter->getSource() == &i_player )
+                if( iter->getSource() == &i_player )
                     continue;
 
                 UpdateDataMapType::iterator iter2 = i_updatePlayers.find(iter->getSource());
-                if (iter2 == i_updatePlayers.end() )
+                if( iter2 == i_updatePlayers.end() )
                 {
-                    std::pair<UpdateDataMapType::iterator, bool> p = i_updatePlayers.insert(ObjectAccessor::UpdateDataValueType(iter->getSource(), UpdateData()));
+                    std::pair<UpdateDataMapType::iterator, bool> p = i_updatePlayers.insert( ObjectAccessor::UpdateDataValueType(iter->getSource(), UpdateData()) );
                     assert(p.second);
                     iter2 = p.first;
                 }
@@ -79,14 +80,7 @@ namespace Neo
 }
 
 ObjectAccessor::ObjectAccessor() {}
-ObjectAccessor::~ObjectAccessor()
-{
-    for (Player2CorpsesMapType::const_iterator itr = i_player2corpse.begin(); itr != i_player2corpse.end(); ++itr)
-    {
-        itr->second->RemoveFromWorld();
-        delete itr->second;
-    }
-}
+ObjectAccessor::~ObjectAccessor() {}
 
 Creature*
 ObjectAccessor::GetNPCIfCanInteractWith(Player const &player, uint64 guid, uint32 npcflagmask)
@@ -101,39 +95,36 @@ ObjectAccessor::GetNPCIfCanInteractWith(Player const &player, uint64 guid, uint3
         return NULL;
 
     // player check
-    if (!player.CanInteractWithNPCs(!unit->isSpiritService()))
+    if(!player.CanInteractWithNPCs(!unit->isSpiritService()))
         return NULL;
 
-    if (player.IsHostileTo(unit))
-        return NULL;
-    
     // appropriate npc type
-    if (npcflagmask && !unit->HasFlag(UNIT_NPC_FLAGS, npcflagmask ))
+    if(npcflagmask && !unit->HasFlag( UNIT_NPC_FLAGS, npcflagmask ))
         return NULL;
 
     // alive or spirit healer
-    if (!unit->isAlive() && (!unit->isSpiritService() || player.isAlive() ))
+    if(!unit->isAlive() && (!unit->isSpiritService() || player.isAlive() ))
         return NULL;
 
     // not allow interaction under control
-    if (unit->GetCharmerGUID())
+    if(unit->GetCharmerGUID())
         return NULL;
 
     // not enemy
-    if (unit->IsHostileTo(&player))
+    if( unit->IsHostileTo(&player))
         return NULL;
 
     // not unfriendly
     FactionTemplateEntry const* factionTemplate = sFactionTemplateStore.LookupEntry(unit->getFaction());
-    if (factionTemplate)
+    if(factionTemplate)
     {
         FactionEntry const* faction = sFactionStore.LookupEntry(factionTemplate->faction);
-        if (faction->reputationListID >= 0 && player.GetReputationRank(faction) <= REP_UNFRIENDLY)
+        if( faction->reputationListID >= 0 && player.GetReputationRank(faction) <= REP_UNFRIENDLY)
             return NULL;
     }
 
     // not too far
-    if (!unit->IsWithinDistInMap(&player,INTERACTION_DISTANCE))
+    if(!unit->IsWithinDistInMap(&player,INTERACTION_DISTANCE))
         return NULL;
 
     return unit;
@@ -142,7 +133,7 @@ ObjectAccessor::GetNPCIfCanInteractWith(Player const &player, uint64 guid, uint3
 Creature*
 ObjectAccessor::GetCreatureOrPet(WorldObject const &u, uint64 guid)
 {
-    if (Creature *unit = GetPet(guid))
+    if(Creature *unit = GetPet(guid))
         return unit;
 
     return GetCreature(u, guid);
@@ -152,13 +143,13 @@ Creature*
 ObjectAccessor::GetCreature(WorldObject const &u, uint64 guid)
 {
     Creature * ret = GetObjectInWorld(guid, (Creature*)NULL);
-    if (!ret)
+    if(!ret)
         return NULL;
 
-    if (ret->GetMapId() != u.GetMapId())
+    if(ret->GetMapId() != u.GetMapId())
         return NULL;
 
-    if (ret->GetInstanceId() != u.GetInstanceId())
+    if(ret->GetInstanceId() != u.GetInstanceId())
         return NULL;
 
     return ret;
@@ -167,10 +158,10 @@ ObjectAccessor::GetCreature(WorldObject const &u, uint64 guid)
 Unit*
 ObjectAccessor::GetUnit(WorldObject const &u, uint64 guid)
 {
-    if (!guid)
+    if(!guid)
         return NULL;
 
-    if (IS_PLAYER_GUID(guid))
+    if(IS_PLAYER_GUID(guid))
         return FindPlayer(guid);
 
     return GetCreatureOrPet(u, guid);
@@ -180,7 +171,7 @@ Corpse*
 ObjectAccessor::GetCorpse(WorldObject const &u, uint64 guid)
 {
     Corpse * ret = GetObjectInWorld(guid, (Corpse*)NULL);
-    if (ret && ret->GetMapId() != u.GetMapId()) ret = NULL;
+    if(ret && ret->GetMapId() != u.GetMapId()) ret = NULL;
     return ret;
 }
 
@@ -188,34 +179,34 @@ Object* ObjectAccessor::GetObjectByTypeMask(Player const &p, uint64 guid, uint32
 {
     Object *obj = NULL;
 
-    if (typemask & TYPEMASK_PLAYER)
+    if(typemask & TYPEMASK_PLAYER)
     {
         obj = FindPlayer(guid);
-        if (obj) return obj;
+        if(obj) return obj;
     }
 
-    if (typemask & TYPEMASK_UNIT)
+    if(typemask & TYPEMASK_UNIT)
     {
         obj = GetCreatureOrPet(p,guid);
-        if (obj) return obj;
+        if(obj) return obj;
     }
 
-    if (typemask & TYPEMASK_GAMEOBJECT)
+    if(typemask & TYPEMASK_GAMEOBJECT)
     {
         obj = GetGameObject(p,guid);
-        if (obj) return obj;
+        if(obj) return obj;
     }
 
-    if (typemask & TYPEMASK_DYNAMICOBJECT)
+    if(typemask & TYPEMASK_DYNAMICOBJECT)
     {
         obj = GetDynamicObject(p,guid);
-        if (obj) return obj;
+        if(obj) return obj;
     }
 
-    if (typemask & TYPEMASK_ITEM)
+    if(typemask & TYPEMASK_ITEM)
     {
-        obj = p.GetItemByGuid(guid);
-        if (obj) return obj;
+        obj = p.GetItemByGuid( guid );
+        if(obj) return obj;
     }
 
     return NULL;
@@ -225,7 +216,7 @@ GameObject*
 ObjectAccessor::GetGameObject(WorldObject const &u, uint64 guid)
 {
     GameObject * ret = GetObjectInWorld(guid, (GameObject*)NULL);
-    if (ret && ret->GetMapId() != u.GetMapId()) ret = NULL;
+    if(ret && ret->GetMapId() != u.GetMapId()) ret = NULL;
     return ret;
 }
 
@@ -233,7 +224,7 @@ DynamicObject*
 ObjectAccessor::GetDynamicObject(Unit const &u, uint64 guid)
 {
     DynamicObject * ret = GetObjectInWorld(guid, (DynamicObject*)NULL);
-    if (ret && ret->GetMapId() != u.GetMapId()) ret = NULL;
+    if(ret && ret->GetMapId() != u.GetMapId()) ret = NULL;
     return ret;
 }
 
@@ -249,8 +240,8 @@ ObjectAccessor::FindPlayerByName(const char *name)
     //TODO: Player Guard
     HashMapHolder<Player>::MapType& m = HashMapHolder<Player>::GetContainer();
     HashMapHolder<Player>::MapType::iterator iter = m.begin();
-    for (; iter != m.end(); ++iter)
-        if (::strcmp(name, iter->second->GetName()) == 0 )
+    for(; iter != m.end(); ++iter)
+        if( ::strcmp(name, iter->second->GetName()) == 0 )
             return iter->second;
     return NULL;
 }
@@ -261,18 +252,8 @@ ObjectAccessor::SaveAllPlayers()
     Guard guard(*HashMapHolder<Player*>::GetLock());
     HashMapHolder<Player>::MapType& m = HashMapHolder<Player>::GetContainer();
     HashMapHolder<Player>::MapType::iterator itr = m.begin();
-    for (; itr != m.end(); ++itr)
+    for(; itr != m.end(); ++itr)
         itr->second->SaveToDB();
-}
-
-void
-ObjectAccessor::RemoveAllCorpses()
-{
-    for (Player2CorpsesMapType::const_iterator itr = i_player2corpse.begin(); itr != i_player2corpse.end(); ++itr)
-	{
-		itr->second->RemoveFromWorld();
-        delete itr->second;
-	}
 }
 
 void
@@ -282,9 +263,9 @@ ObjectAccessor::UpdateObject(Object* obj, Player* exceptPlayer)
     obj->BuildUpdate(update_players);
 
     WorldPacket packet;
-    for (UpdateDataMapType::iterator iter = update_players.begin(); iter != update_players.end(); ++iter)
+    for(UpdateDataMapType::iterator iter = update_players.begin(); iter != update_players.end(); ++iter)
     {
-        if (iter->first == exceptPlayer)
+        if(iter->first == exceptPlayer)
             continue;
 
         iter->second.BuildPacket(&packet);
@@ -305,8 +286,8 @@ ObjectAccessor::RemoveUpdateObject(Object *obj)
 {
     Guard guard(i_updateGuard);
     std::set<Object *>::iterator iter = i_objects.find(obj);
-    if (iter != i_objects.end() )
-        i_objects.erase(iter);
+    if( iter != i_objects.end() )
+        i_objects.erase( iter );
 }
 
 void
@@ -314,19 +295,19 @@ ObjectAccessor::_buildUpdateObject(Object *obj, UpdateDataMapType &update_player
 {
     bool build_for_all = true;
     Player *pl = NULL;
-    if (obj->isType(TYPEMASK_ITEM) )
+    if( obj->isType(TYPEMASK_ITEM) )
     {
         Item *item = static_cast<Item *>(obj);
         pl = item->GetOwner();
         build_for_all = false;
     }
 
-    if (pl != NULL )
+    if( pl != NULL )
         _buildPacket(pl, obj, update_players);
 
     // Capt: okey for all those fools who think its a real fix
     //       THIS IS A TEMP FIX
-    if (build_for_all )
+    if( build_for_all )
     {
         WorldObject * temp = dynamic_cast<WorldObject*>(obj);
 
@@ -343,9 +324,9 @@ ObjectAccessor::_buildPacket(Player *pl, Object *obj, UpdateDataMapType &update_
 {
     UpdateDataMapType::iterator iter = update_players.find(pl);
 
-    if (iter == update_players.end() )
+    if( iter == update_players.end() )
     {
-        std::pair<UpdateDataMapType::iterator, bool> p = update_players.insert(UpdateDataValueType(pl, UpdateData()));
+        std::pair<UpdateDataMapType::iterator, bool> p = update_players.insert( UpdateDataValueType(pl, UpdateData()) );
         assert(p.second);
         iter = p.first;
     }
@@ -378,7 +359,7 @@ ObjectAccessor::GetCorpseForPlayerGUID(uint64 guid)
     Guard guard(i_corpseGuard);
 
     Player2CorpsesMapType::iterator iter = i_player2corpse.find(guid);
-    if (iter == i_player2corpse.end() ) return NULL;
+    if( iter == i_player2corpse.end() ) return NULL;
 
     assert(iter->second->GetType() != CORPSE_BONES);
 
@@ -392,7 +373,7 @@ ObjectAccessor::RemoveCorpse(Corpse *corpse)
 
     Guard guard(i_corpseGuard);
     Player2CorpsesMapType::iterator iter = i_player2corpse.find(corpse->GetOwnerGUID());
-    if (iter == i_player2corpse.end() )
+    if( iter == i_player2corpse.end() )
         return;
 
     // build mapid*cellid -> guid_set map
@@ -425,8 +406,8 @@ void
 ObjectAccessor::AddCorpsesToGrid(GridPair const& gridpair,GridType& grid,Map* map)
 {
     Guard guard(i_corpseGuard);
-    for (Player2CorpsesMapType::iterator iter = i_player2corpse.begin(); iter != i_player2corpse.end(); ++iter)
-        if (iter->second->GetGrid()==gridpair)
+    for(Player2CorpsesMapType::iterator iter = i_player2corpse.begin(); iter != i_player2corpse.end(); ++iter)
+        if(iter->second->GetGrid()==gridpair)
     {
         // verify, if the corpse in our instance (add only corpses which are)
         if (map->Instanceable())
@@ -444,10 +425,10 @@ ObjectAccessor::AddCorpsesToGrid(GridPair const& gridpair,GridType& grid,Map* ma
 }
 
 Corpse*
-ObjectAccessor::ConvertCorpseForPlayer(uint64 player_guid, bool insignia)
+ObjectAccessor::ConvertCorpseForPlayer(uint64 player_guid)
 {
     Corpse *corpse = GetCorpseForPlayerGUID(player_guid);
-    if (!corpse)
+    if(!corpse)
     {
         //in fact this function is called from several places
         //even when player doesn't have a corpse, not an error
@@ -463,17 +444,14 @@ ObjectAccessor::ConvertCorpseForPlayer(uint64 player_guid, bool insignia)
     // remove resurrectble corpse from grid object registry (loaded state checked into call)
     // do not load the map if it's not loaded
     Map *map = MapManager::Instance().FindMap(corpse->GetMapId(), corpse->GetInstanceId());
-    if (map) map->Remove(corpse,false);
+    if(map) map->Remove(corpse,false);
 
     // remove corpse from DB
     corpse->DeleteFromDB();
 
     Corpse *bones = NULL;
     // create the bones only if the map and the grid is loaded at the corpse's location
-    // ignore bones creating option in case insignia
-    if (map && (insignia ||
-       (map->IsBattleGroundOrArena() ? sWorld.getConfig(CONFIG_DEATH_BONES_BG_OR_ARENA) : sWorld.getConfig(CONFIG_DEATH_BONES_WORLD))) &&
-        !map->IsRemovalGrid(corpse->GetPositionX(), corpse->GetPositionY()))
+    if(map && !map->IsRemovalGrid(corpse->GetPositionX(), corpse->GetPositionY()))
     {
         // Create bones, don't change Corpse
         bones = new Corpse;
@@ -495,7 +473,7 @@ ObjectAccessor::ConvertCorpseForPlayer(uint64 player_guid, bool insignia)
 
         for (int i = 0; i < EQUIPMENT_SLOT_END; i++)
         {
-            if (corpse->GetUInt32Value(CORPSE_FIELD_ITEM + i))
+            if(corpse->GetUInt32Value(CORPSE_FIELD_ITEM + i))
                 bones->SetUInt32Value(CORPSE_FIELD_ITEM + i, 0);
         }
 
@@ -515,7 +493,7 @@ ObjectAccessor::Update(uint32 diff)
     UpdateDataMapType update_players;
     {
         Guard guard(i_updateGuard);
-        while (!i_objects.empty())
+        while(!i_objects.empty())
         {
             Object* obj = *i_objects.begin();
             i_objects.erase(i_objects.begin());
@@ -527,7 +505,7 @@ ObjectAccessor::Update(uint32 diff)
     }
 
     WorldPacket packet;                                     // here we allocate a std::vector with a size of 0x10000
-    for (UpdateDataMapType::iterator iter = update_players.begin(); iter != update_players.end(); ++iter)
+    for(UpdateDataMapType::iterator iter = update_players.begin(); iter != update_players.end(); ++iter)
     {
         iter->second.BuildPacket(&packet);
         iter->first->GetSession()->SendPacket(&packet);
@@ -539,21 +517,21 @@ void
 ObjectAccessor::UpdatePlayers(uint32 diff)
 {
     HashMapHolder<Player>::MapType& playerMap = HashMapHolder<Player>::GetContainer();
-    for (HashMapHolder<Player>::MapType::iterator iter = playerMap.begin(); iter != playerMap.end(); ++iter)
-        if (iter->second->IsInWorld())
+    for(HashMapHolder<Player>::MapType::iterator iter = playerMap.begin(); iter != playerMap.end(); ++iter)
+        if(iter->second->IsInWorld())
             iter->second->Update(diff);
 }
 
 void
 ObjectAccessor::WorldObjectChangeAccumulator::Visit(PlayerMapType &m)
 {
-    for (PlayerMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
+    for(PlayerMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
     {
         BuildPacket(iter->getSource());
         if (!iter->getSource()->GetSharedVisionList().empty())
         {
             SharedVisionList::const_iterator it = iter->getSource()->GetSharedVisionList().begin();
-            for (; it != iter->getSource()->GetSharedVisionList().end(); ++it)
+            for ( ; it != iter->getSource()->GetSharedVisionList().end(); ++it)
                 BuildPacket(*it);
         }
     }
@@ -562,12 +540,12 @@ ObjectAccessor::WorldObjectChangeAccumulator::Visit(PlayerMapType &m)
 void
 ObjectAccessor::WorldObjectChangeAccumulator::Visit(CreatureMapType &m)
 {
-    for (CreatureMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
+    for(CreatureMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
     {
         if (!iter->getSource()->GetSharedVisionList().empty())
         {
             SharedVisionList::const_iterator it = iter->getSource()->GetSharedVisionList().begin();
-            for (; it != iter->getSource()->GetSharedVisionList().end(); ++it)
+            for ( ; it != iter->getSource()->GetSharedVisionList().end(); ++it)
                 BuildPacket(*it);
         }
     }
@@ -576,11 +554,11 @@ ObjectAccessor::WorldObjectChangeAccumulator::Visit(CreatureMapType &m)
 void
 ObjectAccessor::WorldObjectChangeAccumulator::Visit(DynamicObjectMapType &m)
 {
-    for (DynamicObjectMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
+    for(DynamicObjectMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
     {
         if (IS_PLAYER_GUID(iter->getSource()->GetCasterGUID()))
         {
-            Player* caster = iter->getSource()->GetCaster()->ToPlayer();
+            Player* caster = (Player*)iter->getSource()->GetCaster();
             if (caster->GetUInt64Value(PLAYER_FARSIGHT) == iter->getSource()->GetGUID())
                 BuildPacket(caster);
         }
@@ -607,7 +585,7 @@ ObjectAccessor::UpdateObjectVisibility(WorldObject *obj)
     obj->GetMap()->UpdateObjectVisibility(obj,cell,p);
 }
 
-/*void ObjectAccessor::UpdateVisibilityForPlayer(Player* player )
+/*void ObjectAccessor::UpdateVisibilityForPlayer( Player* player )
 {
     CellPair p = Neo::ComputeCellPair(player->GetPositionX(), player->GetPositionY());
     Cell cell(p);

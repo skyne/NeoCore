@@ -66,7 +66,7 @@ struct NEO_DLL_DECL boss_sapphironAI : public ScriptedAI
         m_creature->RemoveUnitMovementFlag(MOVEMENTFLAG_LEVITATING + MOVEMENTFLAG_ONTRANSPORT);
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
     }
 

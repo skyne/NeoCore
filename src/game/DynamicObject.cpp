@@ -1,7 +1,9 @@
 /*
  * Copyright (C) 2005-2008 MaNGOS <http://www.mangosproject.org/>
  *
- * Copyright (C) 2008 Trinity <http://www.trinitycore.org/>
+ * Copyright (C) 2008 Neo <http://www.neocore.org/>
+ *
+ * Copyright (C) 2009-2010 NeoZero <http://www.neozero.org/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,7 +40,7 @@ DynamicObject::DynamicObject() : WorldObject()
     m_objectType |= TYPEMASK_DYNAMICOBJECT;
     m_objectTypeId = TYPEID_DYNAMICOBJECT;
                                                             // 2.3.2 - 0x58
-    m_updateFlag = (UPDATEFLAG_LOWGUID | UPDATEFLAG_HIGHGUID | UPDATEFLAG_HASPOSITION);
+    //m_updateFlag = (UPDATEFLAG_LOWGUID | UPDATEFLAG_HIGHGUID | UPDATEFLAG_HASPOSITION);
 
     m_valuesCount = DYNAMICOBJECT_END;
 }
@@ -46,7 +48,7 @@ DynamicObject::DynamicObject() : WorldObject()
 void DynamicObject::AddToWorld()
 {
     ///- Register the dynamicObject for guid lookup
-    if (!IsInWorld())
+    if(!IsInWorld())
     {
         ObjectAccessor::Instance().AddObject(this);
         WorldObject::AddToWorld();
@@ -56,42 +58,35 @@ void DynamicObject::AddToWorld()
 void DynamicObject::RemoveFromWorld()
 {
     ///- Remove the dynamicObject from the accessor
-    if (IsInWorld())
+    if(IsInWorld())
     {
         ObjectAccessor::Instance().RemoveObject(this);
         WorldObject::RemoveFromWorld();
     }
 }
 
-bool DynamicObject::Create(uint32 guidlow, Unit *caster, uint32 spellId, uint32 effIndex, float x, float y, float z, int32 duration, float radius )
+bool DynamicObject::Create( uint32 guidlow, Unit *caster, uint32 spellId, uint32 effIndex, float x, float y, float z, int32 duration, float radius )
 {
     SetInstanceId(caster->GetInstanceId());
 
     WorldObject::_Create(guidlow, HIGHGUID_DYNAMICOBJECT, caster->GetMapId());
     Relocate(x,y,z,0);
 
-    if (!IsPositionValid())
+    if(!IsPositionValid())
     {
         sLog.outError("ERROR: DynamicObject (spell %u eff %u) not created. Suggested coordinates isn't valid (X: %f Y: %f)",spellId,effIndex,GetPositionX(),GetPositionY());
         return false;
     }
 
-	SetEntry(spellId);
-    SetFloatValue(OBJECT_FIELD_SCALE_X, 1);
-	SetUInt64Value(DYNAMICOBJECT_CASTER, caster->GetGUID());
-
-    // The lower word of DYNAMICOBJECT_BYTES must be 0x0001. This value means that the visual radius will be overriden
-    // by client for most of the "ground patch" visual effect spells and a few "skyfall" ones like Hurricane.
-    // If any other value is used, the client will _always_ use the radius provided in DYNAMICOBJECT_RADIUS, but
-    // precompensation is necessary (eg radius *= 2) for many spells. Anyway, blizz sends 0x0001 for all the spells
-    // I saw sniffed...
-    SetUInt32Value(DYNAMICOBJECT_BYTES, 0x00000001);
-    SetUInt32Value(DYNAMICOBJECT_SPELLID, spellId);
-    SetFloatValue(DYNAMICOBJECT_RADIUS, radius);
-    SetFloatValue(DYNAMICOBJECT_POS_X, x);
-    SetFloatValue(DYNAMICOBJECT_POS_Y, y);
-    SetFloatValue(DYNAMICOBJECT_POS_Z, z);
-    SetUInt32Value(DYNAMICOBJECT_CASTTIME, getMSTime());
+    SetEntry(spellId);
+    SetFloatValue( OBJECT_FIELD_SCALE_X, 1 );
+    SetUInt64Value( DYNAMICOBJECT_CASTER, caster->GetGUID() );
+    SetUInt32Value( DYNAMICOBJECT_BYTES, 0x00000001 );
+    SetUInt32Value( DYNAMICOBJECT_SPELLID, spellId );
+    SetFloatValue( DYNAMICOBJECT_RADIUS, radius);
+    SetFloatValue( DYNAMICOBJECT_POS_X, x );
+    SetFloatValue( DYNAMICOBJECT_POS_Y, y );
+    SetFloatValue( DYNAMICOBJECT_POS_Z, z );
 
     m_aliveDuration = duration;
     m_radius = radius;
@@ -112,7 +107,7 @@ void DynamicObject::Update(uint32 p_time)
 {
     // caster can be not in world at time dynamic object update, but dynamic object not yet deleted in Unit destructor
     Unit* caster = GetCaster();
-    if (!caster)
+    if(!caster)
     {
         Delete();
         return;
@@ -120,14 +115,14 @@ void DynamicObject::Update(uint32 p_time)
 
     bool deleteThis = false;
 
-    if (m_aliveDuration > int32(p_time))
+    if(m_aliveDuration > int32(p_time))
         m_aliveDuration -= p_time;
     else
         deleteThis = true;
 
-    if (m_effIndex < 4)
+    if(m_effIndex < 4)
     {
-        if (m_updateTimer < p_time)
+        if(m_updateTimer < p_time)
         {
             Neo::DynamicObjectUpdater notifier(*this,caster);
             VisitNearbyObject(GetRadius(), notifier);
@@ -135,7 +130,7 @@ void DynamicObject::Update(uint32 p_time)
         }else m_updateTimer -= p_time;
     }
 
-    if (deleteThis)
+    if(deleteThis)
     {
         caster->RemoveDynObjectWithGUID(GetGUID());
         Delete();
@@ -151,7 +146,7 @@ void DynamicObject::Delete()
 void DynamicObject::Delay(int32 delaytime)
 {
     m_aliveDuration -= delaytime;
-    for (AffectedSet::iterator iunit= m_affected.begin();iunit != m_affected.end();++iunit)
+    for(AffectedSet::iterator iunit= m_affected.begin();iunit != m_affected.end();++iunit)
         if (*iunit)
             (*iunit)->DelayAura(m_spellId, m_effIndex, delaytime);
 }

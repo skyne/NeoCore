@@ -101,7 +101,7 @@ struct NEO_DLL_DECL npc_bartlebyAI : public ScriptedAI
         }
     }
 
-    void EnterCombat(Unit *who) {}
+    void Aggro(Unit *who) {}
 };
 
 bool QuestAccept_npc_bartleby(Player *player, Creature *_Creature, Quest const *_Quest)
@@ -151,7 +151,7 @@ struct NEO_DLL_DECL npc_dashel_stonefistAI : public ScriptedAI
         }
     }
 
-    void EnterCombat(Unit *who) {}
+    void Aggro(Unit *who) {}
 };
 
 bool QuestAccept_npc_dashel_stonefist(Player *player, Creature *_Creature, Quest const *_Quest)

@@ -54,7 +54,7 @@ struct NEO_DLL_DECL npc_cairne_bloodhoofAI : public ScriptedAI
         Uppercut_Timer = 10000;
     }
 
-    void EnterCombat(Unit *who) {}
+    void Aggro(Unit *who) {}
 
     void UpdateAI(const uint32 diff)
     {

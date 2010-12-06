@@ -1,7 +1,9 @@
 /*
  * Copyright (C) 2005-2008 MaNGOS <http://www.mangosproject.org/>
  *
- * Copyright (C) 2008 Trinity <http://www.trinitycore.org/>
+ * Copyright (C) 2008 Neo <http://www.neocore.org/>
+ *
+ * Copyright (C) 2009-2010 NeoZero <http://www.neozero.org/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,10 +36,7 @@ Totem::Totem() : Creature()
     m_type = TOTEM_PASSIVE;
 }
 
-/// Updates the totem with time, removes is owner or itself died, or duration expired, or updates duration time
-/// Paramteres: uint32 time, the difftime
-/// Returns: nothing
-void Totem::Update(uint32 time )
+void Totem::Update( uint32 time )
 {
     Unit *owner = GetOwner();
     if (!owner || !owner->isAlive() || !this->isAlive())
@@ -54,42 +53,39 @@ void Totem::Update(uint32 time )
     else
         m_duration -= time;
 
-    Creature::Update(time);
+    Creature::Update( time );
 }
 
-/// Summons a totem
-/// Parameters: Unit*, the owner of totem
-/// Returns: nothing
 void Totem::Summon(Unit* owner)
 {
     CreatureInfo const *cinfo = GetCreatureInfo();
     if (owner->GetTypeId()==TYPEID_PLAYER && cinfo)
     {
         uint32 modelid = 0;
-        if (owner->ToPlayer()->GetTeam() == HORDE)
+        if(((Player*)owner)->GetTeam() == HORDE)
         {
-            if (cinfo->Modelid_H1)
+            if(cinfo->Modelid_H1)
                 modelid = cinfo->Modelid_H1;
-            else if (cinfo->Modelid_H2)
+            else if(cinfo->Modelid_H2)
                 modelid = cinfo->Modelid_H2;
         }
         else
         {
-            if (cinfo->Modelid_A1)
+            if(cinfo->Modelid_A1)
                 modelid = cinfo->Modelid_A1;
-            else if (cinfo->Modelid_A2)
+            else if(cinfo->Modelid_A2)
                 modelid = cinfo->Modelid_A2;
         }
         if (modelid)
             SetDisplayId(modelid);
         else
-            sLog.outErrorDb("Totem::Summon: Missing modelid information for entry %u, team %u, totem will use default values.",GetEntry(),owner->ToPlayer()->GetTeam());
+            sLog.outErrorDb("Totem::Summon: Missing modelid information for entry %u, team %u, totem will use default values.",GetEntry(),((Player*)owner)->GetTeam());
     }
 
     // Only add if a display exists.
     sLog.outDebug("AddObject at Totem.cpp line 49");
     SetInstanceId(owner->GetInstanceId());
-    owner->GetMap()->Add(ToCreature());
+    owner->GetMap()->Add((Creature*)this);
 
     WorldPacket data(SMSG_GAMEOBJECT_SPAWN_ANIM_OBSOLETE, 8);
     data << GetGUID();
@@ -104,13 +100,10 @@ void Totem::Summon(Unit* owner)
         default: break;
     }
 
-    if (GetEntry() == SENTRY_TOTEM_ENTRY)
+    if(GetEntry() == SENTRY_TOTEM_ENTRY)
         SetReactState(REACT_AGGRESSIVE);
 }
 
-/// Removes the totem, stop it's combat, remove auras from it and thne clear
-/// Parameters: nothing
-/// Returns: nothing
 void Totem::UnSummon()
 {
     SendObjectDeSpawnAnim(GetGUID());
@@ -121,9 +114,9 @@ void Totem::UnSummon()
     if (owner)
     {
         // clear owenr's totem slot
-        for (int i = 0; i < MAX_TOTEM; ++i)
+        for(int i = 0; i < MAX_TOTEM; ++i)
         {
-            if (owner->m_TotemSlot[i]==GetGUID())
+            if(owner->m_TotemSlot[i]==GetGUID())
             {
                 owner->m_TotemSlot[i] = 0;
                 break;
@@ -137,13 +130,13 @@ void Totem::UnSummon()
         if (owner->GetTypeId() == TYPEID_PLAYER)
         {
             // Not only the player can summon the totem (scripted AI)
-            pGroup = owner->ToPlayer()->GetGroup();
+            pGroup = ((Player*)owner)->GetGroup();
             if (pGroup)
             {
-                for (GroupReference *itr = pGroup->GetFirstMember(); itr != NULL; itr = itr->next())
+                for(GroupReference *itr = pGroup->GetFirstMember(); itr != NULL; itr = itr->next())
                 {
                     Player* Target = itr->getSource();
-                    if (Target && pGroup->SameSubGroup(owner->ToPlayer(), Target))
+                    if(Target && pGroup->SameSubGroup((Player*)owner, Target))
                         Target->RemoveAurasDueToSpell(GetSpell());
                 }
             }
@@ -154,9 +147,6 @@ void Totem::UnSummon()
     AddObjectToRemoveList();
 }
 
-/// Set the owner of totem
-///	Parameters: uint64 guid, the guid of charater/creature
-/// Returns: nothing
 void Totem::SetOwner(uint64 guid)
 {
     SetCreatorGUID(guid);
@@ -168,20 +158,14 @@ void Totem::SetOwner(uint64 guid)
     }
 }
 
-/// Gets the owner of totem
-/// Paramters: nothing
-/// Returns: Unit* the owner's pointer
 Unit *Totem::GetOwner()
 {
     uint64 ownerid = GetOwnerGUID();
-    if (!ownerid)
+    if(!ownerid)
         return NULL;
     return ObjectAccessor::GetUnit(*this, ownerid);
 }
 
-/// Sets the totem's type
-/// Parameters: SpellEntry const* the spell what called the totem
-/// Returns: nothing
 void Totem::SetTypeBySummonSpell(SpellEntry const * spellProto)
 {
     // Get spell casted by totem
@@ -192,12 +176,10 @@ void Totem::SetTypeBySummonSpell(SpellEntry const * spellProto)
         if (GetSpellCastTime(totemSpell))
             m_type = TOTEM_ACTIVE;
     }
-    if (spellProto->SpellIconID==2056)
+    if(spellProto->SpellIconID==2056)
         m_type = TOTEM_STATUE;                              //Jewelery statue
 }
 
-/// Gets true if totem is immune
-/// See Creature::IsImmunedToSpell(SpellEntry const*,bool)
 bool Totem::IsImmunedToSpell(SpellEntry const* spellInfo, bool useCharges)
 {
 /*    for (int i=0;i<3;i++)

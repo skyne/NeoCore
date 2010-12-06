@@ -67,7 +67,7 @@ struct NEO_DLL_DECL boss_patchwerkAI : public ScriptedAI
         DoScriptText(SAY_DEATH, m_creature);
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
         if (rand()%2)
         {

@@ -45,7 +45,7 @@ struct NEO_DLL_DECL boss_ironayaAI : public ScriptedAI
         hasCastedWstomp = false;
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
         DoYell(SAY_AGGRO,LANG_UNIVERSAL,NULL);
         DoPlaySoundToSet(m_creature,SOUND_AGGRO);

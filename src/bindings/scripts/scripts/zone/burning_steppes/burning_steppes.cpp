@@ -64,7 +64,7 @@ struct NEO_DLL_DECL npc_ragged_johnAI : public ScriptedAI
         ScriptedAI::MoveInLineOfSight(who);
     }
 
-    void EnterCombat(Unit *who) {}
+    void Aggro(Unit *who) {}
 };
 
 CreatureAI* GetAI_npc_ragged_john(Creature *_Creature)

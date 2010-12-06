@@ -59,16 +59,16 @@ struct NEO_DLL_DECL boss_golemaggAI : public ScriptedAI
         m_creature->CastSpell(m_creature,SPELL_MAGMASPLASH,true);
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
     }
 
     void JustDied(Unit* Killer)
     {
+
         if(pInstance)
             pInstance->SetData(DATA_GOLEMAGG_DEATH, 0);
     }
-
     void UpdateAI(const uint32 diff)
     {
         if (!UpdateVictim())
@@ -131,7 +131,7 @@ struct NEO_DLL_DECL mob_core_ragerAI : public ScriptedAI
         Check_Timer = 1000;
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
     }
 

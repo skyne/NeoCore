@@ -1,7 +1,9 @@
 /*
  * Copyright (C) 2005-2008 MaNGOS <http://www.mangosproject.org/>
  *
- * Copyright (C) 2008 Trinity <http://www.trinitycore.org/>
+ * Copyright (C) 2008 Neo <http://www.neocore.org/>
+ *
+ * Copyright (C) 2009-2010 NeoZero <http://www.neozero.org/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,6 +29,30 @@ class Item;
 
 #define MAIL_BODY_ITEM_TEMPLATE 8383                        // - plain letter, A Dusty Unsent Letter: 889
 #define MAX_MAIL_ITEMS 12
+
+enum MAIL_RESPONSE
+{
+    MAIL_OK                 = 0,
+    MAIL_MONEY_TAKEN        = 1,
+    MAIL_ITEM_TAKEN         = 2,
+    MAIL_RETURNED_TO_SENDER = 3,
+    MAIL_DELETED            = 4,
+    MAIL_MADE_PERMANENT     = 5
+};
+
+enum MAIL_ERRORS
+{
+    MAIL_ERR_BAG_FULL                  = 1,
+    MAIL_ERR_CANNOT_SEND_TO_SELF       = 2,
+    MAIL_ERR_NOT_ENOUGH_MONEY          = 3,
+    MAIL_ERR_RECIPIENT_NOT_FOUND       = 4,
+    MAIL_ERR_NOT_YOUR_TEAM             = 5,
+    MAIL_ERR_INTERNAL_ERROR            = 6,
+    MAIL_ERR_DISABLED_FOR_TRIAL_ACC    = 14,
+    MAIL_ERR_RECIPIENT_CAP_REACHED     = 15,
+    MAIL_ERR_CANT_SEND_WRAPPED_COD     = 16,
+    MAIL_ERR_MAIL_AND_CHAT_SUSPENDED   = 17
+};
 
 enum MailCheckMask
 {
@@ -81,7 +107,19 @@ struct MailItemInfo
     uint32 item_template;
 };
 
-typedef std::map<uint32, Item*> MailItemMap;
+struct MailItem
+{
+    MailItem() : item_slot(0), item_guidlow(0), item_template(0), item(NULL) {}
+
+    uint8 item_slot;                                        // slot in mail
+    uint32 item_guidlow;                                    // item guid (low part)
+    uint32 item_template;                                   // item entry
+    Item *item;                                             // item pointer
+
+    void deleteItem(bool inDB = false);
+};
+
+typedef std::map<uint32, MailItem> MailItemMap;
 
 class MailItemsInfo
 {
@@ -91,13 +129,35 @@ class MailItemsInfo
         MailItemMap::iterator begin() { return i_MailItemMap.begin(); }
         MailItemMap::iterator end() { return i_MailItemMap.end(); }
 
-        void AddItem(Item *item);
+        void AddItem(uint32 guidlow, uint32 _template, Item *item, uint8 slot = 0)
+        {
+            MailItem mailItem;
+            mailItem.item_slot = slot;
+            mailItem.item_guidlow = guidlow;
+            mailItem.item_template = _template;
+            mailItem.item = item;
+            i_MailItemMap[guidlow] = mailItem;
+        }
+
+        void AddItem(uint32 guidlow, uint8 slot = 0)
+        {
+            MailItem mailItem;
+            mailItem.item_guidlow = guidlow;
+            mailItem.item_slot = slot;
+            i_MailItemMap[guidlow] = mailItem;
+        }
 
         uint8 size() const { return i_MailItemMap.size(); }
         bool empty() const { return i_MailItemMap.empty(); }
 
-        void deleteIncludedItems(bool inDB = false);
-
+        void deleteIncludedItems(bool inDB = false)
+        {
+            for(MailItemMap::iterator mailItemIter = begin(); mailItemIter != end(); ++mailItemIter)
+            {
+                MailItem& mailItem = mailItemIter->second;
+                mailItem.deleteItem(inDB);
+            }
+        }
     private:
         MailItemMap i_MailItemMap;                          // Keep the items in a map to avoid duplicate guids (which can happen), store only low part of guid
 };
@@ -129,13 +189,20 @@ struct Mail
         items.push_back(mii);
     }
 
-    void AddAllItems(MailItemsInfo& pMailItemsInfo);
-
-    bool RemoveItem(uint32 item_guid)
+    void AddAllItems(MailItemsInfo& pMailItemsInfo)
     {
-        for (std::vector<MailItemInfo>::iterator itr = items.begin(); itr != items.end(); ++itr)
+        for(MailItemMap::iterator mailItemIter = pMailItemsInfo.begin(); mailItemIter != pMailItemsInfo.end(); ++mailItemIter)
         {
-            if (itr->item_guid == item_guid)
+            MailItem& mailItem = mailItemIter->second;
+            AddItem(mailItem.item_guidlow, mailItem.item_template);
+        }
+    }
+
+    bool RemoveItem(uint32 itemId)
+    {
+        for(std::vector<MailItemInfo>::iterator itr = items.begin(); itr != items.end(); ++itr)
+        {
+            if(itr->item_guid == itemId)
             {
                 items.erase(itr);
                 return true;

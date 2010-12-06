@@ -1,0 +1,16 @@
+ALTER TABLE creature_template DROP COLUMN heroic_entry; 
+ALTER TABLE access_requirement DROP COLUMN heroic_key; 
+ALTER TABLE access_requirement DROP COLUMN heroic_key2; 
+ALTER TABLE access_requirement DROP COLUMN heroic_quest_done; 
+ALTER TABLE access_requirement DROP COLUMN heroic_quest_failed_text; 
+ALTER TABLE item_template DROP COLUMN socketColor_1; 
+ALTER TABLE item_template DROP COLUMN socketContent_1; 
+ALTER TABLE item_template DROP COLUMN socketColor_2; 
+ALTER TABLE item_template DROP COLUMN socketContent_2; 
+ALTER TABLE item_template DROP COLUMN socketColor_3; 
+ALTER TABLE item_template DROP COLUMN socketContent_3; 
+ALTER TABLE item_template DROP COLUMN socketBonus; 
+ALTER TABLE item_template DROP COLUMN GemProperties; 
+ALTER TABLE item_template DROP COLUMN TotemCategory; 
+ALTER TABLE creature DROP COLUMN spawnMask; 
+ALTER TABLE gameobject DROP COLUMN spawnMask;

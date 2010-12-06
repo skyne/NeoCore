@@ -39,7 +39,7 @@ struct NEO_DLL_DECL boss_death_knight_darkreaverAI : public ScriptedAI
         }
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
     }
 };

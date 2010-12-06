@@ -1,0 +1,1 @@
+UPDATE trinity_string SET content_default="Found items %u: %u ( inventory %u mail %u auction %u)" WHERE entry=438;

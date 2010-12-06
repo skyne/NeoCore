@@ -79,7 +79,7 @@ struct NEO_DLL_DECL boss_majordomoAI : public ScriptedAI
         DoScriptText(SAY_SLAY, m_creature);
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
         DoScriptText(SAY_AGGRO, m_creature);
     }

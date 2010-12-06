@@ -1,7 +1,9 @@
 /*
  * Copyright (C) 2005-2008 MaNGOS <http://www.mangosproject.org/>
  *
- * Copyright (C) 2008 Trinity <http://www.trinitycore.org/>
+ * Copyright (C) 2008 Neo <http://www.neocore.org/>
+ *
+ * Copyright (C) 2009-2010 NeoZero <http://www.neozero.org/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -46,16 +48,6 @@ class SqlResultQueue;
 class QueryResult;
 class WorldSocket;
 
-// ServerMessages.dbc
-enum ServerMessageType
-{
-    SERVER_MSG_SHUTDOWN_TIME      = 1,
-    SERVER_MSG_RESTART_TIME       = 2,
-    SERVER_MSG_STRING             = 3,
-    SERVER_MSG_SHUTDOWN_CANCELLED = 4,
-    SERVER_MSG_RESTART_CANCELLED  = 5
-};
-
 enum ShutdownMask
 {
     SHUTDOWN_MASK_RESTART = 1,
@@ -69,15 +61,6 @@ enum ShutdownExitCode
     RESTART_EXIT_CODE  = 2,
 };
 
-enum MaintenanceTasks
-{
-    MAINTENANCE_TASK_DISTRIBUTE_ARENA_POINTS = 1,
-    MAINTENANCE_TASK_ERASE_CORPSES           = 2,
-    MAINTENANCE_TASK_RELOAD_ALL              = 4,
-    MAINTENANCE_TASK_DISTRIBUTE_PVP_RANKS    = 8,
-    MAINTENANCE_TASK_UNLOAD_MAPS             = 16,
-};
-
 /// Timers for different object refresh rates
 enum WorldTimers
 {
@@ -88,18 +71,14 @@ enum WorldTimers
     WUPDATE_UPTIME      = 4,
     WUPDATE_CORPSES     = 5,
     WUPDATE_EVENTS      = 6,
-    WUPDATE_CLEANDB     = 7,
-	WUPDATE_AUTOBROADCAST = 8,
-    WUPDATE_COUNT       = 9
+    WUPDATE_COUNT       = 7
 };
 
 /// Configuration elements
 enum WorldConfigs
 {
-	CONFIG_CUSTOM_ANNOUNCE_STRING,
     CONFIG_COMPRESSION = 0,
     CONFIG_GRID_UNLOAD,
-    CONFIG_DUEL_SYSTEM,
     CONFIG_INTERVAL_SAVE,
     CONFIG_INTERVAL_GRIDCLEAN,
     CONFIG_INTERVAL_MAPUPDATE,
@@ -108,8 +87,7 @@ enum WorldConfigs
     CONFIG_PORT_WORLD,
     CONFIG_SOCKET_SELECTTIME,
     CONFIG_GROUP_XP_DISTANCE,
-	CONFIG_MAX_RECRUIT_A_FRIEND_DISTANCE,
-	CONFIG_SIGHT_MONSTER,
+    CONFIG_SIGHT_MONSTER,
     CONFIG_SIGHT_GUARDER,
     CONFIG_GAME_TYPE,
     CONFIG_REALM_ZONE,
@@ -135,10 +113,6 @@ enum WorldConfigs
     CONFIG_START_PLAYER_MONEY,
     CONFIG_MAX_HONOR_POINTS,
     CONFIG_START_HONOR_POINTS,
-    CONFIG_MAX_ARENA_POINTS,
-    CONFIG_START_ARENA_POINTS,
-	CONFIG_MAX_RECRUIT_A_FRIEND_BONUS_PLAYER_LEVEL,
-    CONFIG_MAX_RECRUIT_A_FRIEND_BONUS_PLAYER_LEVEL_DIFFERENCE,
     CONFIG_INSTANCE_IGNORE_LEVEL,
     CONFIG_INSTANCE_IGNORE_RAID,
     CONFIG_BATTLEGROUND_CAST_DESERTER,
@@ -150,15 +124,12 @@ enum WorldConfigs
     CONFIG_MAX_PRIMARY_TRADE_SKILL,
     CONFIG_MIN_PETITION_SIGNS,
     CONFIG_GM_LOGIN_STATE,
-    CONFIG_GM_VISIBLE_STATE,
     CONFIG_GM_CHAT,
     CONFIG_GM_WISPERING_TO,
     CONFIG_GM_IN_GM_LIST,
     CONFIG_GM_IN_WHO_LIST,
     CONFIG_GM_LOG_TRADE,
     CONFIG_START_GM_LEVEL,
-    CONFIG_ALLOW_GM_GROUP,
-    CONFIG_ALLOW_GM_FRIEND,
     CONFIG_GROUP_VISIBILITY,
     CONFIG_MAIL_DELIVERY_DELAY,
     CONFIG_UPTIME_UPDATE,
@@ -168,7 +139,6 @@ enum WorldConfigs
     CONFIG_SKILL_CHANCE_GREY,
     CONFIG_SKILL_CHANCE_MINING_STEPS,
     CONFIG_SKILL_CHANCE_SKINNING_STEPS,
-    CONFIG_SKILL_PROSPECTING,
     CONFIG_SKILL_GAIN_CRAFTING,
     CONFIG_SKILL_GAIN_DEFENSE,
     CONFIG_SKILL_GAIN_GATHERING,
@@ -177,7 +147,6 @@ enum WorldConfigs
     CONFIG_SAVE_RESPAWN_TIME_IMMEDIATELY,
     CONFIG_ALWAYS_MAX_SKILL_FOR_LEVEL,
     CONFIG_WEATHER,
-    CONFIG_EXPANSION,
     CONFIG_CHATFLOOD_MESSAGE_COUNT,
     CONFIG_CHATFLOOD_MESSAGE_DELAY,
     CONFIG_CHATFLOOD_MUTE_TIME,
@@ -203,22 +172,16 @@ enum WorldConfigs
     CONFIG_DEATH_SICKNESS_LEVEL,
     CONFIG_DEATH_CORPSE_RECLAIM_DELAY_PVP,
     CONFIG_DEATH_CORPSE_RECLAIM_DELAY_PVE,
-    CONFIG_DEATH_BONES_WORLD,
-    CONFIG_DEATH_BONES_BG_OR_ARENA,
     CONFIG_THREAT_RADIUS,
     CONFIG_INSTANT_LOGOUT,
-    CONFIG_GROUPLEADER_RECONNECT_PERIOD,
     CONFIG_DISABLE_BREATHING,
     CONFIG_ALL_TAXI_PATHS,
     CONFIG_DECLINED_NAMES_USED,
     CONFIG_LISTEN_RANGE_SAY,
     CONFIG_LISTEN_RANGE_TEXTEMOTE,
     CONFIG_LISTEN_RANGE_YELL,
-    CONFIG_ARENA_MAX_RATING_DIFFERENCE,
-    CONFIG_ARENA_RATING_DISCARD_TIMER,
-    CONFIG_ARENA_AUTO_DISTRIBUTE_POINTS,
-    CONFIG_ARENA_AUTO_DISTRIBUTE_INTERVAL_DAYS,
     CONFIG_BATTLEGROUND_PREMATURE_FINISH_TIMER,
+
     CONFIG_MAX_WHO,
     CONFIG_BG_START_MUSIC,
     CONFIG_START_ALL_SPELLS,
@@ -236,26 +199,10 @@ enum WorldConfigs
     CONFIG_MIN_LOG_UPDATE,
     CONFIG_ENABLE_SINFO_LOGIN,
     CONFIG_PREMATURE_BG_REWARD,
-    CONFIG_PET_LOS,
-    CONFIG_VMAP_TOTEM,
-    CONFIG_NUMTHREADS,
-    CONFIG_CHATLOG_CHANNEL,
-    CONFIG_CHATLOG_WHISPER,
-    CONFIG_CHATLOG_SYSCHAN,
-    CONFIG_CHATLOG_PARTY,
-    CONFIG_CHATLOG_RAID,
-    CONFIG_CHATLOG_GUILD,
-    CONFIG_CHATLOG_PUBLIC,
-    CONFIG_CHATLOG_ADDON,
-    CONFIG_CHATLOG_BGROUND,
-    CONFIG_LOGDB_CLEARINTERVAL,
-    CONFIG_LOGDB_CLEARTIME,
+
 	CONFIG_VMAP_INDOOR_CHECK,
-    CONFIG_MMAP_ENABLED,
-    CONFIG_SERVER_LOCKDOWN,
-    CONFIG_SERVER_MAINTENANCE_TASKS,
-    CONFIG_SERVER_LOCKDOWN_INTERVAL_DAYS,
-    CONFIG_SERVER_LOCKDOWN_LENGTH_MINUTES,
+	CONFIG_NUMTHREADS,
+
     CONFIG_VALUE_COUNT
 };
 
@@ -267,7 +214,6 @@ enum Rates
     RATE_POWER_RAGE_INCOME,
     RATE_POWER_RAGE_LOSS,
     RATE_POWER_FOCUS,
-    RATE_SKILL_DISCOVERY,
     RATE_DROP_ITEM_POOR,
     RATE_DROP_ITEM_NORMAL,
     RATE_DROP_ITEM_UNCOMMON,
@@ -277,7 +223,7 @@ enum Rates
     RATE_DROP_ITEM_ARTIFACT,
     RATE_DROP_ITEM_REFERENCED,
     RATE_DROP_MONEY,
-    
+
 	//class specific xp rate section start
 	RATE_XP_KILL_HUMAN,
 	RATE_XP_KILL_ORC,
@@ -321,9 +267,8 @@ enum Rates
 	//end section
 
 	RATE_XP_RAF_MULTIPLIER,
-    RATE_XP_PAST_70,
+    RATE_XP_PAST_60,
     RATE_REPUTATION_GAIN,
-	RATE_REPUTATION_RECRUIT_A_FRIEND_BONUS,
     RATE_CREATURE_NORMAL_HP,
     RATE_CREATURE_ELITE_ELITE_HP,
     RATE_CREATURE_ELITE_RAREELITE_HP,
@@ -409,7 +354,7 @@ enum RealmZone
 };
 
 // DB scripting commands
-#define SCRIPT_COMMAND_TALK                  0              // source = unit, target=any, datalong (0=say, 1=whisper, 2=yell, 3=emote text)
+#define SCRIPT_COMMAND_TALK                  0              // source = unit, target=any, datalong ( 0=say, 1=whisper, 2=yell, 3=emote text)
 #define SCRIPT_COMMAND_EMOTE                 1              // source = unit, datalong = anim_id
 #define SCRIPT_COMMAND_FIELD_SET             2              // source = any, datalong = field_id, datalog2 = value
 #define SCRIPT_COMMAND_MOVE_TO               3              // source = Creature, datalog2 = time, x/y/z
@@ -460,7 +405,6 @@ class World
 
         WorldSession* FindSession(uint32 id) const;
         void AddSession(WorldSession *s);
-		void SendRNDBroadcast();
         bool RemoveSession(uint32 id);
         /// Get the number of current active sessions
         void UpdateMaxSessionCounters();
@@ -520,7 +464,7 @@ class World
         uint32 GetUptime() const { return uint32(m_gameTime - m_startTime); }
         /// Update time
         uint32 GetUpdateTime() const { return m_updateTime; }
-        void SetRecordDiffInterval(int32 t) { if (t >= 0) m_configs[CONFIG_INTERVAL_LOG_UPDATE] = (uint32)t; }
+        void SetRecordDiffInterval(int32 t) { if(t >= 0) m_configs[CONFIG_INTERVAL_LOG_UPDATE] = (uint32)t; }
 
         /// Get the maximum skill level a player can reach
         uint16 GetConfigMaxSkillValue() const
@@ -539,7 +483,7 @@ class World
         void SendGlobalGMMessage(WorldPacket *packet, WorldSession *self = 0, uint32 team = 0);
         void SendZoneMessage(uint32 zone, WorldPacket *packet, WorldSession *self = 0, uint32 team = 0);
         void SendZoneText(uint32 zone, const char *text, WorldSession *self = 0, uint32 team = 0);
-        void SendServerMessage(ServerMessageType type, const char *text = "", Player* player = NULL);
+        void SendServerMessage(uint32 type, const char *text = "", Player* player = NULL);
 
         /// Are we in the middle of a shutdown?
         bool IsShutdowning() const { return m_ShutdownTimer > 0; }
@@ -552,7 +496,7 @@ class World
 
         void Update(time_t diff);
 
-        void UpdateSessions(time_t diff);
+        void UpdateSessions( time_t diff );
         /// Set a server rate (see #Rates)
         void setRate(Rates rate,float value) { rate_values[rate]=value; }
         /// Get a server rate (see #Rates)
@@ -561,14 +505,14 @@ class World
         /// Set a server configuration element (see #WorldConfigs)
         void setConfig(uint32 index,uint32 value)
         {
-            if (index<CONFIG_VALUE_COUNT)
+            if(index<CONFIG_VALUE_COUNT)
                 m_configs[index]=value;
         }
 
         /// Get a server configuration element (see #WorldConfigs)
         uint32 getConfig(uint32 index) const
         {
-            if (index<CONFIG_VALUE_COUNT)
+            if(index<CONFIG_VALUE_COUNT)
                 return m_configs[index];
             else
                 return 0;
@@ -599,23 +543,8 @@ class World
         static float GetVisibleUnitGreyDistance()       { return m_VisibleUnitGreyDistance;       }
         static float GetVisibleObjectGreyDistance()     { return m_VisibleObjectGreyDistance;     }
 
-        //movement anticheat enable flag
-        inline bool GetMvAnticheatEnable()             {return m_MvAnticheatEnable;}
-        inline bool GetMvAnticheatKick()               {return m_MvAnticheatKick;}
-        inline uint32 GetMvAnticheatAlarmCount()       {return m_MvAnticheatAlarmCount;}
-        inline uint32 GetMvAnticheatAlarmPeriod()      {return m_MvAnticheatAlarmPeriod;}
-        inline unsigned char GetMvAnticheatBan()       {return m_MvAntiCheatBan;}
-        inline std::string GetMvAnticheatBanTime()     {return m_MvAnticheatBanTime;}
-        inline unsigned char GetMvAnticheatGmLevel()   {return m_MvAnticheatGmLevel;}
-        inline bool GetMvAnticheatKill()               {return m_MvAnticheatKill;}
-        inline float GetMvAnticheatMaxXYT()            {return m_MvAnticheatMaxXYT;}
-        inline float GetMvAnticheatHighSpeedMaxXYT()   {return m_MvAnticheatHighSpeedMaxXYT;}
-        inline float GetMvAnticheatSpeedMaxXYT()       {return m_MvAnticheatSpeedMaxXYT;}
-        inline float GetMvAnticheatWalkMaxXYT()        {return m_MvAnticheatWalkMaxXYT;}
-        inline uint16 GetMvAnticheatIgnoreAfterTeleport()   {return m_MvAnticheatIgnoreAfterTeleport;}
-
         void ProcessCliCommands();
-        void QueueCliCommand(CliCommandHolder::Print* zprintf, char const* input ) { cliCmdQueue.add(new CliCommandHolder(input, zprintf)); }
+        void QueueCliCommand( CliCommandHolder::Print* zprintf, char const* input ) { cliCmdQueue.add(new CliCommandHolder(input, zprintf)); }
 
         void UpdateResultQueue();
         void InitResultQueue();
@@ -626,35 +555,23 @@ class World
 
         void UpdateAllowedSecurity();
 
-        LocaleConstant GetAvailableDbcLocale(LocaleConstant locale) const { if (m_availableDbcLocaleMask & (1 << locale)) return locale; else return m_defaultDbcLocale; }
+        LocaleConstant GetAvailableDbcLocale(LocaleConstant locale) const { if(m_availableDbcLocaleMask & (1 << locale)) return locale; else return m_defaultDbcLocale; }
 
         //used World DB version
         void LoadDBVersion();
         char const* GetDBVersion() { return m_DBVersion.c_str(); }
-
-	//used World DB's supported core
-	uint8 LoadDBSupportedCoreVersion();
 
         //used Script version
         void SetScriptsVersion(char const* version) { m_ScriptsVersion = version ? version : "unknown scripting library"; }
         char const* GetScriptsVersion() { return m_ScriptsVersion.c_str(); }
 
         void RecordTimeDiff(const char * text, ...);
-        void LoadAutobroadcasts();
-        bool IsLockedDown() { return m_locked_down; }
-        void SetLockdownState(bool apply) { m_locked_down = apply; }
-        void LockdownMsg();
-		std::string CannString;
-
-	protected:
+    protected:
         void _UpdateGameTime();
         void ScriptsProcess();
         // callback for UpdateRealmCharacters
         void _UpdateRealmCharCount(QueryResult_AutoPtr resultCharCount, uint32 accountId);
 
-        void InitDailyQuestResetTime();
-        void ResetDailyQuests();
-		void DoMaintenance();
     private:
         static volatile bool m_stopEvent;
         static uint8 m_ExitCode;
@@ -670,10 +587,6 @@ class World
         uint32 m_updateTimeCount;
         uint32 m_currentTime;
 
-        uint64 m_server_lockdown_time;
-        bool m_locked_down;
-        bool m_maintenance_done;
-
         typedef UNORDERED_MAP<uint32, Weather*> WeatherMap;
         WeatherMap m_weathers;
         typedef UNORDERED_MAP<uint32, WorldSession*> SessionMap;
@@ -687,7 +600,7 @@ class World
 
         std::string m_newCharString;
 
-        float rate_values[MAX_RATES];		
+        float rate_values[MAX_RATES];
         uint32 m_configs[CONFIG_VALUE_COUNT];
         int32 m_playerLimit;
         AccountTypes m_allowedSecurityLevel;
@@ -707,28 +620,10 @@ class World
         static float m_MaxVisibleDistanceInFlight;
         static float m_VisibleUnitGreyDistance;
         static float m_VisibleObjectGreyDistance;
-        
-        //movement anticheat enable flag
-        bool m_MvAnticheatEnable;
-        bool m_MvAnticheatKick;
-        uint32 m_MvAnticheatAlarmCount;
-        uint32 m_MvAnticheatAlarmPeriod;
-        unsigned char m_MvAntiCheatBan;
-        std::string m_MvAnticheatBanTime;
-        unsigned char m_MvAnticheatGmLevel;
-        bool m_MvAnticheatKill;
-        float m_MvAnticheatMaxXYT;
-        float m_MvAnticheatHighSpeedMaxXYT;
-        float m_MvAnticheatSpeedMaxXYT;
-        float m_MvAnticheatWalkMaxXYT;
-        uint16 m_MvAnticheatIgnoreAfterTeleport;
 
         // CLI command holder to be thread safe
         ACE_Based::LockedQueue<CliCommandHolder*, ACE_Thread_Mutex> cliCmdQueue;
         SqlResultQueue *m_resultQueue;
-
-        // next daily quests reset time
-        time_t m_NextDailyQuestReset;
 
         //Player Queue
         Queue m_QueuedPlayer;
@@ -740,8 +635,6 @@ class World
         //used versions
         std::string m_DBVersion;
         std::string m_ScriptsVersion;
-
-		std::list<std::string> m_Autobroadcasts;
 };
 
 extern uint32 realmID;

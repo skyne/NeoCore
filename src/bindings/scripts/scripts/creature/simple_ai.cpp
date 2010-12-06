@@ -156,7 +156,8 @@ void SimpleAI::KilledUnit(Unit *victim)
     case CAST_KILLEDUNIT_VICTIM:
         target = victim;
         break;
-    }	
+    }
+
     //Target is ok, cast a spell on it
     if (target)
         DoCast(target, Kill_Spell);

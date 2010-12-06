@@ -52,7 +52,7 @@ struct NEO_DLL_DECL boss_renatakiAI : public ScriptedAI
         Ambushed = false;
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
     }
 

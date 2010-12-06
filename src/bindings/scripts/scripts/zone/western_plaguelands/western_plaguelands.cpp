@@ -100,7 +100,7 @@ struct NEO_DLL_DECL npc_the_scourge_cauldronAI : public ScriptedAI
 
     void Reset() {}
 
-    void EnterCombat(Unit* who) {}
+    void Aggro(Unit* who) {}
 
     void DoDie()
     {

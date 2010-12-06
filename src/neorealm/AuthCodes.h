@@ -87,7 +87,6 @@ enum LoginResult     //5875 && 6005
 	LOGIN_LOCKED_ENFORCED   = 0x1C,
 };*/
 
-//Supporting 1.12.1 , 1.12.2 , 2.4.3
 #define EXPECTED_NEO_CLIENT_BUILD        {5875,6005,8606, 0}
 
 #endif

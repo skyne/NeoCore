@@ -69,9 +69,6 @@ struct NEO_DLL_DECL boss_ysondreAI : public ScriptedAI
 
     void SummonDruids(Unit* victim)
     {
-        if(!victim)
-            return;
-
         Rand = rand()%10;
         switch (rand()%2)
         {

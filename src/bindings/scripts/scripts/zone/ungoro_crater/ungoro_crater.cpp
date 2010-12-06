@@ -26,7 +26,7 @@ npc_a-me
 EndContentData */
 
 #include "precompiled.h"
-#include "escort_ai.h"
+#include "../../npc/npc_escortAI.h"
 
 #define SAY_READY -1000200
 #define SAY_AGGRO1 -1000201
@@ -51,9 +51,9 @@ struct NEO_DLL_DECL npc_ameAI : public npc_escortAI
 
     void WaypointReached(uint32 i)
     {
-        Player* pPlayer = GetPlayerForEscort();
+        Player* player = Unit::GetPlayer(PlayerGUID);
 
-        if (!pPlayer)
+        if (!player)
             return;
 
         switch (i)
@@ -61,32 +61,35 @@ struct NEO_DLL_DECL npc_ameAI : public npc_escortAI
 
          case 19:
             m_creature->SummonCreature(ENTRY_STOMPER, -6391.69, -1730.49, -272.83, 4.96, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 25000);
-            DoScriptText(SAY_AGGRO1, m_creature, pPlayer);
+            DoScriptText(SAY_AGGRO1, m_creature, player);
             break;
             case 28:
-            DoScriptText(SAY_SEARCH, m_creature, pPlayer);
+            DoScriptText(SAY_SEARCH, m_creature, player);
             break;
             case 38:
             m_creature->SummonCreature(ENTRY_TARLORD, -6370.75, -1382.84, -270.51, 6.06, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 25000);
-            DoScriptText(SAY_AGGRO2, m_creature, pPlayer);
+            DoScriptText(SAY_AGGRO2, m_creature, player);
             break;
             case 49:
             m_creature->SummonCreature(ENTRY_TARLORD1, -6324.44, -1181.05, -270.17, 4.34, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 25000);
-            DoScriptText(SAY_AGGRO3, m_creature, pPlayer);
+            DoScriptText(SAY_AGGRO3, m_creature, player);
             break;
          case 55:
-            DoScriptText(SAY_FINISH, m_creature, pPlayer);
-            if (pPlayer)
-                pPlayer->GroupEventHappens(QUEST_CHASING_AME,m_creature);
+            DoScriptText(SAY_FINISH, m_creature, player);
+            if (player && player->GetTypeId() == TYPEID_PLAYER)
+                ((Player*)player)->GroupEventHappens(QUEST_CHASING_AME,m_creature);
             break;
 
         }
-    }
+   }
 
     void Reset()
     {
       DEMORALIZINGSHOUT_Timer = 5000;
     }
+
+    void Aggro(Unit* who)
+    {}
 
     void JustSummoned(Creature* summoned)
     {
@@ -95,8 +98,11 @@ struct NEO_DLL_DECL npc_ameAI : public npc_escortAI
 
     void JustDied(Unit* killer)
     {
-        if (Player* pPlayer = GetPlayerForEscort())
-            pPlayer->FailQuest(QUEST_CHASING_AME);
+        if (PlayerGUID)
+        {
+            if (Player* player = Unit::GetPlayer(PlayerGUID))
+                ((Player*)player)->FailQuest(QUEST_CHASING_AME);
+        }
     }
 
     void UpdateAI(const uint32 diff)
@@ -114,15 +120,15 @@ struct NEO_DLL_DECL npc_ameAI : public npc_escortAI
     }
 };
 
-bool QuestAccept_npc_ame(Player* pPlayer, Creature* pCreature, Quest const* quest)
+bool QuestAccept_npc_ame(Player* player, Creature* creature, Quest const* quest)
 {
     if (quest->GetQuestId() == QUEST_CHASING_AME)
     {
-        CAST_AI(npc_escortAI, (pCreature->AI()))->Start(false, false, pPlayer->GetGUID());
-        DoScriptText(SAY_READY, pCreature, pPlayer);
-        pCreature->SetUInt32Value(UNIT_FIELD_BYTES_1,0);
+        ((npc_escortAI*)(creature->AI()))->Start(false, true, false, player->GetGUID());
+        DoScriptText(SAY_READY, creature, player);
+        creature->SetUInt32Value(UNIT_FIELD_BYTES_1,0);
         // Change faction so mobs attack
-        pCreature->setFaction(113);
+        creature->setFaction(113);
     }
     return true;
 }

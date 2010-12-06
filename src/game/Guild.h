@@ -1,7 +1,9 @@
 /*
  * Copyright (C) 2005-2008 MaNGOS <http://www.mangosproject.org/>
  *
- * Copyright (C) 2008 Trinity <http://www.trinitycore.org/>
+ * Copyright (C) 2008 Neo <http://www.neocore.org/>
+ *
+ * Copyright (C) 2009-2010 NeoZero <http://www.neozero.org/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,9 +22,6 @@
 
 #ifndef NEOCORE_GUILD_H
 #define NEOCORE_GUILD_H
-
-#define WITHDRAW_MONEY_UNLIMITED    0xFFFFFFFF
-#define WITHDRAW_SLOT_UNLIMITED     0xFFFFFFFF
 
 #include "Item.h"
 
@@ -52,10 +51,8 @@ enum GuildRankRights
     GR_RIGHT_EPNOTE             = 0x00002040,
     GR_RIGHT_VIEWOFFNOTE        = 0x00004040,
     GR_RIGHT_EOFFNOTE           = 0x00008040,
+    // [TZERO] tbc enumerations [?]
     GR_RIGHT_MODIFY_GUILD_INFO  = 0x00010040,
-    GR_RIGHT_REPAIR_FROM_GUILD  = 0x00020000,               // unused in 2.4.x?, Remove money withdraw capacity
-    GR_RIGHT_WITHDRAW_REPAIR    = 0x00040000,               // withdraw for repair
-    GR_RIGHT_WITHDRAW_GOLD      = 0x00080000,               // withdraw gold
     GR_RIGHT_ALL                = 0x000FF1FF
 };
 
@@ -63,10 +60,10 @@ enum Typecommand
 {
     GUILD_CREATE_S  = 0x00,
     GUILD_INVITE_S  = 0x01,
-    GUILD_QUIT_S    = 0x03,
-    GUILD_FOUNDER_S = 0x0E,
+    GUILD_QUIT_S    = 0x02,
+    GUILD_FOUNDER_S = 0x0C,
+    // [TZERO] tbc enumerations [?]
     GUILD_UNK1      = 0x10,
-    GUILD_BANK_S    = 0x15,
     GUILD_UNK3      = 0x16
 };
 
@@ -86,16 +83,13 @@ enum CommandErrors
     GUILD_PLAYER_NOT_IN_GUILD_S     = 0x0A,
     GUILD_PLAYER_NOT_FOUND          = 0x0B,
     GUILD_NOT_ALLIED                = 0x0C,
+    // [TZERO] tbc enumerations [?]
     GUILD_RANK_TOO_HIGH_S           = 0x0D,
     GUILD_ALREADY_LOWEST_RANK_S     = 0x0E,
     GUILD_TEMP_ERROR                = 0x11,
     GUILD_RANK_IN_USE               = 0x12,
     GUILD_IGNORE                    = 0x13,
     GUILD_ERR_UNK1                  = 0x17,
-    GUILD_WITHDRAW_TOO_MUCH         = 0x18,
-    GUILD_BANK_NO_MONEY             = 0x19,
-    GUILD_BANK_TAB_IS_FULL          = 0x1B,
-    GUILD_BANK_ITEM_NOT_FOUND       = 0x1C
 };
 
 enum GuildEvents
@@ -114,8 +108,8 @@ enum GuildEvents
     GE_UNK2             = 0x0B,
     GE_SIGNED_ON        = 0x0C,
     GE_SIGNED_OFF       = 0x0D,
+    // [TZERO] tbc enumerations [?]
     GE_UNK3             = 0x0E,
-    GE_BANKTAB_PURCHASED= 0x0F,
     GE_UNK5             = 0x10,
     GE_UNK6             = 0x11,                             // string 0000000000002710 is 1 gold
     GE_UNK7             = 0x12
@@ -135,27 +129,6 @@ enum PetitionSigns
     PETITION_SIGN_ALREADY_IN_GUILD  = 2,
     PETITION_SIGN_CANT_SIGN_OWN     = 3,
     PETITION_SIGN_NOT_SERVER        = 4,
-};
-
-enum GuildBankRights
-{
-    GUILD_BANK_RIGHT_VIEW_TAB       = 0x01,
-    GUILD_BANK_RIGHT_PUT_ITEM       = 0x02,
-    GUILD_BANK_RIGHT_UPDATE_TEXT    = 0x04,
-
-    GUILD_BANK_RIGHT_DEPOSIT_ITEM   = GUILD_BANK_RIGHT_VIEW_TAB | GUILD_BANK_RIGHT_PUT_ITEM,
-    GUILD_BANK_RIGHT_FULL           = 0xFF,
-};
-
-enum GuildBankLogEntries
-{
-    GUILD_BANK_LOG_DEPOSIT_ITEM     = 1,
-    GUILD_BANK_LOG_WITHDRAW_ITEM    = 2,
-    GUILD_BANK_LOG_MOVE_ITEM        = 3,
-    GUILD_BANK_LOG_DEPOSIT_MONEY    = 4,
-    GUILD_BANK_LOG_WITHDRAW_MONEY   = 5,
-    GUILD_BANK_LOG_REPAIR_MONEY     = 6,
-    GUILD_BANK_LOG_MOVE_ITEM2       = 7,
 };
 
 enum GuildEventLogEntryTypes
@@ -188,44 +161,6 @@ enum GuildEmblem
     ERR_GUILDEMBLEM_INVALIDVENDOR         = 5
 };
 
-struct GuildBankEvent
-{
-    uint32 LogGuid;
-    uint8  LogEntry;
-    uint8  TabId;
-    uint32 PlayerGuid;
-    uint32 ItemOrMoney;
-    uint8  ItemStackCount;
-    uint8  DestTabId;
-    uint64 TimeStamp;
-
-    const bool isMoneyEvent()
-    {
-        return LogEntry == GUILD_BANK_LOG_DEPOSIT_MONEY ||
-            LogEntry == GUILD_BANK_LOG_WITHDRAW_MONEY ||
-            LogEntry == GUILD_BANK_LOG_REPAIR_MONEY;
-    }
-};
-
-struct GuildBankTab
-{
-    Item* Slots[GUILD_BANK_MAX_SLOTS];
-    std::string Name;
-    std::string Icon;
-    std::string Text;
-};
-
-struct GuildItemPosCount
-{
-    GuildItemPosCount(uint8 _slot, uint8 _count) : slot(_slot), count(_count) {}
-
-    bool isContainedIn(std::vector<GuildItemPosCount> const& vec) const;
-
-    uint8 slot;
-    uint8 count;
-};
-typedef std::vector<GuildItemPosCount> GuildItemPosCountVec;
-
 struct MemberSlot
 {
     uint64 logout_time;
@@ -236,28 +171,14 @@ struct MemberSlot
     uint32 zoneId;
     uint8 level;
     uint8 Class;
-    uint32 BankResetTimeMoney;
-    uint32 BankRemMoney;
-    uint32 BankResetTimeTab[GUILD_BANK_MAX_TABS];
-    uint32 BankRemSlotsTab[GUILD_BANK_MAX_TABS];
 };
 
 struct RankInfo
 {
-    RankInfo(const std::string& _name, uint32 _rights, uint32 _money) : name(_name), rights(_rights), BankMoneyPerDay(_money)
-    {
-        for (uint8 i = 0; i < GUILD_BANK_MAX_TABS; ++i)
-        {
-            TabRight[i] = 0;
-            TabSlotPerDay[i] = 0;
-        }
-    }
+    RankInfo(const std::string& _name, uint32 _rights) : name(_name), rights(_rights)  {}
 
     std::string name;
     uint32 rights;
-    uint32 BankMoneyPerDay;
-    uint32 TabRight[GUILD_BANK_MAX_TABS];
-    uint32 TabSlotPerDay[GUILD_BANK_MAX_TABS];
 };
 
 class Guild
@@ -266,7 +187,7 @@ class Guild
         Guild();
         ~Guild();
 
-        bool create(Player* leader, std::string gname);
+        bool create(uint64 lGuid, std::string gname);
         void Disband();
 
         typedef std::map<uint32, MemberSlot> MemberList;
@@ -333,9 +254,9 @@ class Guild
         }
         MemberSlot* GetMemberSlot(const std::string& name, uint64& guid)
         {
-            for (MemberList::iterator itr = members.begin(); itr != members.end(); ++itr)
+            for(MemberList::iterator itr = members.begin(); itr != members.end(); ++itr)
             {
-                if (itr->second.name == name)
+                if(itr->second.name == name)
                 {
                     guid = itr->first;
                     return &itr->second;
@@ -355,59 +276,10 @@ class Guild
         void   LogGuildEvent(uint8 EventType, uint32 PlayerGuid1, uint32 PlayerGuid2, uint8 NewRank);
         void   RenumGuildEventlog();
 
-        // ** Guild bank **
-        // Content & item deposit/withdraw
-        void   DisplayGuildBankContent(WorldSession *session, uint8 TabId);
-        void   DisplayGuildBankContentUpdate(uint8 TabId, int32 slot1, int32 slot2 = -1);
-        void   DisplayGuildBankContentUpdate(uint8 TabId, GuildItemPosCountVec const& slots);
-        void   DisplayGuildBankMoneyUpdate();
-
-        Item*  GetItem(uint8 TabId, uint8 SlotId);
-        uint8  CanStoreItem(uint8 tab, uint8 slot, GuildItemPosCountVec& dest, uint32 count, Item *pItem, bool swap = false) const;
-        Item*  StoreItem(uint8 tab, GuildItemPosCountVec const& pos, Item *pItem);
-        void   RemoveItem(uint8 tab, uint8 slot);
-
-        // Tabs
-        void   DisplayGuildBankTabsInfo(WorldSession *session);
-        void   CreateNewBankTab();
-        void   SetGuildBankTabText(uint8 TabId, std::string text);
-        void   SendGuildBankTabText(WorldSession *session, uint8 TabId);
-        void   SetGuildBankTabInfo(uint8 TabId, std::string name, std::string icon);
-        void   CreateBankRightForTab(uint32 rankid, uint8 TabId);
-        const  GuildBankTab *GetBankTab(uint8 index) { if (index >= m_TabListMap.size()) return NULL; return m_TabListMap[index]; }
-        const  uint8 GetPurchasedTabs() const { return purchased_tabs; }
-        uint32 GetBankRights(uint32 rankId, uint8 TabId) const;
-        bool   IsMemberHaveRights(uint32 LowGuid, uint8 TabId,uint32 rights) const;
-        bool   CanMemberViewTab(uint32 LowGuid, uint8 TabId) const;
-        // Load/unload
-        void   LoadGuildBankFromDB();
-        void   UnloadGuildBank();
         void   IncOnlineMemberCount() { ++m_onlinemembers; }
-        // Money deposit/withdraw
-        void   SendMoneyInfo(WorldSession *session, uint32 LowGuid);
-        bool   MemberMoneyWithdraw(uint32 amount, uint32 LowGuid);
-        uint64 GetGuildBankMoney() { return guildbank_money; }
-        void   SetBankMoney(int64 money);
-        // per days
-        bool   MemberItemWithdraw(uint8 TabId, uint32 LowGuid);
-        uint32 GetMemberSlotWithdrawRem(uint32 LowGuid, uint8 TabId);
-        uint32 GetMemberMoneyWithdrawRem(uint32 LowGuid);
-        void   SetBankMoneyPerDay(uint32 rankId, uint32 money);
-        void   SetBankRightsAndSlots(uint32 rankId, uint8 TabId, uint32 right, uint32 SlotPerDay, bool db);
-        uint32 GetBankMoneyPerDay(uint32 rankId);
-        uint32 GetBankSlotPerDay(uint32 rankId, uint8 TabId);
-        // rights per day
-        void   LoadBankRightsFromDB(uint32 GuildId);
-        // logs
-        void   LoadGuildBankEventLogFromDB();
-        void   UnloadGuildBankEventLog();
-        void   DisplayGuildBankLogs(WorldSession *session, uint8 TabId);
-        void   LogBankEvent(uint8 LogEntry, uint8 TabId, uint32 PlayerGuidLow, uint32 ItemOrMoney, uint8 ItemStackCount=0, uint8 DestTabId=0);
-        void   RenumBankLogs();
-        bool   AddGBankItemToDB(uint32 GuildId, uint32 BankTab , uint32 BankTabSlot , uint32 GUIDLow, uint32 Entry);
 
     protected:
-        void AddRank(const std::string& name,uint32 rights,uint32 money);
+        void AddRank(const std::string& name,uint32 rights);
 
         uint32 Id;
         std::string name;
@@ -428,30 +300,16 @@ class Guild
 
         MemberList members;
 
-        typedef std::vector<GuildBankTab*> TabListMap;
-        TabListMap m_TabListMap;
-
         /** These are actually ordered lists. The first element is the oldest entry.*/
-        typedef std::list<GuildEventlogEntry> GuildEventlog;
-        typedef std::list<GuildBankEvent> GuildBankEventLog;
+        typedef std::list<GuildEventlogEntry*> GuildEventlog;
         GuildEventlog m_GuildEventlog;
-        GuildBankEventLog m_GuildBankEventLog_Money;
-        GuildBankEventLog m_GuildBankEventLog_Item[GUILD_BANK_MAX_TABS];
 
-        bool m_bankloaded;
         bool m_eventlogloaded;
         uint32 m_onlinemembers;
-        uint64 guildbank_money;
         uint8 purchased_tabs;
 
         uint32 LogMaxGuid;
         uint32 GuildEventlogMaxGuid;
-    private:
-        // internal common parts for CanStore/StoreItem functions
-        void AppendDisplayGuildBankSlot(WorldPacket& data, GuildBankTab const *tab, int32 slot);
-        uint8 _CanStoreItem_InSpecificSlot(uint8 tab, uint8 slot, GuildItemPosCountVec& dest, uint32& count, bool swap, Item *pSrcItem ) const;
-        uint8 _CanStoreItem_InTab(uint8 tab, GuildItemPosCountVec& dest, uint32& count, bool merge, Item *pSrcItem, uint8 skip_slot ) const;
-        Item* _StoreItem(uint8 tab, uint8 slot, Item *pItem, uint32 count, bool clone);
 };
 #endif
 

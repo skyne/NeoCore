@@ -58,7 +58,7 @@ struct NEO_DLL_DECL boss_kruulAI : public ScriptedAI
         Hound_Timer = 8000;
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
     }
 

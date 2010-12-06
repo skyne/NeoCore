@@ -127,7 +127,7 @@ struct NEO_DLL_DECL boss_ragnarosAI : public Scripted_NoMovementAI
         DoScriptText(SAY_KILL, m_creature);
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
     }
 
@@ -224,12 +224,8 @@ struct NEO_DLL_DECL boss_ragnarosAI : public Scripted_NoMovementAI
                 for(int i = 0; i < 9;i++)
                 {
                     target = SelectUnit(SELECT_TARGET_RANDOM,0);
-                    if(target)
-                    {
-                        Summoned = m_creature->SummonCreature(12143,target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(),0,TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN,900000);
-                        if(Summoned)
-                            ((CreatureAI*)Summoned->AI())->AttackStart(target);
-                    }
+                    Summoned = m_creature->SummonCreature(12143,target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(),0,TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN,900000);
+                    ((CreatureAI*)Summoned->AI())->AttackStart(target);
                 }
 
                 HasSubmergedOnce = true;
@@ -245,12 +241,8 @@ struct NEO_DLL_DECL boss_ragnarosAI : public Scripted_NoMovementAI
                 for(int i = 0; i < 9;i++)
                 {
                     target = SelectUnit(SELECT_TARGET_RANDOM,0);
-                    if(target)
-                    {
-                        Summoned = m_creature->SummonCreature(12143,target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(),0,TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN,900000);
-                        if(Summoned)
-                            ((CreatureAI*)Summoned->AI())->AttackStart(target);
-                    }
+                    Summoned = m_creature->SummonCreature(12143,target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(),0,TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN,900000);
+                    ((CreatureAI*)Summoned->AI())->AttackStart(target);
                 }
 
                 WasBanished = true;

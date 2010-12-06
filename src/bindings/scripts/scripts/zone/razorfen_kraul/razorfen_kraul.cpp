@@ -26,8 +26,7 @@ npc_willix
 EndContentData */
 
 #include "precompiled.h"
-#include "escort_ai.h"
-#include "def_razorfen_kraul.h"
+#include "../../npc/npc_escortAI.h"
 
 #define SAY_READY -1047000
 #define SAY_POINT -10470001
@@ -43,15 +42,14 @@ EndContentData */
 
 #define QUEST_WILLIX_THE_IMPORTER 1144
 #define ENTRY_BOAR 4514
-#define SPELL_QUILLBOAR_CHANNELING 7083
 
 struct NEO_DLL_DECL npc_willixAI : public npc_escortAI
 {
-    npc_willixAI(Creature *c) : npc_escortAI(c) {}
+npc_willixAI(Creature *c) : npc_escortAI(c) {}
 
     void WaypointReached(uint32 i)
     {
-        Player* player = GetPlayerForEscort();
+        Player* player = Unit::GetPlayer(PlayerGUID);
 
         if (!player)
             return;
@@ -91,7 +89,8 @@ struct NEO_DLL_DECL npc_willixAI : public npc_escortAI
             break;
         case 45:
             DoScriptText(SAY_WIN, m_creature, player);
-            player->GroupEventHappens(QUEST_WILLIX_THE_IMPORTER,m_creature);
+            if (player && player->GetTypeId() == TYPEID_PLAYER)
+                ((Player*)player)->GroupEventHappens(QUEST_WILLIX_THE_IMPORTER,m_creature);
             break;
         case 46:
             DoScriptText(SAY_END, m_creature, player);
@@ -101,7 +100,7 @@ struct NEO_DLL_DECL npc_willixAI : public npc_escortAI
 
     void Reset() {}
 
-    void EnterCombat(Unit* who)
+    void Aggro(Unit* who)
     {
         DoScriptText(SAY_AGGRO1, m_creature, NULL);
     }
@@ -113,8 +112,11 @@ struct NEO_DLL_DECL npc_willixAI : public npc_escortAI
 
     void JustDied(Unit* killer)
     {
-        if (Player* pPlayer = GetPlayerForEscort())
-            CAST_PLR(pPlayer)->FailQuest(QUEST_WILLIX_THE_IMPORTER);
+        if (PlayerGUID)
+        {
+            if (Player* player = Unit::GetPlayer(PlayerGUID))
+                ((Player*)player)->FailQuest(QUEST_WILLIX_THE_IMPORTER);
+        }
     }
 
     void UpdateAI(const uint32 diff)
@@ -127,55 +129,12 @@ bool QuestAccept_npc_willix(Player* player, Creature* creature, Quest const* que
 {
     if (quest->GetQuestId() == QUEST_WILLIX_THE_IMPORTER)
     {
-        CAST_AI(npc_escortAI, (creature->AI()))->Start(true, false, player->GetGUID());
+        ((npc_escortAI*)(creature->AI()))->Start(true, true, false, player->GetGUID());
         DoScriptText(SAY_READY, creature, player);
         creature->setFaction(113);
     }
+
     return true;
-}
-
-struct NEO_DLL_DECL npc_deaths_head_ward_keeperAI : public ScriptedAI
-{
-    npc_deaths_head_ward_keeperAI(Creature *c) : ScriptedAI(c)
-    {
-        pInstance = ((ScriptedInstance*)c->GetInstanceData());
-        Reset();
-    }
-
-    ScriptedInstance *pInstance;
-    uint32 QuillboarChanneling_Timer;
-
-    void Reset()
-    {
-        QuillboarChanneling_Timer = 1500;
-    }
-
-    void EnterCombat(Unit *who)
-    {
-    }
-
-    void UpdateAI(const uint32 diff)
-    {
-        if (!m_creature->isAlive())
-            return;
-
-        if (pInstance)
-            pInstance->SetData(TYPE_WARD_KEEPERS, NOT_STARTED);
-
-        if (QuillboarChanneling_Timer < diff)
-        {
-            if( m_creature->IsNonMeleeSpellCasted(false) )
-                m_creature->InterruptNonMeleeSpells(true);
-            DoCast(m_creature, SPELL_QUILLBOAR_CHANNELING);
-            QuillboarChanneling_Timer = 1100;
-        }else QuillboarChanneling_Timer -= diff;
-
-    }
-};
-
-CreatureAI* GetAI_npc_deaths_head_ward_keeper(Creature *_Creature)
-{
-    return new npc_deaths_head_ward_keeperAI(_Creature);
 }
 
 CreatureAI* GetAI_npc_willix(Creature *_Creature)
@@ -241,11 +200,6 @@ void AddSC_razorfen_kraul()
     newscript->Name = "npc_willix";
     newscript->GetAI = &GetAI_npc_willix;
     newscript->pQuestAccept = &QuestAccept_npc_willix;
-    newscript->RegisterSelf();
-    
-    newscript = new Script;
-    newscript->Name = "npc_deaths_head_ward_keeper";
-    newscript->GetAI = &GetAI_npc_deaths_head_ward_keeper;
     newscript->RegisterSelf();
 }
 

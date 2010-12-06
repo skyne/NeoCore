@@ -68,7 +68,7 @@ struct NEO_DLL_DECL boss_sarturaAI : public ScriptedAI
 
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
         DoScriptText(SAY_AGGRO, m_creature);
     }
@@ -161,6 +161,7 @@ struct NEO_DLL_DECL boss_sarturaAI : public ScriptedAI
     }
 };
 
+
 struct NEO_DLL_DECL mob_sartura_royal_guardAI : public ScriptedAI
 {
     mob_sartura_royal_guardAI(Creature *c) : ScriptedAI(c) {}
@@ -186,9 +187,10 @@ struct NEO_DLL_DECL mob_sartura_royal_guardAI : public ScriptedAI
 
         WhirlWind = false;
         AggroReset = false;
+
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
     }
 

@@ -55,7 +55,7 @@ struct NEO_DLL_DECL boss_postmaster_malownAI : public ScriptedAI
         HasYelled = false;
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
     }
 
@@ -132,6 +132,7 @@ CreatureAI* GetAI_boss_postmaster_malown(Creature *_Creature)
 {
     return new boss_postmaster_malownAI (_Creature);
 }
+
 
 void AddSC_boss_postmaster_malown()
 {

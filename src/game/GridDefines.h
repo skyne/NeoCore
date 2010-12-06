@@ -1,7 +1,9 @@
 /*
  * Copyright (C) 2005-2008 MaNGOS <http://www.mangosproject.org/>
  *
- * Copyright (C) 2008 Trinity <http://www.trinitycore.org/>
+ * Copyright (C) 2008 Neo <http://www.neocore.org/>
+ *
+ * Copyright (C) 2009-2010 NeoZero <http://www.neozero.org/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -57,7 +59,7 @@ class Player;
 
 #define TOTAL_NUMBER_OF_CELLS_PER_MAP    (MAX_NUMBER_OF_GRIDS*MAX_NUMBER_OF_CELLS)
 
-#define MAP_RESOLUTION 128
+#define MAP_RESOLUTION 256
 
 #define MAP_SIZE                (SIZE_OF_GRIDS*MAX_NUMBER_OF_GRIDS)
 #define MAP_HALFSIZE            (MAP_SIZE/2)
@@ -94,7 +96,7 @@ struct NEO_DLL_DECL CoordPair
 
     void operator<<(const uint32 val)
     {
-        if (x_coord >= val )
+        if( x_coord >= val )
             x_coord -= val;
         else
             x_coord = 0;
@@ -102,7 +104,7 @@ struct NEO_DLL_DECL CoordPair
 
     void operator>>(const uint32 val)
     {
-        if (x_coord+val < LIMIT )
+        if( x_coord+val < LIMIT )
             x_coord += val;
         else
             x_coord = LIMIT - 1;
@@ -110,7 +112,7 @@ struct NEO_DLL_DECL CoordPair
 
     void operator-=(const uint32 val)
     {
-        if (y_coord >= val )
+        if( y_coord >= val )
             y_coord -= val;
         else
             y_coord = 0;
@@ -118,7 +120,7 @@ struct NEO_DLL_DECL CoordPair
 
     void operator+=(const uint32 val)
     {
-        if (y_coord+val < LIMIT )
+        if( y_coord+val < LIMIT )
             y_coord += val;
         else
             y_coord = LIMIT - 1;
@@ -169,9 +171,9 @@ namespace Neo
 
     inline void NormalizeMapCoord(float &c)
     {
-        if (c > MAP_HALFSIZE - 0.5)
+        if(c > MAP_HALFSIZE - 0.5)
             c = MAP_HALFSIZE - 0.5;
-        else if (c < -(MAP_HALFSIZE - 0.5))
+        else if(c < -(MAP_HALFSIZE - 0.5))
             c = -(MAP_HALFSIZE - 0.5);
     }
 

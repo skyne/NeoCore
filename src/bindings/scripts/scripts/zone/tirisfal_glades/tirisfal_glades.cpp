@@ -47,7 +47,7 @@ struct NEO_DLL_DECL npc_calvin_montagueAI : public ScriptedAI
         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_2);
     }
 
-    void EnterCombat(Unit* who) { }
+    void Aggro(Unit* who) { }
 
     void JustDied(Unit* Killer)
     {

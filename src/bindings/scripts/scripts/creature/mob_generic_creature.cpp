@@ -56,7 +56,7 @@ struct NEO_DLL_DECL generic_creatureAI : public ScriptedAI
         else GlobalCooldown = 0;
 
         //Buff timer (only buff when we are alive and not in combat
-        if (!m_creature->isInCombat() && m_creature->isAlive())
+        if (!InCombat && m_creature->isAlive())
             if (BuffTimer < diff )
             {
                 //Find a spell that targets friendly and applies an aura (these are generally buffs)
@@ -164,13 +164,10 @@ CreatureAI* GetAI_generic_creature(Creature *_Creature)
 
 void AddSC_generic_creature()
 {
-    /*
-    [Disabled to prevent "CRASH ALERT!"]
     Script *newscript;
     newscript = new Script;
     newscript->Name="generic_creature";
     newscript->GetAI = &GetAI_generic_creature;
     newscript->RegisterSelf();
-    */
 }
 

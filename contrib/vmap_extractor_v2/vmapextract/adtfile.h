@@ -1,58 +1,59 @@
 #ifndef ADT_H
 #define ADT_H
 
-#include "mpq_libmpq04.h"
+#include "mpq.h"
 #include "wmo.h"
 #include "model.h"
+
+#define __STORMLIB_SELF__
 
 #define TILESIZE (533.33333f)
 #define CHUNKSIZE ((TILESIZE) / 16.0f)
 #define UNITSIZE (CHUNKSIZE / 8.0f)
 
+typedef unsigned char uint8;
+typedef unsigned short uint16;
+typedef unsigned int uint32;
+
 class Liquid;
 
-typedef struct
-{
-    float x;
-    float y;
-    float z;
+typedef struct {
+float x;
+float y;
+float z;
 }svec;
 
-struct vec
-{
-    double x;
-    double y;
-    double z;
-};
+typedef struct {
+double x;
+double y;
+double z;
+}vec;
 
-struct triangle
-{
+typedef struct{
     vec v[3];
-};
 
-typedef struct
-{
-    float v9[16*8+1][16*8+1];
-    float v8[16*8][16*8];
+}triangle;
+
+typedef struct{
+float v9[16*8+1][16*8+1];
+float v8[16*8][16*8];
 }Cell;
 
-typedef struct
-{
-    double v9[9][9];
-    double v8[8][8];
-    uint16 area_id;
-    //Liquid *lq;
-    float waterlevel[9][9];
-    uint8 flag;
+typedef struct{
+double v9[9][9];
+double v8[8][8];
+uint16 area_id;
+//Liquid *lq;
+float waterlevel[9][9];
+uint8 flag;
 }chunk;
 
 typedef struct
 {
-    chunk ch[16][16];
+chunk ch[16][16];
 }mcell;
 
-struct MapChunkHeader
-{
+struct MapChunkHeader {
     uint32 flags;
     uint32 ix;
     uint32 iy;
@@ -98,7 +99,7 @@ public:
     int nMDX;
     string* WmoInstansName;
     string* ModelInstansName;
-    bool init(uint32 map_num, uint32 tileX, uint32 tileY);
+    bool init(char *map_id);
     //void LoadMapChunks();
 
     //uint32 wmo_count;
@@ -118,4 +119,7 @@ private:
 void fixnamen(char *name, size_t len);
 //void fixMapNamen(char *name, size_t len);
 
+
 #endif
+
+

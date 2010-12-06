@@ -127,7 +127,7 @@ struct NEO_DLL_DECL instance_blackrock_depths : public ScriptedInstance
             }
         }
 
-        debug_log("TSCR: Instance Blackrock Depths: GetPlayerInMap, but PlayerList is empty!");
+        debug_log("NeoScript: Instance Blackrock Depths: GetPlayerInMap, but PlayerList is empty!");
         return NULL;
     }
 
@@ -170,39 +170,34 @@ struct NEO_DLL_DECL instance_blackrock_depths : public ScriptedInstance
 
         if (!player)
         {
-            debug_log("TSCR: Instance Blackrock Depths: SetData (Type: %u Data %u) cannot find any player.", type, data);
+            debug_log("NeoScript: Instance Blackrock Depths: SetData (Type: %u Data %u) cannot find any player.", type, data);
             return;
         }
 
-        debug_log("TSCR: Instance Blackrock Depths: SetData update (Type: %u Data %u)", type, data);
+        debug_log("NeoScript: Instance Blackrock Depths: SetData update (Type: %u Data %u)", type, data);
 
         switch(type)
         {
         case TYPE_RING_OF_LAW:
-            if(Encounter[0] != DONE)
-                Encounter[0] = data;
+            Encounter[0] = data;
             break;
         case TYPE_VAULT:
-            if(Encounter[1] != DONE)
-                Encounter[1] = data;
+            Encounter[1] = data;
             break;
         case TYPE_BAR:
             if (data == SPECIAL)
                 ++BarAleCount;
-            else if(Encounter[2] != DONE)
+            else
                 Encounter[2] = data;
             break;
         case TYPE_TOMB_OF_SEVEN:
-            if(Encounter[3] != DONE)
-                Encounter[3] = data;
+            Encounter[3] = data;
             break;
         case TYPE_LYCEUM:
-            if(Encounter[4] != DONE)
-                Encounter[4] = data;
+            Encounter[4] = data;
             break;
         case TYPE_IRON_HALL:
-            if(Encounter[5] != DONE)
-                Encounter[5] = data;
+            Encounter[5] = data;
             break;
         }
 

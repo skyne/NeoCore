@@ -24,14 +24,12 @@ EndScriptData
 
 /* ContentData
 npc_chicken_cluck       100%    support for quest 3861 (Cluck!)
-npc_dancing_flames      100%    midsummer event NPC
 npc_guardian            100%    guardianAI used to prevent players from accessing off-limits areas. Not in use by SD2
 npc_injured_patient     100%    patients for triage-quests (6622 and 6624)
 npc_doctor              100%    Gustaf Vanhowzen and Gregory Victor, quest 6622 and 6624 (Triage)
 npc_mount_vendor        100%    Regular mount vendors all over the world. Display gossip if player doesn't meet the requirements to buy
 npc_rogue_trainer       80%     Scripted trainers, so they are able to offer item 17126 for class quest 6681
 npc_sayge               100%    Darkmoon event fortune teller, buff player based on answers given
-npc_snake_trap_serpents 80%     AI for snakes that summoned by Snake Trap
 EndContentData */
 
 #include "precompiled.h"
@@ -69,10 +67,8 @@ struct NEO_DLL_DECL npc_chicken_cluckAI : public ScriptedAI
         if(m_creature->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER))
         {
             if(ResetFlagTimer < diff)
-            {
                 EnterEvadeMode();
-                return;
-            }else ResetFlagTimer -= diff;
+            else ResetFlagTimer -= diff;
         }
 
         if(UpdateVictim())
@@ -127,85 +123,6 @@ bool QuestComplete_npc_chicken_cluck(Player *player, Creature *_Creature, const 
     if(_Quest->GetQuestId() == QUEST_CLUCK)
         ((npc_chicken_cluckAI*)_Creature->AI())->Reset();
 
-    return true;
-}
-
-/*######
-## npc_dancing_flames
-######*/
-
-#define SPELL_BRAZIER       45423
-#define SPELL_SEDUCTION     47057
-#define SPELL_FIERY_AURA    45427
-
-struct NEO_DLL_DECL npc_dancing_flamesAI : public ScriptedAI
-{
-    npc_dancing_flamesAI(Creature *c) : ScriptedAI(c) {}
-
-    bool active;
-    uint32 can_iteract;
-
-    void Reset()
-    {
-        active = true;
-        can_iteract = 3500;
-        DoCast(m_creature,SPELL_BRAZIER,true);
-        DoCast(m_creature,SPELL_FIERY_AURA,false);
-        float x, y, z;
-        m_creature->GetPosition(x,y,z);
-        m_creature->Relocate(x,y,z + 0.94f);
-        m_creature->AddUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT | MOVEMENTFLAG_LEVITATING);
-        m_creature->HandleEmoteCommand(EMOTE_ONESHOT_DANCE);
-        WorldPacket data;                       //send update position to client
-        m_creature->BuildHeartBeatMsg(&data);
-        m_creature->SendMessageToSet(&data,true);
-    }
-
-    void UpdateAI(const uint32 diff)
-    {
-        if (!active)
-        {
-            if(can_iteract <= diff){
-                active = true;
-                can_iteract = 3500;
-                m_creature->HandleEmoteCommand(EMOTE_ONESHOT_DANCE);
-            }else can_iteract -= diff;
-        }
-    }
-
-    void Aggro(Unit* who){}
-};
-
-CreatureAI* GetAI_npc_dancing_flames(Creature *_Creature)
-{
-    return new npc_dancing_flamesAI(_Creature);
-}
-
-bool ReceiveEmote_npc_dancing_flames( Player *player, Creature *flame, uint32 emote )
-{
-    if ( ((npc_dancing_flamesAI*)flame->AI())->active &&
-        flame->IsWithinLOS(player->GetPositionX(),player->GetPositionY(),player->GetPositionZ()) && flame->IsWithinDistInMap(player,30.0f))
-    {
-        flame->SetInFront(player);
-        ((npc_dancing_flamesAI*)flame->AI())->active = false;
-
-        WorldPacket data;
-        flame->BuildHeartBeatMsg(&data);
-        flame->SendMessageToSet(&data,true);
-        switch(emote)
-        {
-            case TEXTEMOTE_KISS:    flame->HandleEmoteCommand(EMOTE_ONESHOT_SHY); break;
-            case TEXTEMOTE_WAVE:    flame->HandleEmoteCommand(EMOTE_ONESHOT_WAVE); break;
-            case TEXTEMOTE_BOW:     flame->HandleEmoteCommand(EMOTE_ONESHOT_BOW); break;
-            case TEXTEMOTE_JOKE:    flame->HandleEmoteCommand(EMOTE_ONESHOT_LAUGH); break;
-            case TEXTEMOTE_DANCE:
-            {
-                if (!player->HasAura(SPELL_SEDUCTION,0))
-                    flame->CastSpell(player,SPELL_SEDUCTION,true);
-            }
-            break;
-        }
-    }
     return true;
 }
 
@@ -556,7 +473,7 @@ void npc_doctorAI::UpdateAI(const uint32 diff)
             case DOCTOR_ALLIANCE: patientEntry = AllianceSoldierId[rand()%3]; break;
             case DOCTOR_HORDE:    patientEntry = HordeSoldierId[rand()%3]; break;
             default:
-                error_log("TSCR: Invalid entry for Triage doctor. Please check your database");
+                error_log("NeoScript: Invalid entry for Triage doctor. Please check your database");
                 return;
         }
 
@@ -689,12 +606,12 @@ bool GossipHello_npc_mount_vendor(Player *player, Creature *_Creature)
             else canBuy = true;
             break;
         case 16264:                                         //Winaestra
-            if (player->GetReputationRank(911) != REP_EXALTED && race != RACE_BLOODELF)
+            if (player->GetReputationRank(911) != REP_EXALTED) //[TZERO]&& race != RACE_BLOODELF)
                 player->SEND_GOSSIP_MENU(10305, _Creature->GetGUID());
             else canBuy = true;
             break;
         case 17584:                                         //Torallius the Pack Handler
-            if (player->GetReputationRank(930) != REP_EXALTED && race != RACE_DRAENEI)
+            if (player->GetReputationRank(930) != REP_EXALTED) //[TZERO] && race != RACE_DRAENEI)
                 player->SEND_GOSSIP_MENU(10239, _Creature->GetGUID());
             else canBuy = true;
             break;
@@ -965,150 +882,22 @@ CreatureAI* GetAI_npc_tonk_mine(Creature *_Creature)
 
 bool ReceiveEmote_npc_winter_reveler( Player *player, Creature *_Creature, uint32 emote )
 {
-    if(player->HasAura(26218, 1))
+    //TODO: check auralist.
+    if(player->HasAura(26218, 0))
         return false;
 
     if( emote == TEXTEMOTE_KISS )
-        _Creature->CastSpell(player, 26218, false);
-
+    {
+        _Creature->CastSpell(_Creature, 26218, false);
+        player->CastSpell(player, 26218, false);
+        switch(rand()%3)
+        {
+        case 0: _Creature->CastSpell(player, 26207, false); break;
+        case 1: _Creature->CastSpell(player, 26206, false); break;
+        case 2: _Creature->CastSpell(player, 45036, false); break;
+        }
+    }
     return true;
-}
-
-/*####
-## npc_brewfest_reveler
-####*/
-
-bool ReceiveEmote_npc_brewfest_reveler( Player *player, Creature *_Creature, uint32 emote )
-{
-    if( emote == TEXTEMOTE_DANCE )
-        _Creature->CastSpell(player, 41586, false);
-
-    return true;
-}
-
-/*####
-## npc_snake_trap_serpents
-####*/
-
-#define SPELL_MIND_NUMBING_POISON    8692    //Viper
-#define SPELL_DEADLY_POISON          34655   //Venomous Snake
-#define SPELL_CRIPPLING_POISON       3409    //Viper
-
-#define VENOMOUS_SNAKE_TIMER 1200
-#define VIPER_TIMER 3000
-
-#define C_VIPER 19921
-
-#define RAND 5
-
-struct NEO_DLL_DECL npc_snake_trap_serpentsAI : public ScriptedAI
-{
-    npc_snake_trap_serpentsAI(Creature *c) : ScriptedAI(c) {}
-
-    uint32 SpellTimer;
-    Unit *Owner;
-    bool IsViper;
-
-    void Aggro(Unit *who) {}
-
-    void Reset()
-    {
-        Owner = m_creature->GetOwner();
-
-        if (!m_creature->isPet() || !Owner)
-            return;
-
-        CreatureInfo const *Info = m_creature->GetCreatureInfo();
-
-        if(Info->Entry == C_VIPER)
-            IsViper = true;
-
-        //Add delta to make them not all hit the same time
-        uint32 delta = (rand() % 7) *100;
-        m_creature->SetStatFloatValue(UNIT_FIELD_BASEATTACKTIME, Info->baseattacktime + delta);
-        m_creature->SetStatFloatValue(UNIT_FIELD_RANGED_ATTACK_POWER , Info->attackpower);
-
-    }
-
-    //Redefined for random target selection:
-    void MoveInLineOfSight(Unit *who)
-    {
-        if (!m_creature->isPet() || !Owner)
-            return;
-
-        if( !m_creature->getVictim() && who->isTargetableForAttack() && ( m_creature->IsHostileTo( who )) && who->isInAccessiblePlaceFor(m_creature) && Owner->IsHostileTo(who))//don't attack not-pvp-flaged
-        {
-            if (m_creature->GetDistanceZ(who) > CREATURE_Z_ATTACK_RANGE)
-                return;
-
-            float attackRadius = m_creature->GetAttackDistance(who);
-            if( m_creature->IsWithinDistInMap(who, attackRadius) && m_creature->IsWithinLOSInMap(who) )
-            {
-                if (!(rand() % RAND) )
-                {
-                    m_creature->setAttackTimer(BASE_ATTACK, (rand() % 10) * 100);
-                    SpellTimer = (rand() % 10) * 100;
-                    AttackStart(who);
-                }
-            }
-        }
-    }
-
-    void UpdateAI(const uint32 diff)
-    {
-        if (!m_creature->isPet() || !Owner)
-            return;
-
-        //Follow if not in combat
-        if (!m_creature->hasUnitState(UNIT_STAT_FOLLOW)&& !m_creature->isInCombat())
-        {
-            m_creature->GetMotionMaster()->Clear();
-            m_creature->GetMotionMaster()->MoveFollow(Owner,PET_FOLLOW_DIST,PET_FOLLOW_ANGLE);
-        }
-
-        //No victim -> get new from owner (need this because MoveInLineOfSight won't work while following -> corebug)
-        if (!m_creature->getVictim())
-        {
-            if (m_creature->isInCombat())
-                DoStopAttack();
-
-            if(Owner->getAttackerForHelper())
-                AttackStart(Owner->getAttackerForHelper());
-
-            return;
-        }
-
-        if (SpellTimer < diff)
-        {
-            if (IsViper) //Viper
-            {
-                if (rand() % 3 == 0) //33% chance to cast
-                {
-                    uint32 spell;
-                    if( rand() % 2 == 0)
-                        spell = SPELL_MIND_NUMBING_POISON;
-                    else
-                        spell = SPELL_CRIPPLING_POISON;
-
-                    DoCast(m_creature->getVictim(),spell);
-                }
-
-                SpellTimer = VIPER_TIMER;
-            }
-            else //Venomous Snake
-            {
-                if (rand() % 10 < 8) //80% chance to cast
-                    DoCast(m_creature->getVictim(),SPELL_DEADLY_POISON);
-                SpellTimer = VENOMOUS_SNAKE_TIMER + (rand() %5)*100;
-            }
-        }else SpellTimer-=diff;
-        DoMeleeAttackIfReady();
-    }
-};
-
-CreatureAI* GetAI_npc_snake_trap_serpents(Creature *_Creature)
-{
-    return new npc_snake_trap_serpentsAI(_Creature);
 }
 
 void AddSC_npcs_special()
@@ -1121,12 +910,6 @@ void AddSC_npcs_special()
     newscript->pReceiveEmote =  &ReceiveEmote_npc_chicken_cluck;
     newscript->pQuestAccept =   &QuestAccept_npc_chicken_cluck;
     newscript->pQuestComplete = &QuestComplete_npc_chicken_cluck;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name="npc_dancing_flames";
-    newscript->GetAI = &GetAI_npc_dancing_flames;
-    newscript->pReceiveEmote =  &ReceiveEmote_npc_dancing_flames;
     newscript->RegisterSelf();
 
     newscript = new Script;
@@ -1176,16 +959,6 @@ void AddSC_npcs_special()
     newscript = new Script;
     newscript->Name="npc_winter_reveler";
     newscript->pReceiveEmote =  &ReceiveEmote_npc_winter_reveler;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name="npc_brewfest_reveler";
-    newscript->pReceiveEmote =  &ReceiveEmote_npc_brewfest_reveler;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name="npc_snake_trap_serpents";
-    newscript->GetAI = &GetAI_npc_snake_trap_serpents;
     newscript->RegisterSelf();
 }
 

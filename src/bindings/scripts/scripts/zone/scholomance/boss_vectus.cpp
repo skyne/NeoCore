@@ -42,7 +42,7 @@ struct NEO_DLL_DECL boss_vectusAI : public ScriptedAI
         Frenzy_Timer = 0;
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
     }
 

@@ -1,7 +1,9 @@
 /*
  * Copyright (C) 2005-2008 MaNGOS <http://www.mangosproject.org/>
  *
- * Copyright (C) 2008 Trinity <http://www.trinitycore.org/>
+ * Copyright (C) 2008 Neo <http://www.neocore.org/>
+ *
+ * Copyright (C) 2009-2010 NeoZero <http://www.neozero.org/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,10 +33,13 @@
 //       if this class definition not complite then VS for x64 release use different size for
 //       struct OpcodeHandler in this header and Opcode.cpp and get totally wrong data from
 //       table opcodeTable in source when Opcode.h included but WorldSession.h not included
+
 #include "WorldSession.h"
 
+class WorldSession;
+
 /// List of Opcodes
-enum Opcodes
+enum OpcodesList
 {
     MSG_NULL_ACTION                                 = 0x000,
     CMSG_BOOTME                                     = 0x001,
@@ -845,7 +850,6 @@ enum Opcodes
     SMSG_GHOSTEE_GONE                               = 0x326,
     CMSG_GM_UPDATE_TICKET_STATUS                    = 0x327,
     SMSG_GM_TICKET_STATUS_UPDATE                    = 0x328,
-    MSG_SET_DUNGEON_DIFFICULTY                      = 0x329,
     CMSG_GMSURVEY_SUBMIT                            = 0x32A,
     SMSG_UPDATE_INSTANCE_OWNERSHIP                  = 0x32B,
     CMSG_IGNORE_KNOCKBACK_CHEAT                     = 0x32C,
@@ -863,39 +867,16 @@ enum Opcodes
     SMSG_CHARACTER_PROFILE                          = 0x338,
     SMSG_CHARACTER_PROFILE_REALM_CONNECTED          = 0x339,
     SMSG_DEFENSE_MESSAGE                            = 0x33A,
-    SMSG_INSTANCE_DIFFICULTY                        = 0x33B,
     MSG_GM_RESETINSTANCELIMIT                       = 0x33C,
     SMSG_MOTD                                       = 0x33D,
-    SMSG_MOVE_SET_FLIGHT_OBSOLETE                   = 0x33E,
-    SMSG_MOVE_UNSET_FLIGHT_OBSOLETE                 = 0x33F,
-    CMSG_MOVE_FLIGHT_ACK_OBSOLETE                   = 0x340,
     MSG_MOVE_START_SWIM_CHEAT                       = 0x341,
     MSG_MOVE_STOP_SWIM_CHEAT                        = 0x342,
     SMSG_MOVE_SET_CAN_FLY                           = 0x343,
     SMSG_MOVE_UNSET_CAN_FLY                         = 0x344,
     CMSG_MOVE_SET_CAN_FLY_ACK                       = 0x345,
     CMSG_MOVE_SET_FLY                               = 0x346,
-    CMSG_SOCKET_GEMS                                = 0x347,
-    CMSG_ARENA_TEAM_CREATE                          = 0x348,
-    SMSG_ARENA_TEAM_COMMAND_RESULT                  = 0x349,
-    UMSG_UPDATE_ARENA_TEAM_OBSOLETE                 = 0x34A,
-    CMSG_ARENA_TEAM_QUERY                           = 0x34B,
-    SMSG_ARENA_TEAM_QUERY_RESPONSE                  = 0x34C,
-    CMSG_ARENA_TEAM_ROSTER                          = 0x34D,
-    SMSG_ARENA_TEAM_ROSTER                          = 0x34E,
-    CMSG_ARENA_TEAM_INVITE                          = 0x34F,
-    SMSG_ARENA_TEAM_INVITE                          = 0x350,
-    CMSG_ARENA_TEAM_ACCEPT                          = 0x351,
-    CMSG_ARENA_TEAM_DECLINE                         = 0x352,
-    CMSG_ARENA_TEAM_LEAVE                           = 0x353,
-    CMSG_ARENA_TEAM_REMOVE                          = 0x354,
-    CMSG_ARENA_TEAM_DISBAND                         = 0x355,
-    CMSG_ARENA_TEAM_LEADER                          = 0x356,
-    SMSG_ARENA_TEAM_EVENT                           = 0x357,
-    CMSG_BATTLEMASTER_JOIN_ARENA                    = 0x358,
     MSG_MOVE_START_ASCEND                           = 0x359,
     MSG_MOVE_STOP_ASCEND                            = 0x35A,
-    SMSG_ARENA_TEAM_STATS                           = 0x35B,
     CMSG_LFG_SET_AUTOJOIN                           = 0x35C,
     CMSG_LFG_CLEAR_AUTOJOIN                         = 0x35D,
     CMSG_LFM_SET_AUTOFILL                           = 0x35E,
@@ -922,25 +903,11 @@ enum Opcodes
     SMSG_TITLE_EARNED                               = 0x373,
     CMSG_SET_TITLE                                  = 0x374,
     CMSG_CANCEL_MOUNT_AURA                          = 0x375,
-    SMSG_ARENA_ERROR                                = 0x376,
-    MSG_INSPECT_ARENA_TEAMS                         = 0x377,
     SMSG_DEATH_RELEASE_LOC                          = 0x378,
     CMSG_CANCEL_TEMP_ENCHANTMENT                    = 0x379,
     SMSG_FORCED_DEATH_UPDATE                        = 0x37A,
     CMSG_CHEAT_SET_HONOR_CURRENCY                   = 0x37B,
-    CMSG_CHEAT_SET_ARENA_CURRENCY                   = 0x37C,
-    MSG_MOVE_SET_FLIGHT_SPEED_CHEAT                 = 0x37D,
-    MSG_MOVE_SET_FLIGHT_SPEED                       = 0x37E,
-    MSG_MOVE_SET_FLIGHT_BACK_SPEED_CHEAT            = 0x37F,
-    MSG_MOVE_SET_FLIGHT_BACK_SPEED                  = 0x380,
-    SMSG_FORCE_FLIGHT_SPEED_CHANGE                  = 0x381,
-    CMSG_FORCE_FLIGHT_SPEED_CHANGE_ACK              = 0x382,
-    SMSG_FORCE_FLIGHT_BACK_SPEED_CHANGE             = 0x383,
-    CMSG_FORCE_FLIGHT_BACK_SPEED_CHANGE_ACK         = 0x384,
-    SMSG_SPLINE_SET_FLIGHT_SPEED                    = 0x385,
-    SMSG_SPLINE_SET_FLIGHT_BACK_SPEED               = 0x386,
     CMSG_MAELSTROM_INVALIDATE_CACHE                 = 0x387,
-    SMSG_FLIGHT_SPLINE_SYNC                         = 0x388,
     CMSG_SET_TAXI_BENCHMARK_MODE                    = 0x389,
     SMSG_JOINED_BATTLEGROUND_QUEUE                  = 0x38A,
     SMSG_REALM_SPLIT                                = 0x38B,
@@ -1033,15 +1000,6 @@ enum Opcodes
     SMSG_VOICE_CHAT_STATUS                          = 0x3E2,
     CMSG_REPORT_PVP_AFK                             = 0x3E3,
     CMSG_REPORT_PVP_AFK_RESULT                      = 0x3E4,
-    CMSG_GUILD_BANKER_ACTIVATE                      = 0x3E5,
-    CMSG_GUILD_BANK_QUERY_TAB                       = 0x3E6,
-    SMSG_GUILD_BANK_LIST                            = 0x3E7,
-    CMSG_GUILD_BANK_SWAP_ITEMS                      = 0x3E8,
-    CMSG_GUILD_BANK_BUY_TAB                         = 0x3E9,
-    CMSG_GUILD_BANK_UPDATE_TAB                      = 0x3EA,
-    CMSG_GUILD_BANK_DEPOSIT_MONEY                   = 0x3EB,
-    CMSG_GUILD_BANK_WITHDRAW_MONEY                  = 0x3EC,
-    MSG_GUILD_BANK_LOG_QUERY                        = 0x3ED,
     CMSG_SET_CHANNEL_WATCH                          = 0x3EE,
     SMSG_USERLIST_ADD                               = 0x3EF,
     SMSG_USERLIST_REMOVE                            = 0x3F0,
@@ -1051,13 +1009,11 @@ enum Opcodes
     SMSG_GOGOGO_OBSOLETE                            = 0x3F4,
     SMSG_ECHO_PARTY_SQUELCH                         = 0x3F5,
     CMSG_SET_TITLE_SUFFIX                           = 0x3F6,
-    CMSG_SPELLCLICK                                 = 0x3F7,
     SMSG_LOOT_LIST                                  = 0x3F8,
     CMSG_GM_CHARACTER_RESTORE                       = 0x3F9,
     CMSG_GM_CHARACTER_SAVE                          = 0x3FA,
     SMSG_VOICESESSION_FULL                          = 0x3FB,
     MSG_GUILD_PERMISSIONS                           = 0x3FC,
-    MSG_GUILD_BANK_MONEY_WITHDRAWN                  = 0x3FD,
     MSG_GUILD_EVENT_LOG_QUERY                       = 0x3FE,
     CMSG_MAELSTROM_RENAME_GUILD                     = 0x3FF,
     CMSG_GET_MIRRORIMAGE_DATA                       = 0x400,
@@ -1069,12 +1025,9 @@ enum Opcodes
     CMSG_KEEP_ALIVE                                 = 0x406,
     SMSG_RAID_READY_CHECK_ERROR                     = 0x407,
     CMSG_OPT_OUT_OF_LOOT                            = 0x408,
-    MSG_QUERY_GUILD_BANK_TEXT                       = 0x409,
-    CMSG_SET_GUILD_BANK_TEXT                        = 0x40A,
     CMSG_SET_GRANTABLE_LEVELS                       = 0x40B,
     CMSG_GRANT_LEVEL                                = 0x40C,
     CMSG_REFER_A_FRIEND                             = 0x40D,
-    MSG_GM_CHANGE_ARENA_RATING                      = 0x40E,
     CMSG_DECLINE_CHANNEL_INVITE                     = 0x40F,
     CMSG_GROUPACTION_THROTTLED                      = 0x410,
     SMSG_OVERRIDE_LIGHT                             = 0x411,
@@ -1098,9 +1051,6 @@ enum Opcodes
     SMSG_SUMMON_CANCEL                              = 0x423
 };
 
-// Don't forget to change this value and add opcode name to Opcodes.cpp when you add new opcode!
-#define NUM_MSG_TYPES 0x424
-
 /// Player state
 enum SessionStatus
 {
@@ -1110,24 +1060,39 @@ enum SessionStatus
     STATUS_NEVER                                            ///< Opcode not accepted from client (deprecated or server side only)
 };
 
-class WorldPacket;
-
-struct OpcodeHandler
+struct OpcodeStruct
 {
     char const* name;
     SessionStatus status;
     void (WorldSession::*handler)(WorldPacket& recvPacket);
 };
 
-extern OpcodeHandler opcodeTable[NUM_MSG_TYPES];
+typedef std::map< uint16, OpcodeStruct> OpcodeMap;
 
-/// Lookup opcode name for human understandable logging
-inline const char* LookupOpcodeName(uint16 id)
+class Opcodes
 {
-    if (id >= NUM_MSG_TYPES)
-        return "Received unknown opcode, it's more than max!";
-    return opcodeTable[id].name;
-}
+    public:
+        Opcodes();
+        ~Opcodes();
+    public:
+        void BuildOpcodeList();
+        void StoreOpcode(uint16 Opcode,char const* name, SessionStatus status, void (WorldSession::*handler)(WorldPacket& recvPacket)) 
+        { mOpcodeMap[Opcode].name = name; mOpcodeMap[Opcode].status = status ; mOpcodeMap[Opcode].handler = handler; };
+
+        /// Lookup opcode name for human understandable logging
+        inline OpcodeStruct const* LookupOpcode(uint16 id)
+        {
+            OpcodeMap::iterator itr = mOpcodeMap.find(id);
+            if (itr != mOpcodeMap.end())
+                return &mOpcodeMap[id];
+            return NULL;
+        }
+
+        OpcodeMap mOpcodeMap;
+
+};
+
+#define opCodes Neo::Singleton<Opcodes>::Instance()
 #endif
 /// @}
 

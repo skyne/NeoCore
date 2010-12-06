@@ -140,16 +140,17 @@ struct NEO_DLL_DECL boss_twinemperorsAI : public ScriptedAI
         DoPlaySoundToSet(m_creature, IAmVeklor() ? SOUND_VL_KILL : SOUND_VN_KILL);
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
         DoZoneInCombat();
+        InCombat = true;
         Creature *pOtherBoss = GetOtherBoss();
         if (pOtherBoss)
         {
             // TODO: we should activate the other boss location so he can start attackning even if nobody
             // is near I dont know how to do that
-            ScriptedAI *otherAI = CAST_AI(ScriptedAI, pOtherBoss->AI());
-            if (!pOtherBoss->isInCombat())
+            ScriptedAI *otherAI = (ScriptedAI*)pOtherBoss->AI();
+            if (!otherAI->InCombat)
             {
                 DoPlaySoundToSet(m_creature, IAmVeklor() ? SOUND_VL_AGGRO : SOUND_VN_AGGRO);
                 otherAI->AttackStart(who);
@@ -265,11 +266,8 @@ struct NEO_DLL_DECL boss_twinemperorsAI : public ScriptedAI
                 m_creature->clearUnitState(UNIT_STAT_STUNNED);
                 Unit *nearu = m_creature->SelectNearestTarget(100);
                 //DoYell(nearu->GetName(), LANG_UNIVERSAL, 0);
-                if(nearu)
-                {
-                    AttackStart(nearu);
-                    m_creature->getThreatManager().addThreat(nearu, 10000);
-                }
+                AttackStart(nearu);
+                m_creature->getThreatManager().addThreat(nearu, 10000);
                 return true;
             }
             else
@@ -348,7 +346,7 @@ struct NEO_DLL_DECL boss_twinemperorsAI : public ScriptedAI
         for(std::list<Creature*>::iterator iter = unitList.begin(); iter != unitList.end(); ++iter)
         {
             Creature *c = (Creature *)(*iter);
-            if (c && c->isDead())
+            if (c->isDead())
             {
                 c->Respawn();
                 c->setFaction(7);
@@ -608,6 +606,12 @@ struct NEO_DLL_DECL boss_veklorAI : public boss_twinemperorsAI
             {
                 m_creature->GetMotionMaster()->MoveChase(who, VEKLOR_DIST, 0);
                 m_creature->AddThreat(who, 0.0f);
+            }
+
+            if (!InCombat)
+            {
+                InCombat = true;
+                Aggro(who);
             }
         }
     }

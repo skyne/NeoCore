@@ -1,7 +1,9 @@
 /*
  * Copyright (C) 2005-2008 MaNGOS <http://www.mangosproject.org/>
  *
- * Copyright (C) 2008 Trinity <http://www.trinitycore.org/>
+ * Copyright (C) 2008 Neo <http://www.neocore.org/>
+ *
+ * Copyright (C) 2009-2010 NeoZero <http://www.neozero.org/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -55,7 +57,7 @@ class NEO_DLL_DECL DestinationHolder
         uint32 StartTravel(TRAVELLER &traveller, bool sendMove = true);
         void GetLocationNow(uint32 mapid, float &x, float &y, float &z, bool is3D = false) const;
         void GetLocationNowNoMicroMovement(float &x, float &y, float &z) const; // For use without micro movement
-        float GetDistance3dFromDestSq(const WorldObject &obj) const;
+        float GetDistance2dFromDestSq(const WorldObject &obj) const;
 
     private:
         void _findOffSetPoint(float x1, float y1, float x2, float y2, float offset, float &x, float &y);

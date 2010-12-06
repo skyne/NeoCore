@@ -42,7 +42,7 @@ struct NEO_DLL_DECL celebras_the_cursedAI : public ScriptedAI
         CorruptForces_Timer = 30000;
     }
 
-    void EnterCombat(Unit *who) { }
+    void Aggro(Unit *who) { }
 
     void JustDied(Unit* Killer)
     {

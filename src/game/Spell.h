@@ -1,7 +1,9 @@
 /*
  * Copyright (C) 2005-2008 MaNGOS <http://www.mangosproject.org/>
  *
- * Copyright (C) 2008 Trinity <http://www.trinitycore.org/>
+ * Copyright (C) 2008 Neo <http://www.neocore.org/>
+ *
+ * Copyright (C) 2009-2010 NeoZero <http://www.neozero.org/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,6 +24,7 @@
 #define __SPELL_H
 
 #include "GridDefines.h"
+#include "SpellMgr.h"
 
 class Unit;
 class Player;
@@ -48,11 +51,13 @@ enum SpellCastTargetFlags
     TARGET_FLAG_ITEM            = 0x00000010,               // pguid
     TARGET_FLAG_SOURCE_LOCATION = 0x00000020,               // 3 float
     TARGET_FLAG_DEST_LOCATION   = 0x00000040,               // 3 float
+	TARGET_FLAG_OBJECT          = 0x00000800,               // pguid
+	TARGET_FLAG_TRADE_ITEM      = 0x00001000,               // pguid
+    TARGET_FLAG_STRING          = 0x00002000,               // string
+
+    //[TZERO] tbc enumerations [?]
     TARGET_FLAG_OBJECT_UNK      = 0x00000080,               // ?
     TARGET_FLAG_PVP_CORPSE      = 0x00000200,               // pguid
-    TARGET_FLAG_OBJECT          = 0x00000800,               // pguid
-    TARGET_FLAG_TRADE_ITEM      = 0x00001000,               // pguid
-    TARGET_FLAG_STRING          = 0x00002000,               // string
     TARGET_FLAG_UNK1            = 0x00004000,               // ?
     TARGET_FLAG_CORPSE          = 0x00008000,               // pguid
     TARGET_FLAG_UNK2            = 0x00010000                // pguid
@@ -60,7 +65,6 @@ enum SpellCastTargetFlags
 
 enum SpellCastFlags
 {
-    CAST_FLAG_UNKNOWN0           = 0x00000001, // stucks spell highlight
     CAST_FLAG_UNKNOWN1           = 0x00000002,
     CAST_FLAG_UNKNOWN2           = 0x00000010,
     CAST_FLAG_AMMO               = 0x00000020,
@@ -77,11 +81,13 @@ enum SpellRangeFlag
 enum SpellNotifyPushType
 {
     PUSH_NONE           = 0,
+    PUSH_SRC_CENTER,
+    PUSH_DST_CENTER,
+
+    //[TZERO] Tbc enumerations [?]
     PUSH_IN_FRONT,
     PUSH_IN_BACK,
     PUSH_IN_LINE,
-    PUSH_SRC_CENTER,
-    PUSH_DST_CENTER,
     PUSH_CASTER_CENTER, //this is never used in grid search
     PUSH_CHAIN,
 };
@@ -99,8 +105,8 @@ class SpellCastTargets
         SpellCastTargets();
         ~SpellCastTargets();
 
-        bool read (WorldPacket * data, Unit *caster);
-        void write (WorldPacket * data);
+        bool read ( WorldPacket * data, Unit *caster );
+        void write ( WorldPacket * data );
 
         SpellCastTargets& operator=(const SpellCastTargets &target)
         {
@@ -152,7 +158,7 @@ class SpellCastTargets
         void setItemTarget(Item* item);
         void updateTradeSlotItem()
         {
-            if (m_itemTarget && (m_targetMask & TARGET_FLAG_TRADE_ITEM))
+            if(m_itemTarget && (m_targetMask & TARGET_FLAG_TRADE_ITEM))
             {
                 m_itemTargetGUID = m_itemTarget->GetGUID();
                 m_itemTargetEntry = m_itemTarget->GetEntry();
@@ -170,7 +176,7 @@ class SpellCastTargets
         int32 m_mapId;
         std::string m_strTarget;
 
-        uint32 m_targetMask;
+        uint16 m_targetMask;
     private:
         // objects (can be used at spell creating and after Update at casting
         Unit *m_unitTarget;
@@ -189,7 +195,7 @@ struct SpellValue
 {
     explicit SpellValue(SpellEntry const *proto)
     {
-        for (uint32 i = 0; i < 3; ++i)
+        for(uint32 i = 0; i < 3; ++i)
             EffectBasePoints[i] = proto->EffectBasePoints[i];
         MaxAffectedTargets = proto->MaxAffectedTargets;
     }
@@ -228,8 +234,8 @@ class Spell
     friend struct Neo::SpellNotifierCreatureAndPlayer;
     public:
 
-        void EffectNULL(uint32);
-        void EffectUnused(uint32);
+        void EffectNULL(uint32 );
+        void EffectUnused(uint32 );
         void EffectDistract(uint32 i);
         void EffectPull(uint32 i);
         void EffectSchoolDMG(uint32 i);
@@ -303,7 +309,6 @@ class Spell
         void EffectSelfResurrect(uint32 i);
         void EffectSkinning(uint32 i);
         void EffectCharge(uint32 i);
-        void EffectProspecting(uint32 i);
         void EffectSendTaxi(uint32 i);
         void EffectSummonCritter(uint32 i);
         void EffectKnockBack(uint32 i);
@@ -331,7 +336,7 @@ class Spell
         void EffectQuestFail(uint32 i);
         void EffectRedirectThreat(uint32 i);
 
-        Spell(Unit* Caster, SpellEntry const *info, bool triggered, uint64 originalCasterGUID = 0, Spell** triggeringContainer = NULL, bool skipCheck = false);
+        Spell( Unit* Caster, SpellEntry const *info, bool triggered, uint64 originalCasterGUID = 0, Spell** triggeringContainer = NULL, bool skipCheck = false );
         ~Spell();
 
         void prepare(SpellCastTargets * targets, Aura* triggeredByAura = NULL);
@@ -343,8 +348,8 @@ class Spell
         void TakeReagents();
         void TakeCastItem();
         void TriggerSpell();
-        uint8 CanCast(bool strict);
-        int16 PetCanCast(Unit* target);
+        SpellCastResult CanCast(bool strict);
+        SpellCastResult PetCanCast(Unit* target);
         bool CanAutoCast(Unit* target);
 
         // handlers
@@ -354,35 +359,34 @@ class Spell
         void _handle_immediate_phase();
         void _handle_finish_phase();
 
-        uint8 CheckItems();
-        uint8 CheckRange(bool strict);
-        uint8 CheckPower();
-        uint8 CheckCasterAuras() const;
+        SpellCastResult CheckItems();
+        SpellCastResult CheckRange(bool strict);
+        SpellCastResult CheckPower();
+        SpellCastResult CheckCasterAuras() const;
 
         int32 CalculateDamage(uint8 i, Unit* target) { return m_caster->CalculateSpellDamage(m_spellInfo,i,m_currentBasePoints[i],target); }
 
         bool HaveTargetsForEffect(uint8 effect) const;
         void Delayed();
         void DelayedChannel();
-        uint32 getState() const { return m_spellState; }
+        inline uint32 getState() const { return m_spellState; }
         void setState(uint32 state) { m_spellState = state; }
 
         void DoCreateItem(uint32 i, uint32 itemtype);
 
-        void WriteSpellGoTargets(WorldPacket * data);
-        void WriteAmmoToPacket(WorldPacket * data);
+        void WriteSpellGoTargets( WorldPacket * data );
+        void WriteAmmoToPacket( WorldPacket * data );
         void FillTargetMap();
 
         void SetTargetMap(uint32 i, uint32 cur);
 
         Unit* SelectMagnetTarget();
-        void HandleHitTriggerAura();
         bool CheckTarget(Unit* target, uint32 eff);
 
-        void CheckSrc() { if (!m_targets.HasSrc()) m_targets.setSrc(m_caster); }
-        void CheckDst() { if (!m_targets.HasDst()) m_targets.setDestination(m_caster); }
+        void CheckSrc() { if(!m_targets.HasSrc()) m_targets.setSrc(m_caster); }
+        void CheckDst() { if(!m_targets.HasDst()) m_targets.setDestination(m_caster); }
 
-        void SendCastResult(uint8 result);
+        void SendCastResult(SpellCastResult result);
         void SendSpellStart();
         void SendSpellGo();
         void SendSpellCooldown();
@@ -401,13 +405,39 @@ class Spell
         int32 m_currentBasePoints[3];                       // cache SpellEntry::EffectBasePoints and use for set custom base points
         Item* m_CastItem;
         uint64 m_castItemGUID;
-        uint8 m_cast_count;
         SpellCastTargets m_targets;
 
         int32 GetCastTime() const { return m_casttime; }
         bool IsAutoRepeat() const { return m_autoRepeat; }
         void SetAutoRepeat(bool rep) { m_autoRepeat = rep; }
         void ReSetTimer() { m_timer = m_casttime > 0 ? m_casttime : 0; }
+        bool IsCorrectMobForTameQuest(uint32 unitId, uint32 spellId)
+        {
+            switch(spellId)
+            {     
+            case 1515:      return true;                //Tame Beast
+            case 19548:     return unitId == 1196;      //Ice Claw Bear
+            case 19674:     return unitId == 1126;      //Large Craig Boar
+            case 19687:     return unitId == 1201;      //Snow Leopard
+            case 19688:     return unitId == 2956;      //Adult Plainstrider
+            case 19689:     return unitId == 2959;      //Prairie Stalker
+            case 19692:     return unitId == 2970;      //Swoop
+            case 19693:     return unitId == 1998;      //Webwood Lurker
+            case 19694:     return unitId == 3099;      //Dire Mottled Boar
+            case 19696:     return unitId == 3107;      //Surf Crawler
+            case 19697:     return unitId == 3126;      //Armored Scorpid
+            case 19699:     return unitId == 2043;      //Nightsaber Stalker
+            case 19700:     return unitId == 1996;      //Strigid Screecher
+            /*case 30646:     return unitId == 1111;      //[TZERO]These are all TBC
+            case 30653:     return unitId == 1111;
+            case 30654:     return unitId == 1111;
+            case 30099:     return unitId == 1111;
+            case 30102:     return unitId == 1111;
+            case 30105:     return unitId == 1111; */
+            default:        return false;
+            }
+        }
+
         bool IsNextMeleeSwingSpell() const
         {
             return m_spellInfo->Attributes & (SPELL_ATTR_ON_NEXT_SWING_1|SPELL_ATTR_ON_NEXT_SWING_2);
@@ -526,7 +556,6 @@ class Spell
             uint8  effectMask:8;
             bool   processed:1;
             int32  damage;
-            bool   crit;
         };
         std::list<TargetInfo> m_UniqueTargetInfo;
         uint8 m_needAliveTargetMask;                        // Mask req. alive targets
@@ -618,43 +647,43 @@ namespace Neo
         {
             assert(i_data);
 
-            if (!i_caster)
+            if(!i_caster)
                 return;
 
-            for (typename GridRefManager<T>::iterator itr = m.begin(); itr != m.end(); ++itr)
+            for(typename GridRefManager<T>::iterator itr = m.begin(); itr != m.end(); ++itr)
             {
-                if (!itr->getSource()->isAlive() || (itr->getSource()->GetTypeId() == TYPEID_PLAYER && ((Player*)itr->getSource())->isInFlight()))
+                if( !itr->getSource()->isAlive() || (itr->getSource()->GetTypeId() == TYPEID_PLAYER && ((Player*)itr->getSource())->isInFlight()))
                     continue;
 
                 switch (i_TargetType)
                 {
                     case SPELL_TARGETS_ALLY:
-                        if (!itr->getSource()->isAttackableByAOE() || !i_caster->IsFriendlyTo(itr->getSource() ))
+                        if (!itr->getSource()->isAttackableByAOE() || !i_caster->IsFriendlyTo( itr->getSource() ))
                             continue;
                         break;
                     case SPELL_TARGETS_ENEMY:
                     {
-                        if (itr->getSource()->GetTypeId()==TYPEID_UNIT && ((Creature*)itr->getSource())->isTotem())
+                        if(itr->getSource()->GetTypeId()==TYPEID_UNIT && ((Creature*)itr->getSource())->isTotem())
                             continue;
-                        if (!itr->getSource()->isAttackableByAOE())
+                        if(!itr->getSource()->isAttackableByAOE())
                             continue;
 
                         Unit* check = i_caster->GetCharmerOrOwnerOrSelf();
 
-                        if (check->GetTypeId()==TYPEID_PLAYER )
+                        if( check->GetTypeId()==TYPEID_PLAYER )
                         {
-                            if (check->IsFriendlyTo(itr->getSource() ))
+                            if (check->IsFriendlyTo( itr->getSource() ))
                                 continue;
                         }
                         else
                         {
-                            if (!check->IsHostileTo(itr->getSource() ))
+                            if (!check->IsHostileTo( itr->getSource() ))
                                 continue;
                         }
                     }break;
                     case SPELL_TARGETS_ENTRY:
                     {
-                        if (itr->getSource()->GetEntry()!= i_entry)
+                        if(itr->getSource()->GetEntry()!= i_entry)
                             continue;
                     }break;
                     default: continue;
@@ -663,28 +692,20 @@ namespace Neo
                 switch(i_push_type)
                 {
                     case PUSH_IN_FRONT:
-                        if (i_caster->isInFront((Unit*)(itr->getSource()), i_radius, M_PI/3 ))
+                        if(i_caster->isInFront((Unit*)(itr->getSource()), i_radius, M_PI/3 ))
                             i_data->push_back(itr->getSource());
                         break;
                     case PUSH_IN_BACK:
-                        if (i_caster->isInBack((Unit*)(itr->getSource()), i_radius, M_PI/3 ))
+                        if(i_caster->isInBack((Unit*)(itr->getSource()), i_radius, M_PI/3 ))
                             i_data->push_back(itr->getSource());
                         break;
                     case PUSH_IN_LINE:
-                        if (i_caster->isInLine((Unit*)(itr->getSource()), i_radius ))
+                        if(i_caster->isInLine((Unit*)(itr->getSource()), i_radius ))
                             i_data->push_back(itr->getSource());
                         break;
                     default:
-                        if (i_TargetType != SPELL_TARGETS_ENTRY && i_push_type == PUSH_SRC_CENTER && i_caster) // if caster then check distance from caster to target (because of model collision)
-                        {
-                            if (i_caster->IsWithinDistInMap(itr->getSource(), i_radius) )
-                                i_data->push_back(itr->getSource());
-                        }
-                        else
-                        {
-                            if ((itr->getSource()->GetDistanceSq(i_x, i_y, i_z) < i_radiusSq))
-                                i_data->push_back(itr->getSource());
-                        }
+                        if((itr->getSource()->GetDistanceSq(i_x, i_y, i_z) < i_radiusSq))
+                            i_data->push_back(itr->getSource());
                         break;
                 }
             }

@@ -1,4 +1,4 @@
-/* Copyright (C) 2008 NEO <http://www.neocore.info/>
+/* Copyright (C) 2008-2009 Neo <http://www.neocore.org/>
  *
  * Thanks to the original authors: ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -11,7 +11,6 @@
 #include "Common.h"
 #include "Platform/CompilerDefs.h"
 #include "Database/DBCStructure.h"
-//#include "Unit.h"
 
 class Player;
 class Creature;

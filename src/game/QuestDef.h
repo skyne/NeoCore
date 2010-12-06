@@ -1,7 +1,9 @@
 /*
  * Copyright (C) 2005-2008 MaNGOS <http://www.mangosproject.org/>
  *
- * Copyright (C) 2008 Trinity <http://www.trinitycore.org/>
+ * Copyright (C) 2008 Neo <http://www.neocore.org/>
+ *
+ * Copyright (C) 2009-2010 NeoZero <http://www.neozero.org/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,7 +33,7 @@ class Player;
 
 class ObjectMgr;
 
-#define MAX_QUEST_LOG_SIZE 25
+#define MAX_QUEST_LOG_SIZE 20
 
 #define QUEST_OBJECTIVES_COUNT 4
 #define QUEST_SOURCE_ITEM_IDS_COUNT 4
@@ -46,15 +48,13 @@ enum QuestFailedReasons
     INVALIDREASON_DONT_HAVE_REQ                 = 0,
     INVALIDREASON_QUEST_FAILED_LOW_LEVEL        = 1,        //You are not high enough level for that quest.
     INVALIDREASON_QUEST_FAILED_WRONG_RACE       = 6,        //That quest is not available to your race.
-    INVALIDREASON_QUEST_ALREADY_DONE            = 7,        //You have completed that quest.
     INVALIDREASON_QUEST_ONLY_ONE_TIMED          = 12,       //You can only be on one timed quest at a time.
     INVALIDREASON_QUEST_ALREADY_ON              = 13,       //You are already on that quest
-    INVALIDREASON_QUEST_FAILED_EXPANSION        = 16,       //This quest requires an expansion enabled account.
-    INVALIDREASON_QUEST_ALREADY_ON2             = 18,       //You are already on that quest
     INVALIDREASON_QUEST_FAILED_MISSING_ITEMS    = 21,       //You don't have the required items with you. Check storage.
     INVALIDREASON_QUEST_FAILED_NOT_ENOUGH_MONEY = 23,       //You don't have enough money for that quest.
-    INVALIDREASON_DAILY_QUESTS_REMAINING        = 26,       //You have already completed 10 daily quests today
-    INVALIDREASON_QUEST_FAILED_CAIS             = 27,       //You cannot complete quests once you have reached tired time
+    //[TZERO] tbc enumerations [?]
+    INVALIDREASON_QUEST_ALREADY_ON2             = 18,       //You are already on that quest
+    INVALIDREASON_QUEST_ALREADY_DONE            = 7,        //You have completed that quest.
 };
 
 enum QuestShareMessages
@@ -106,10 +106,10 @@ enum __QuestGiverStatus
     DIALOG_STATUS_CHAT                     = 2,
     DIALOG_STATUS_INCOMPLETE               = 3,
     DIALOG_STATUS_REWARD_REP               = 4,
-    DIALOG_STATUS_AVAILABLE_REP            = 5,
-    DIALOG_STATUS_AVAILABLE                = 6,
-    DIALOG_STATUS_REWARD2                  = 7,             // not yellow dot on minimap
-    DIALOG_STATUS_REWARD                   = 8              // yellow dot on minimap
+    DIALOG_STATUS_AVAILABLE                = 5,
+    DIALOG_STATUS_REWARD_OLD               = 6,             // red dot on minimap
+    DIALOG_STATUS_REWARD2                  = 7,             // yellow dot on minimap
+    // [TZERO] tbc?  DIALOG_STATUS_REWARD                   = 8              // yellow dot on minimap
 };
 
 enum __QuestFlags
@@ -122,19 +122,17 @@ enum __QuestFlags
     //QUEST_FLAGS_NONE2        = 0x00000010,                // Not used currently
     QUEST_FLAGS_EPIC           = 0x00000020,                // Not used currently: Unsure of content
     QUEST_FLAGS_RAID           = 0x00000040,                // Not used currently
-    QUEST_FLAGS_TBC            = 0x00000080,                // Not used currently: Available if TBC expension enabled only
+
     QUEST_FLAGS_UNK2           = 0x00000100,                // Not used currently: _DELIVER_MORE Quest needs more than normal _q-item_ drops from mobs
     QUEST_FLAGS_HIDDEN_REWARDS = 0x00000200,                // Items and money rewarded only sent in SMSG_QUESTGIVER_OFFER_REWARD (not in SMSG_QUESTGIVER_QUEST_DETAILS or in client quest log(SMSG_QUEST_QUERY_RESPONSE))
     QUEST_FLAGS_AUTO_REWARDED  = 0x00000400,                // These quests are automatically rewarded on quest complete and they will never appear in quest log client side.
-    QUEST_FLAGS_TBC_RACES      = 0x00000800,                // Not used currently: Blood elf/Draenei starting zone quests
-    QUEST_FLAGS_DAILY          = 0x00001000,                // Used to know quest is Daily one
 
     // Neo flags for set SpecialFlags in DB if required but used only at server
     QUEST_NEO_FLAGS_REPEATABLE           = 0x010000,     // Set by 1 in SpecialFlags from DB
     QUEST_NEO_FLAGS_EXPLORATION_OR_EVENT = 0x020000,     // Set by 2 in SpecialFlags from DB (if reequired area explore, spell SPELL_EFFECT_QUEST_COMPLETE casting, table `*_script` command SCRIPT_COMMAND_QUEST_EXPLORED use, set from script DLL)
     QUEST_NEO_FLAGS_DB_ALLOWED = 0xFFFF | QUEST_NEO_FLAGS_REPEATABLE | QUEST_NEO_FLAGS_EXPLORATION_OR_EVENT,
 
-    // NEO flags for internal use only
+    // Neo flags for internal use only
     QUEST_NEO_FLAGS_DELIVER              = 0x040000,     // Internal flag computed only
     QUEST_NEO_FLAGS_SPEAKTO              = 0x080000,     // Internal flag computed only
     QUEST_NEO_FLAGS_KILL_OR_CAST         = 0x100000,     // Internal flag computed only
@@ -162,10 +160,10 @@ class Quest
     friend class ObjectMgr;
     public:
         Quest(Field * questRecord);
-        uint32 XPValue(Player *pPlayer ) const;
+        uint32 XPValue( Player *pPlayer ) const;
 
-        bool HasFlag(uint32 flag ) const { return (QuestFlags & flag ) != 0; }
-        void SetFlag(uint32 flag ) { QuestFlags |= flag; }
+        bool HasFlag( uint32 flag ) const { return ( QuestFlags & flag ) != 0; }
+        void SetFlag( uint32 flag ) { QuestFlags |= flag; }
 
         // table data accessors:
         uint32 GetQuestId() const { return QuestId; }
@@ -173,7 +171,7 @@ class Quest
         int32  GetZoneOrSort() const { return ZoneOrSort; }
         int32  GetSkillOrClass() const { return SkillOrClass; }
         uint32 GetMinLevel() const { return MinLevel; }
-        int32  GetQuestLevel() const { return QuestLevel; }
+        uint32 GetQuestLevel() const { return QuestLevel; }
         uint32 GetType() const { return Type; }
         uint32 GetRequiredRaces() const { return RequiredRaces; }
         uint32 GetRequiredSkillValue() const { return RequiredSkillValue; }
@@ -218,7 +216,6 @@ class Quest
         bool   IsRepeatable() const { return QuestFlags & QUEST_NEO_FLAGS_REPEATABLE; }
         bool   IsAutoComplete() const { return QuestMethod ? false : true; }
         uint32 GetFlags() const { return QuestFlags; }
-        bool   IsDaily() const { return QuestFlags & QUEST_FLAGS_DAILY; }
 
         // multiple values
         std::string ObjectiveText[QUEST_OBJECTIVES_COUNT];
@@ -263,7 +260,7 @@ class Quest
         int32  ZoneOrSort;
         int32  SkillOrClass;
         uint32 MinLevel;
-        int32  QuestLevel;
+        uint32 QuestLevel;
         uint32 Type;
         uint32 RequiredRaces;
         uint32 RequiredSkillValue;

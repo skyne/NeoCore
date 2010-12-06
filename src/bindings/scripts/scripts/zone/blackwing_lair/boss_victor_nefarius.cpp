@@ -203,7 +203,7 @@ struct NEO_DLL_DECL boss_victor_nefariusAI : public ScriptedAI
         AttackStart(target);
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
     }
 
@@ -319,7 +319,7 @@ struct NEO_DLL_DECL boss_victor_nefariusAI : public ScriptedAI
                         Nefarian->setFaction(103);
                         NefarianGUID = Nefarian->GetGUID();
                     }
-                    else error_log("TSCR: Blackwing Lair: Unable to spawn nefarian properly.");
+                    else error_log("NeoScript: Blackwing Lair: Unable to spawn nefarian properly.");
                 }
 
                 AddSpawnTimer = 4000;

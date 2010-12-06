@@ -401,9 +401,9 @@ bool AuthSocket::_HandleLogonChallenge()
 	LoginDatabase.Execute("DELETE FROM host_banned WHERE unbandate<=UNIX_TIMESTAMP() AND unbandate<>bandate");
 
 	//remove expired friend relationships
-	uint32 relation_period = (sConfig.GetIntDefault("RecruitAFriend.TimePeriod",90)*24*3600);
-	LoginDatabase.PExecute("UPDATE account SET recruiter = 0, recruit_date = 0 WHERE recruit_date < (UNIX_TIMESTAMP()-%u) AND `recruiter` <> 0",relation_period);
-	sLog.outBasic("Remove accounts, was older than %u seconds (%u days)",relation_period,(relation_period/(24*3600))); 
+	uint32 relation_period = sConfig.GetIntDefault("RecruitAFriend.TimePeriod",90)*24*3600;
+	LoginDatabase.PExecute("UPDATE account SET recruiter = 0, recruit_date = 0 WHERE recruit_date < (UNIX_TIMESTAMP()+%u)",relation_period);
+
 
 
     std::string address = GetRemoteAddress();
@@ -565,17 +565,14 @@ bool AuthSocket::_HandleLogonChallenge()
 bool AuthSocket::_HandleLogonProof()
 {
     DEBUG_LOG("Entering _HandleLogonProof");
-
     ///- Read the packet
     if (ibuf.GetLength() < sizeof(sAuthLogonProof_C))
         return false;
-
     sAuthLogonProof_C lp;
     ibuf.Read((char *)&lp, sizeof(sAuthLogonProof_C));
 
     ///- Check if the client has one of the expected version numbers
     bool valid_version=false;
-
     int accepted_versions[]=EXPECTED_NEO_CLIENT_BUILD;
     for(int i=0;accepted_versions[i];i++)
     {

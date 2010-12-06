@@ -83,7 +83,7 @@ struct NEO_DLL_DECL boss_loathebAI : public ScriptedAI
         Summon_Timer = 8000;
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
         switch (rand()%3)
         {

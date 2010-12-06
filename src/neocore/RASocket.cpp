@@ -1,7 +1,9 @@
 /*
  * Copyright (C) 2005-2008 MaNGOS <http://www.mangosproject.org/>
  *
- * Copyright (C) 2008 Trinity <http://www.trinitycore.org/>
+ * Copyright (C) 2008 Neo <http://www.neocore.org/>
+ *
+ * Copyright (C) 2009-2010 NeoZero <http://www.neozero.org/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -154,7 +156,7 @@ void RASocket::OnRead()
                     ///- Escape the Login to allow quotes in names
                     LoginDatabase.escape_string(login);
 
-                    QueryResult_AutoPtr result = LoginDatabase.PQuery("SELECT account.id,gmlevel FROM account, account_access WHERE account.username = '%s' AND account.id = account_access.id",login.c_str());
+                    QueryResult_AutoPtr result = LoginDatabase.PQuery("SELECT gmlevel,id FROM account,account_access WHERE username = '%s' AND account.id = account_access.id",login.c_str());
 
                     ///- If the user is not found, deny access
                     if(!result)
@@ -170,7 +172,7 @@ void RASocket::OnRead()
                         //szPass=fields[0].GetString();
 
                         ///- if gmlevel is too low, deny access
-                        if(fields[1].GetUInt32()<iMinLevel)
+                        if(fields[0].GetUInt32()<iMinLevel)
                         {
                             Sendf("-Not enough privileges.\r\n");
                             sLog.outRemote("User %s has no privilege.\n",szLogin.c_str());

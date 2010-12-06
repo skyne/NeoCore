@@ -1,7 +1,9 @@
 /*
  * Copyright (C) 2005-2008 MaNGOS <http://www.mangosproject.org/>
  *
- * Copyright (C) 2008 Trinity <http://www.trinitycore.org/>
+ * Copyright (C) 2008 Neo <http://www.neocore.org/>
+ *
+ * Copyright (C) 2009-2010 NeoZero <http://www.neozero.org/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -101,7 +103,7 @@ class NEO_DLL_DECL ObjectAccessor : public Neo::Singleton<ObjectAccessor, Neo::C
 
         static Unit* GetObjectInWorld(uint64 guid, Unit* /*fake*/)
         {
-            if (!guid)
+            if(!guid)
                 return NULL;
 
             if (IS_PLAYER_GUID(guid))
@@ -116,19 +118,19 @@ class NEO_DLL_DECL ObjectAccessor : public Neo::Singleton<ObjectAccessor, Neo::C
         template<class T> static T* GetObjectInWorld(uint32 mapid, float x, float y, uint64 guid, T* /*fake*/)
         {
             T* obj = HashMapHolder<T>::Find(guid);
-            if (!obj || obj->GetMapId() != mapid) return NULL;
+            if(!obj || obj->GetMapId() != mapid) return NULL;
 
             CellPair p = Neo::ComputeCellPair(x,y);
-            if (p.x_coord >= TOTAL_NUMBER_OF_CELLS_PER_MAP || p.y_coord >= TOTAL_NUMBER_OF_CELLS_PER_MAP )
+            if(p.x_coord >= TOTAL_NUMBER_OF_CELLS_PER_MAP || p.y_coord >= TOTAL_NUMBER_OF_CELLS_PER_MAP )
             {
                 sLog.outError("ObjectAccessor::GetObjectInWorld: invalid coordinates supplied X:%f Y:%f grid cell [%u:%u]", x, y, p.x_coord, p.y_coord);
                 return NULL;
             }
 
             CellPair q = Neo::ComputeCellPair(obj->GetPositionX(),obj->GetPositionY());
-            if (q.x_coord >= TOTAL_NUMBER_OF_CELLS_PER_MAP || q.y_coord >= TOTAL_NUMBER_OF_CELLS_PER_MAP )
+            if(q.x_coord >= TOTAL_NUMBER_OF_CELLS_PER_MAP || q.y_coord >= TOTAL_NUMBER_OF_CELLS_PER_MAP )
             {
-                sLog.outError("ObjectAccessor::GetObjecInWorld: object (GUID: %u TypeId: %u) has invalid coordinates X:%f Y:%f grid cell [%u:%u]", obj->GetGUIDLow(), obj->GetTypeId(), obj->GetPositionX(), obj->GetPositionY(), q.x_coord, q.y_coord);
+                sLog.outError("ObjectAccessor::GetObjecInWorld: object "UI64FMTD" has invalid coordinates X:%f Y:%f grid cell [%u:%u]", obj->GetGUID(), obj->GetPositionX(), obj->GetPositionY(), q.x_coord, q.y_coord);
                 return NULL;
             }
 
@@ -176,12 +178,11 @@ class NEO_DLL_DECL ObjectAccessor : public Neo::Singleton<ObjectAccessor, Neo::C
             Guard guard(i_updateGuard);
 
             std::set<Object *>::iterator iter2 = std::find(i_objects.begin(), i_objects.end(), (Object *)pl);
-            if (iter2 != i_objects.end() )
+            if( iter2 != i_objects.end() )
                 i_objects.erase(iter2);
         }
 
         void SaveAllPlayers();
-		void RemoveAllCorpses();
 
         void AddUpdateObject(Object *obj);
         void RemoveUpdateObject(Object *obj);
@@ -193,7 +194,7 @@ class NEO_DLL_DECL ObjectAccessor : public Neo::Singleton<ObjectAccessor, Neo::C
         void RemoveCorpse(Corpse *corpse);
         void AddCorpse(Corpse* corpse);
         void AddCorpsesToGrid(GridPair const& gridpair,GridType& grid,Map* map);
-        Corpse* ConvertCorpseForPlayer(uint64 player_guid, bool insignia = false);
+        Corpse* ConvertCorpseForPlayer(uint64 player_guid);
 
         static void UpdateObject(Object* obj, Player* exceptPlayer);
         static void _buildUpdateObject(Object* obj, UpdateDataMapType &);

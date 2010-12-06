@@ -1,7 +1,9 @@
 /*
  * Copyright (C) 2005-2008 MaNGOS <http://www.mangosproject.org/>
  *
- * Copyright (C) 2008 Trinity <http://www.trinitycore.org/>
+ * Copyright (C) 2008 Neo <http://www.neocore.org/>
+ *
+ * Copyright (C) 2009-2010 NeoZero <http://www.neozero.org/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +22,6 @@
 
 #ifndef _PLAYER_DUMP_H
 #define _PLAYER_DUMP_H
-
 #include <string>
 #include <map>
 #include <set>
@@ -32,7 +33,7 @@ enum DumpTableType
     DTT_CHAR_TABLE,     //                                  // character_action, character_aura, character_homebind,
                                                             // character_queststatus, character_reputation,
                                                             // character_spell, character_spell_cooldown, character_ticket,
-                                                            // character_tutorial
+                                                            // character_tutorial , character_kill
 
     DTT_INVENTORY,      //    -> item guids collection      // character_inventory
 

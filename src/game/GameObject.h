@@ -1,7 +1,9 @@
 /*
  * Copyright (C) 2005-2008 MaNGOS <http://www.mangosproject.org/>
  *
- * Copyright (C) 2008 Trinity <http://www.trinitycore.org/>
+ * Copyright (C) 2008 Neo <http://www.neocore.org/>
+ *
+ * Copyright (C) 2009-2010 NeoZero <http://www.neozero.org/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,7 +30,7 @@
 #include "Database/DatabaseEnv.h"
 
 // GCC have alternative #pragma pack(N) syntax and old gcc version not support pack(push,N), also any gcc version not support it at some platform
-#if defined(__GNUC__ )
+#if defined( __GNUC__ )
 #pragma pack(1)
 #else
 #pragma pack(push,1)
@@ -330,26 +332,6 @@ struct GameObjectInfo
             uint32 conditionID2;                            //5
             uint32 serverOnly;                              //6
         } auraGenerator;
-        //31 GAMEOBJECT_TYPE_DUNGEON_DIFFICULTY
-        struct
-        {
-            uint32 mapID;                                   //0
-            uint32 difficulty;                              //1
-        } dungeonDifficulty;
-        //32 GAMEOBJECT_TYPE_DO_NOT_USE_YET
-        struct
-        {
-            uint32 mapID;                                   //0
-            uint32 difficulty;                              //1
-        } doNotUseYet;
-        //33 GAMEOBJECT_TYPE_DESTRUCTIBLE_BUILDING
-        struct
-        {
-            uint32 dmgPctState1;                            //0
-            uint32 dmgPctState2;                            //1
-            uint32 state1Name;                              //2
-            uint32 state2Name;                              //3
-        } destructibleBuilding;
 
         // not use for specific field access (only for output with loop by all filed), also this determinate max union size
         struct                                              // GAMEOBJECT_TYPE_SPELLCASTER
@@ -365,16 +347,6 @@ struct GameObjectLocale
     std::vector<std::string> Name;
     std::vector<std::string> CastBarCaption;
 };
-
-// client side GO show states
-enum GOState
-{
-    GO_STATE_ACTIVE             = 0,                        // show in world as used and not reset (closed door open)
-    GO_STATE_READY              = 1,                        // show in world as ready (closed door close)
-    GO_STATE_ACTIVE_ALTERNATIVE = 2                         // show in world as used in alt way and not reset (closed door open by cannon fire)
-};
-
-#define MAX_GO_STATE              3
 
 // from `gameobject`
 struct GameObjectData
@@ -392,12 +364,11 @@ struct GameObjectData
     int32  spawntimesecs;
     uint32 animprogress;
     uint32 go_state;
-    uint8 spawnMask;
     uint32 ArtKit;
 };
 
 // GCC have alternative #pragma pack() syntax and old gcc version not support pack(pop), also any gcc version not support it at some platform
-#if defined(__GNUC__ )
+#if defined( __GNUC__ )
 #pragma pack()
 #else
 #pragma pack(pop)
@@ -430,7 +401,7 @@ class NEO_DLL_SPEC GameObject : public WorldObject
         void RemoveFromWorld();
 
         bool Create(uint32 guidlow, uint32 name_id, Map *map, float x, float y, float z, float ang, float rotation0, float rotation1, float rotation2, float rotation3, uint32 animprogress, uint32 go_state, uint32 ArtKit = 0);
-        void Update(uint32 diff);
+        void Update(uint32 p_time);
         static GameObject* GetGameObject(WorldObject& object, uint64 guid);
         GameObjectInfo const* GetGOInfo() const;
 
@@ -459,7 +430,7 @@ class NEO_DLL_SPEC GameObject : public WorldObject
         const char* GetNameForLocaleIdx(int32 locale_idx) const;
 
         void SaveToDB();
-        void SaveToDB(uint32 mapid, uint8 spawnMask);
+        void SaveToDB(uint32 mapid);
         bool LoadFromDB(uint32 guid, Map *map);
         void DeleteFromDB();
         void SetLootState(LootState s) { m_lootState = s; }
@@ -488,7 +459,7 @@ class NEO_DLL_SPEC GameObject : public WorldObject
         time_t GetRespawnTimeEx() const
         {
             time_t now = time(NULL);
-            if (m_respawnTime > now)
+            if(m_respawnTime > now)
                 return m_respawnTime;
             else
                 return now;
@@ -578,7 +549,7 @@ class NEO_DLL_SPEC GameObject : public WorldObject
             return autoCloseTime / 0x10000;
         }
 
-        void TriggeringLinkedGameObject(uint32 trapEntry, Unit* target);
+        void TriggeringLinkedGameObject( uint32 trapEntry, Unit* target);
 
         bool isVisibleForInState(Player const* u, bool inVisibleList) const;
         bool canDetectTrap(Player const* u, float distance) const;

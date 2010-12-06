@@ -62,51 +62,53 @@ void CreatureEventAIMgr::LoadCreatureEventAI_Texts(bool check_entry_use)
             // range negative
             if (i > MIN_CREATURE_AI_TEXT_STRING_ID || i <= MAX_CREATURE_AI_TEXT_STRING_ID)
             {
-                sLog.outErrorDb("CreatureEventAI:  Entry %i in table creature_ai_texts is not in valid range(%d-%d)",i,MIN_CREATURE_AI_TEXT_STRING_ID,MAX_CREATURE_AI_TEXT_STRING_ID);
+                sLog.outErrorDb("CreatureEventAI:  Entry %i in table `creature_ai_texts` is not in valid range(%d-%d)",i,MIN_CREATURE_AI_TEXT_STRING_ID,MAX_CREATURE_AI_TEXT_STRING_ID);
                 continue;
             }
 
             // range negative (don't must be happen, loaded from same table)
             if (!objmgr.GetNeoStringLocale(i))
             {
-                sLog.outErrorDb("CreatureEventAI:  Entry %i in table creature_ai_texts not found",i);
+                sLog.outErrorDb("CreatureEventAI:  Entry %i in table `creature_ai_texts` not found",i);
                 continue;
             }
 
             if (temp.SoundId)
             {
                 if (!sSoundEntriesStore.LookupEntry(temp.SoundId))
-                    sLog.outErrorDb("CreatureEventAI:  Entry %i in table creature_ai_texts has Sound %u but sound does not exist.",i,temp.SoundId);
+                    sLog.outErrorDb("CreatureEventAI:  Entry %i in table `creature_ai_texts` has Sound %u but sound does not exist.",i,temp.SoundId);
             }
 
             if (!GetLanguageDescByID(temp.Language))
-                sLog.outErrorDb("CreatureEventAI:  Entry %i in table creature_ai_texts using Language %u but Language does not exist.",i,temp.Language);
+                sLog.outErrorDb("CreatureEventAI:  Entry %i in table `creature_ai_texts` using Language %u but Language does not exist.",i,temp.Language);
 
             if (temp.Type > CHAT_TYPE_ZONE_YELL)
-                sLog.outErrorDb("CreatureEventAI:  Entry %i in table creature_ai_texts has Type %u but this Chat Type does not exist.",i,temp.Type);
+                sLog.outErrorDb("CreatureEventAI:  Entry %i in table `creature_ai_texts` has Type %u but this Chat Type does not exist.",i,temp.Type);
 
             if (temp.Emote)
             {
                 if (!sEmotesStore.LookupEntry(temp.Emote))
-                    sLog.outErrorDb("CreatureEventAI:  Entry %i in table creature_ai_texts has Emote %u but emote does not exist.",i,temp.Emote);
+                    sLog.outErrorDb("CreatureEventAI:  Entry %i in table `creature_ai_texts` has Emote %u but emote does not exist.",i,temp.Emote);
             }
 
             m_CreatureEventAI_TextMap[i] = temp;
             ++count;
         } while (result->NextRow());
 
-        if (check_entry_use)
+        
+
+        if(check_entry_use)
            CheckUnusedAITexts();
 
-        sLog.outString("");
+        sLog.outString();
         sLog.outString(">> Loaded %u additional CreatureEventAI Texts data.", count);
     }
     else
     {
         barGoLink bar(1);
         bar.step();
-        sLog.outString("");
-        sLog.outString(">> Loaded 0 additional CreatureEventAI Texts data. DB table creature_ai_texts is empty.");
+        sLog.outString();
+        sLog.outString(">> Loaded 0 additional CreatureEventAI Texts data. DB table `creature_ai_texts` is empty.");
     }
 
 }
@@ -115,23 +117,23 @@ void CreatureEventAIMgr::CheckUnusedAITexts()
 {
     std::set<int32> idx_set;
     // check not used strings this is negative range
-    for (CreatureEventAI_TextMap::const_iterator itr = m_CreatureEventAI_TextMap.begin(); itr != m_CreatureEventAI_TextMap.end(); ++itr)
+    for(CreatureEventAI_TextMap::const_iterator itr = m_CreatureEventAI_TextMap.begin(); itr != m_CreatureEventAI_TextMap.end(); ++itr)
         idx_set.insert(itr->first);
 
-    for (CreatureEventAI_Event_Map::const_iterator itr = m_CreatureEventAI_Event_Map.begin(); itr != m_CreatureEventAI_Event_Map.end(); ++itr)
+    for(CreatureEventAI_Event_Map::const_iterator itr = m_CreatureEventAI_Event_Map.begin(); itr != m_CreatureEventAI_Event_Map.end(); ++itr)
     {
-        for (size_t i = 0; i < itr->second.size(); ++i)
+        for(size_t i = 0; i < itr->second.size(); ++i)
         {
             CreatureEventAI_Event const& event = itr->second[i];
 
-            for (int j = 0; j < MAX_ACTIONS; ++j)
+            for(int j = 0; j < MAX_ACTIONS; ++j)
             {
                 CreatureEventAI_Action const& action = event.action[j];
                 switch(action.type)
                 {
                     case ACTION_T_TEXT:
                     {
-                        for (int k = 0; k < 3; ++k)
+                        for(int k = 0; k < 3; ++k)
                             if (action.text.TextId[k])
                                 idx_set.erase(action.text.TextId[k]);
                         break;
@@ -142,8 +144,8 @@ void CreatureEventAIMgr::CheckUnusedAITexts()
         }
     }
 
-    for (std::set<int32>::const_iterator itr = idx_set.begin(); itr != idx_set.end(); ++itr)
-        sLog.outErrorDb("CreatureEventAI:  Entry %i in table creature_ai_texts but not used in EventAI scripts.",*itr);
+    for(std::set<int32>::const_iterator itr = idx_set.begin(); itr != idx_set.end(); ++itr)
+        sLog.outErrorDb("CreatureEventAI:  Entry %i in table `creature_ai_texts` but not used in EventAI scripts.",*itr);
 }
 
 // -------------------
@@ -174,7 +176,7 @@ void CreatureEventAIMgr::LoadCreatureEventAI_Summons(bool check_entry_use)
             temp.orientation = fields[4].GetFloat();
             temp.SpawnTimeSecs = fields[5].GetUInt32();
 
-            if (!Neo::IsValidMapCoord(temp.position_x,temp.position_y,temp.position_z,temp.orientation))
+            if(!Neo::IsValidMapCoord(temp.position_x,temp.position_y,temp.position_z,temp.orientation))
             {
                 sLog.outErrorDb("CreatureEventAI:  Summon id %u have wrong coordinates (%f,%f,%f,%f), skipping.", i,temp.position_x,temp.position_y,temp.position_z,temp.orientation);
                 continue;
@@ -185,18 +187,20 @@ void CreatureEventAIMgr::LoadCreatureEventAI_Summons(bool check_entry_use)
             ++Count;
         } while (result->NextRow());
 
-        if (check_entry_use)
+        
+
+        if(check_entry_use)
             CheckUnusedAISummons();
 
-        sLog.outString("");
+        sLog.outString();
         sLog.outString(">> Loaded %u CreatureEventAI summon definitions", Count);
     }
     else
     {
         barGoLink bar(1);
         bar.step();
-        sLog.outString("");
-        sLog.outString(">> Loaded 0 CreatureEventAI Summon definitions. DB table creature_ai_summons is empty.");
+        sLog.outString();
+        sLog.outString(">> Loaded 0 CreatureEventAI Summon definitions. DB table `creature_ai_summons` is empty.");
     }
 
 }
@@ -205,15 +209,15 @@ void CreatureEventAIMgr::CheckUnusedAISummons()
 {
     std::set<int32> idx_set;
     // check not used strings this is negative range
-    for (CreatureEventAI_Summon_Map::const_iterator itr = m_CreatureEventAI_Summon_Map.begin(); itr != m_CreatureEventAI_Summon_Map.end(); ++itr)
+    for(CreatureEventAI_Summon_Map::const_iterator itr = m_CreatureEventAI_Summon_Map.begin(); itr != m_CreatureEventAI_Summon_Map.end(); ++itr)
         idx_set.insert(itr->first);
 
-    for (CreatureEventAI_Event_Map::const_iterator itr = m_CreatureEventAI_Event_Map.begin(); itr != m_CreatureEventAI_Event_Map.end(); ++itr)
+    for(CreatureEventAI_Event_Map::const_iterator itr = m_CreatureEventAI_Event_Map.begin(); itr != m_CreatureEventAI_Event_Map.end(); ++itr)
     {
-        for (size_t i = 0; i < itr->second.size(); ++i)
+        for(size_t i = 0; i < itr->second.size(); ++i)
         {
             CreatureEventAI_Event const& event = itr->second[i];
-            for (int j = 0; j < MAX_ACTIONS; ++j)
+            for(int j = 0; j < MAX_ACTIONS; ++j)
             {
                 CreatureEventAI_Action const& action = event.action[j];
                 switch(action.type)
@@ -230,8 +234,8 @@ void CreatureEventAIMgr::CheckUnusedAISummons()
         }
     }
 
-    for (std::set<int32>::const_iterator itr = idx_set.begin(); itr != idx_set.end(); ++itr)
-        sLog.outErrorDb("CreatureEventAI:  Entry %i in table creature_ai_summons but not used in EventAI scripts.",*itr);
+    for(std::set<int32>::const_iterator itr = idx_set.begin(); itr != idx_set.end(); ++itr)
+        sLog.outErrorDb("CreatureEventAI:  Entry %i in table `creature_ai_summons` but not used in EventAI scripts.",*itr);
 }
 
 // -------------------
@@ -334,7 +338,7 @@ void CreatureEventAIMgr::LoadCreatureEventAI_Scripts()
                             continue;
                         }
 
-                        if ((temp.spell_hit.schoolMask & pSpell->SchoolMask) != pSpell->SchoolMask)
+                        if ((temp.spell_hit.schoolMask & GetSchoolMask(pSpell->School)) != GetSchoolMask(pSpell->School))
                             sLog.outErrorDb("CreatureEventAI:  Creature %u has param1(spellId %u) but param2 is not -1 and not equal to spell's school mask. Event %u can never trigger.", temp.creature_id, temp.spell_hit.schoolMask, i);
                     }
 
@@ -360,11 +364,11 @@ void CreatureEventAIMgr::LoadCreatureEventAI_Scripts()
                         case SPAWNED_EVENT_ALWAY:
                             break;
                         case SPAWNED_EVENT_MAP:
-                            if (!sMapStore.LookupEntry(temp.spawned.conditionValue1))
+                            if(!sMapStore.LookupEntry(temp.spawned.conditionValue1))
                                 sLog.outErrorDb("CreatureEventAI:  Creature %u are using spawned event(%u) with param1 = %u 'map specific' but with not existed map (%u) in param2. Event will never repeat.", temp.creature_id, i, temp.spawned.condition, temp.spawned.conditionValue1);
                             break;
                         case SPAWNED_EVENT_ZONE:
-                            if (!GetAreaEntryByAreaID(temp.spawned.conditionValue1))
+                            if(!GetAreaEntryByAreaID(temp.spawned.conditionValue1))
                                 sLog.outErrorDb("CreatureEventAI:  Creature %u are using spawned event(%u) with param1 = %u 'area specific' but with not existed area (%u) in param2. Event will never repeat.", temp.creature_id, i, temp.spawned.condition, temp.spawned.conditionValue1);
                         default:
                             sLog.outErrorDb("CreatureEventAI:  Creature %u are using invalid spawned event %u mode (%u) in param1", temp.creature_id, i, temp.spawned.condition);
@@ -493,17 +497,17 @@ void CreatureEventAIMgr::LoadCreatureEventAI_Scripts()
                     case ACTION_T_TEXT:
                     {
                        bool not_set = false;
-                       for (int k = 0; k < 3; ++k)
+                       for(int k = 0; k < 3; ++k)
                        {
                            if (action.text.TextId[k])
                            {
                                 if (k > 0 && not_set)
                                     sLog.outErrorDb("CreatureEventAI:  Event %u Action %u has param%d, but it follow after not set param. Required for randomized text.", i, j+1, k+1);
-                                if (!action.text.TextId[k])
+                                if(!action.text.TextId[k])
                                     not_set = true;
 
                                 // range negative
-                                else if (action.text.TextId[k] > MIN_CREATURE_AI_TEXT_STRING_ID || action.text.TextId[k] <= MAX_CREATURE_AI_TEXT_STRING_ID)
+                                else if(action.text.TextId[k] > MIN_CREATURE_AI_TEXT_STRING_ID || action.text.TextId[k] <= MAX_CREATURE_AI_TEXT_STRING_ID)
                                 {
                                     sLog.outErrorDb("CreatureEventAI:  Event %u Action %u param%d references out-of-range entry (%i) in texts table.", i, j+1, k+1, action.text.TextId[k]);
                                     action.text.TextId[k] = 0;
@@ -735,9 +739,9 @@ void CreatureEventAIMgr::LoadCreatureEventAI_Scripts()
                         }
                         break;
                     case ACTION_T_SET_INVINCIBILITY_HP_LEVEL:
-                        if (action.invincibility_hp_level.is_percent)
+                        if(action.invincibility_hp_level.is_percent)
                         {
-                            if (action.invincibility_hp_level.hp_level > 100)
+                            if(action.invincibility_hp_level.hp_level > 100)
                             {
                                 sLog.outErrorDb("CreatureEventAI:  Event %u Action %u uses wrong percent value %u.", i, j+1, action.invincibility_hp_level.hp_level);
                                 action.invincibility_hp_level.hp_level = 100;
@@ -777,37 +781,39 @@ void CreatureEventAIMgr::LoadCreatureEventAI_Scripts()
             m_CreatureEventAI_Event_Map[creature_id].push_back(temp);
             ++Count;
 
-            if (CreatureInfo const* cInfo = sCreatureStorage.LookupEntry<CreatureInfo>(temp.creature_id))
+            if(CreatureInfo const* cInfo = sCreatureStorage.LookupEntry<CreatureInfo>(temp.creature_id))
             {
-                if (!cInfo->AIName || !cInfo->AIName[0])
+                if(!cInfo->AIName || !cInfo->AIName[0])
                 {
                     //sLog.outErrorDb("CreatureEventAI: Creature Entry %u has EventAI script but its AIName is empty. Set to EventAI as default.", cInfo->Entry);
                     size_t len = strlen("EventAI")+1;
                     const_cast<CreatureInfo*>(cInfo)->AIName = new char[len];
                     strncpy(const_cast<char*>(cInfo->AIName), "EventAI", len);
                 }
-                if (strcmp(cInfo->AIName, "EventAI"))
+                if(strcmp(cInfo->AIName, "EventAI"))
                 {
                     //sLog.outErrorDb("CreatureEventAI: Creature Entry %u has EventAI script but it has AIName %s. EventAI script will be overriden.", cInfo->Entry, cInfo->AIName);
                 }
-                if (cInfo->ScriptID)
+                if(cInfo->ScriptID)
                 {
                     //sLog.outErrorDb("CreatureEventAI: Creature Entry %u has EventAI script but it also has C++ script. EventAI script will be overriden.", cInfo->Entry);
                 }
             }            
         } while (result->NextRow());
 
+        
+
         CheckUnusedAITexts();
         CheckUnusedAISummons();
 
-        sLog.outString("");
+        sLog.outString();
         sLog.outString(">> Loaded %u CreatureEventAI scripts", Count);
     }
     else
     {
         barGoLink bar(1);
         bar.step();
-        sLog.outString("");
-        sLog.outString(">> Loaded 0 CreatureEventAI scripts. DB table creature_ai_scripts is empty.");
+        sLog.outString();
+        sLog.outString(">> Loaded 0 CreatureEventAI scripts. DB table `creature_ai_scripts` is empty.");
     }
 }

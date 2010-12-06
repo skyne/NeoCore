@@ -90,15 +90,16 @@ struct NEO_DLL_DECL npc_shenthulAI : public ScriptedAI
         playerGUID = 0;
     }
 
-    void EnterCombat(Unit* who) { }
+    void Aggro(Unit* who) { }
 
     void UpdateAI(const uint32 diff)
     {
         if( CanEmote )
             if( Reset_Timer < diff )
         {
-            if( Player* temp = Unit::GetPlayer(playerGUID) )
-                temp->FailQuest(QUEST_2460);
+            if( Unit* temp = Unit::GetUnit((*m_creature),playerGUID) )
+                if( temp->GetTypeId() == TYPEID_PLAYER )
+                    ((Player*)temp)->FailQuest(QUEST_2460);
             Reset();
         } else Reset_Timer -= diff;
 
@@ -173,7 +174,7 @@ struct NEO_DLL_DECL npc_thrall_warchiefAI : public ScriptedAI
         Shock_Timer = 8000;
     }
 
-    void EnterCombat(Unit *who) {}
+    void Aggro(Unit *who) {}
 
     void UpdateAI(const uint32 diff)
     {

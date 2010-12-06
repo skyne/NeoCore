@@ -1,7 +1,7 @@
 
 ########### next target ###############
 
-SET(neointerface_LIB_SRCS
+SET(trinityinterface_LIB_SRCS
    ScriptMgr.cpp
    ScriptMgr.h
    config.h
@@ -11,9 +11,9 @@ SET(neointerface_LIB_SRCS
    Scripts/sc_defines.h
 )
 
-add_library(neointerface SHARED ${neointerface_LIB_SRCS})
+add_library(trinityinterface SHARED ${trinityinterface_LIB_SRCS})
 
-target_link_libraries(neointerface)
+target_link_libraries(trinityinterface)
 
-set_target_properties(neointerface PROPERTIES VERSION 4.2.0 SOVERSION 4)
-install(TARGETS neointerface DESTINATION lib)
+set_target_properties(trinityinterface PROPERTIES VERSION 4.2.0 SOVERSION 4)
+install(TARGETS trinityinterface DESTINATION lib)

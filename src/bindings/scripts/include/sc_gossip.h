@@ -1,4 +1,4 @@
-/* Copyright (C) 2008 Neo <http://www.neocore.info/>
+/* Copyright (C) 2008 Neo <http://www.neocore.org/>
  *
  * Thanks to the original authors: ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -36,8 +36,6 @@
 #define GOSSIP_TEXT_ALTERACVALLEY       "Alterac Valley"
 #define GOSSIP_TEXT_ARATHIBASIN         "Arathi Basin"
 #define GOSSIP_TEXT_WARSONGULCH         "Warsong Gulch"
-#define GOSSIP_TEXT_ARENA               "Arena"
-#define GOSSIP_TEXT_EYEOFTHESTORM       "Eye of The Storm"
 
 #define GOSSIP_TEXT_DRUID               "Druid"
 #define GOSSIP_TEXT_HUNTER              "Hunter"
@@ -85,18 +83,14 @@
 #define TRADESKILL_MINING                   11
 #define TRADESKILL_FISHING                  12
 #define TRADESKILL_SKINNING                 13
-#define TRADESKILL_JEWLCRAFTING             14
 
 #define TRADESKILL_LEVEL_NONE               0
 #define TRADESKILL_LEVEL_APPRENTICE         1
 #define TRADESKILL_LEVEL_JOURNEYMAN         2
 #define TRADESKILL_LEVEL_EXPERT             3
 #define TRADESKILL_LEVEL_ARTISAN            4
-#define TRADESKILL_LEVEL_MASTER             5
 
 // Gossip defines
-
-#define GOSSIP_ICON_CHAT                    0
 
 #define GOSSIP_ACTION_TRADE                 1
 #define GOSSIP_ACTION_TRAIN                 2
@@ -174,6 +168,7 @@ extern uint32 GetSkillLevel(Player *player,uint32 skill);
 #define SEND_TABARDLIST(a)         GetSession()->SendTabardVendorActivate(a)
 #define SEND_AUCTIONLIST(a)        GetSession()->SendAuctionHello(a)
 #define SEND_TAXILIST(a)           GetSession()->SendTaxiStatus(a)
+#define GET_HONORRANK()            GetHonorRank()
 
 // Ressurect's the player if is dead.
 #define SEND_SPRESURRECT()         GetSession()->SendSpiritResurrect()

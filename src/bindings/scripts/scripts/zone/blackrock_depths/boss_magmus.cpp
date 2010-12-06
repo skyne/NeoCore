@@ -39,7 +39,7 @@ struct NEO_DLL_DECL boss_magmusAI : public ScriptedAI
         WarStomp_Timer =0;
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
     }
 

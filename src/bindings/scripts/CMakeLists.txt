@@ -1,7 +1,7 @@
 
 ########### next target ###############
 
-SET(neoscript_LIB_SRCS
+SET(trinityscript_LIB_SRCS
    ScriptMgr.cpp
    ScriptMgr.h
    include/precompiled.cpp
@@ -10,7 +10,6 @@ SET(neoscript_LIB_SRCS
    include/sc_creature.h
    include/sc_gossip.h
    include/sc_instance.h
-   scripts/areatrigger/areatrigger_scripts.cpp
    scripts/boss/boss_emeriss.cpp
    scripts/boss/boss_lethon.cpp
    scripts/boss/boss_taerar.cpp
@@ -18,74 +17,34 @@ SET(neoscript_LIB_SRCS
    scripts/creature/mob_generic_creature.cpp
    scripts/creature/simple_ai.cpp
    scripts/creature/simple_ai.h
-   scripts/custom/custom_example.cpp
-   scripts/custom/custom_gossip_codebox.cpp
-   scripts/custom/test.cpp
    scripts/go/go_scripts.cpp
    scripts/guard/guard_ai.cpp
    scripts/guard/guard_ai.h
    scripts/guard/guards.cpp
    scripts/item/item_scripts.cpp
-   scripts/item/item_test.cpp
-   scripts/npc/escort_ai.cpp
-   scripts/npc/escort_ai.h
+   scripts/npc/npc_escortAI.cpp
+   scripts/npc/npc_escortAI.h
    scripts/npc/npc_innkeeper.cpp
-   scripts/npc/npc_professions.cpp
    scripts/npc/npcs_special.cpp
    scripts/zone/arathi_highlands/arathi_highlands.cpp
    scripts/zone/alterac_mountains/alterac_mountains.cpp
-   scripts/zone/alterac_valley/boss_balinda.cpp
-   scripts/zone/alterac_valley/boss_drekthar.cpp
-   scripts/zone/alterac_valley/boss_galvangar.cpp
-   scripts/zone/alterac_valley/boss_vanndar.cpp
-   scripts/zone/alterac_valley/AV_Marshals.cpp
-   scripts/zone/alterac_valley/AV_Warmasters.cpp
    scripts/zone/ashenvale_forest/ashenvale.cpp
-   scripts/zone/aunchindoun/auchenai_crypts/boss_exarch_maladaar.cpp
-   scripts/zone/aunchindoun/auchenai_crypts/boss_shirrak_the_dead_watcher.cpp
-   scripts/zone/aunchindoun/mana_tombs/boss_nexusprince_shaffar.cpp
-   scripts/zone/aunchindoun/mana_tombs/boss_pandemonius.cpp
-   scripts/zone/aunchindoun/sethekk_halls/boss_darkweaver_syth.cpp
-   scripts/zone/aunchindoun/sethekk_halls/boss_tailonking_ikiss.cpp
-   scripts/zone/aunchindoun/sethekk_halls/def_sethekk_halls.h
-   scripts/zone/aunchindoun/sethekk_halls/instance_sethekk_halls.cpp
-   scripts/zone/aunchindoun/shadow_labyrinth/boss_ambassador_hellmaw.cpp
-   scripts/zone/aunchindoun/shadow_labyrinth/boss_blackheart_the_inciter.cpp
-   scripts/zone/aunchindoun/shadow_labyrinth/boss_grandmaster_vorpil.cpp
-   scripts/zone/aunchindoun/shadow_labyrinth/boss_murmur.cpp
-   scripts/zone/aunchindoun/shadow_labyrinth/def_shadow_labyrinth.h
-   scripts/zone/aunchindoun/shadow_labyrinth/instance_shadow_labyrinth.cpp
    scripts/zone/azshara/azshara.cpp
    scripts/zone/azshara/boss_azuregos.cpp
-   scripts/zone/azuremyst_isle/azuremyst_isle.cpp
    scripts/zone/barrens/the_barrens.cpp
-   scripts/zone/blackfathom_deeps/blackfathom_deeps.cpp
-   scripts/zone/blackfathom_deeps/instance_blackfathom_deeps.cpp
-   scripts/zone/black_temple/black_temple.cpp
-   scripts/zone/black_temple/boss_bloodboil.cpp
-   scripts/zone/black_temple/boss_illidan.cpp
-   scripts/zone/black_temple/boss_mother_shahraz.cpp
-   scripts/zone/black_temple/boss_reliquary_of_souls.cpp
-   scripts/zone/black_temple/boss_shade_of_akama.cpp
-   scripts/zone/black_temple/boss_supremus.cpp
-   scripts/zone/black_temple/boss_teron_gorefiend.cpp
-   scripts/zone/black_temple/boss_warlord_najentus.cpp
-   scripts/zone/black_temple/def_black_temple.h
-   scripts/zone/black_temple/illidari_council.cpp
-   scripts/zone/black_temple/instance_black_temple.cpp
-   scripts/zone/blackrock_depths/blackrock_depths.cpp
-   scripts/zone/blackrock_depths/boss_ambassador_flamelash.cpp
-   scripts/zone/blackrock_depths/boss_anubshiah.cpp
-   scripts/zone/blackrock_depths/boss_emperor_dagran_thaurissan.cpp
-   scripts/zone/blackrock_depths/boss_general_angerforge.cpp
+   scripts/zone/blackrock_depths/blackrock_depths.cpp 
+   scripts/zone/blackrock_depths/boss_ambassador_flamelash.cpp 
+   scripts/zone/blackrock_depths/boss_anubshiah.cpp 
+   scripts/zone/blackrock_depths/boss_emperor_dagran_thaurissan.cpp 
+   scripts/zone/blackrock_depths/boss_general_angerforge.cpp 
    scripts/zone/blackrock_depths/boss_gorosh_the_dervish.cpp
-   scripts/zone/blackrock_depths/boss_grizzle.cpp
-   scripts/zone/blackrock_depths/boss_high_interrogator_gerstahn.cpp
-   scripts/zone/blackrock_depths/boss_magmus.cpp
-   scripts/zone/blackrock_depths/boss_moira_bronzebeard.cpp
-   scripts/zone/blackrock_depths/boss_tomb_of_seven.cpp
-   scripts/zone/blackrock_depths/def_blackrock_depths.h
-   scripts/zone/blackrock_depths/instance_blackrock_depths.cpp
+   scripts/zone/blackrock_depths/boss_grizzle.cpp 
+   scripts/zone/blackrock_depths/boss_high_interrogator_gerstahn.cpp 
+   scripts/zone/blackrock_depths/boss_magmus.cpp 
+   scripts/zone/blackrock_depths/boss_moira_bronzebeard.cpp 
+   scripts/zone/blackrock_depths/boss_tomb_of_seven.cpp 
+   scripts/zone/blackrock_depths/def_blackrock_depths.h 
+   scripts/zone/blackrock_depths/instance_blackrock_depths.cpp 
    scripts/zone/blackrock_spire/boss_drakkisath.cpp
    scripts/zone/blackrock_spire/boss_gyth.cpp
    scripts/zone/blackrock_spire/boss_halycon.cpp
@@ -108,50 +67,9 @@ SET(neoscript_LIB_SRCS
    scripts/zone/blackwing_lair/boss_vaelastrasz.cpp
    scripts/zone/blackwing_lair/boss_victor_nefarius.cpp
    scripts/zone/blackwing_lair/instance_blackwing_lair.cpp
-   scripts/zone/blades_edge_mountains/blades_edge_mountains.cpp
    scripts/zone/blasted_lands/blasted_lands.cpp
    scripts/zone/blasted_lands/boss_kruul.cpp
-   scripts/zone/bloodmyst_isle/bloodmyst_isle.cpp
    scripts/zone/burning_steppes/burning_steppes.cpp
-   scripts/zone/caverns_of_time/dark_portal/def_dark_portal.h
-   scripts/zone/caverns_of_time/dark_portal/instance_dark_portal.cpp
-   scripts/zone/caverns_of_time/dark_portal/dark_portal.cpp
-   scripts/zone/caverns_of_time/dark_portal/boss_aeonus.cpp
-   scripts/zone/caverns_of_time/dark_portal/boss_chrono_lord_deja.cpp
-   scripts/zone/caverns_of_time/dark_portal/boss_temporus.cpp
-   scripts/zone/caverns_of_time/hyjal/boss_anetheron.cpp
-   scripts/zone/caverns_of_time/hyjal/boss_archimonde.cpp
-   scripts/zone/caverns_of_time/hyjal/boss_azgalor.cpp
-   scripts/zone/caverns_of_time/hyjal/boss_kazrogal.cpp
-   scripts/zone/caverns_of_time/hyjal/boss_rage_winterchill.cpp
-   scripts/zone/caverns_of_time/hyjal/def_hyjal.h
-   scripts/zone/caverns_of_time/hyjal/hyjal.cpp
-   scripts/zone/caverns_of_time/hyjal/hyjal_trash.cpp
-   scripts/zone/caverns_of_time/hyjal/hyjal_trash.h
-   scripts/zone/caverns_of_time/hyjal/hyjalAI.cpp
-   scripts/zone/caverns_of_time/hyjal/hyjalAI.h
-   scripts/zone/caverns_of_time/hyjal/instance_hyjal.cpp
-   scripts/zone/caverns_of_time/old_hillsbrad/boss_captain_skarloc.cpp
-   scripts/zone/caverns_of_time/old_hillsbrad/boss_epoch_hunter.cpp
-   scripts/zone/caverns_of_time/old_hillsbrad/boss_leutenant_drake.cpp
-   scripts/zone/caverns_of_time/old_hillsbrad/def_old_hillsbrad.h
-   scripts/zone/caverns_of_time/old_hillsbrad/instance_old_hillsbrad.cpp
-   scripts/zone/caverns_of_time/old_hillsbrad/old_hillsbrad.cpp
-   scripts/zone/coilfang_resevoir/serpent_shrine/boss_fathomlord_karathress.cpp
-   scripts/zone/coilfang_resevoir/serpent_shrine/boss_hydross_the_unstable.cpp
-   scripts/zone/coilfang_resevoir/serpent_shrine/boss_lurker_below.cpp
-   scripts/zone/coilfang_resevoir/serpent_shrine/boss_lady_vashj.cpp
-   scripts/zone/coilfang_resevoir/serpent_shrine/boss_leotheras_the_blind.cpp
-   scripts/zone/coilfang_resevoir/serpent_shrine/boss_morogrim_tidewalker.cpp
-   scripts/zone/coilfang_resevoir/serpent_shrine/def_serpent_shrine.h
-   scripts/zone/coilfang_resevoir/serpent_shrine/instance_serpent_shrine.cpp
-   scripts/zone/coilfang_resevoir/steam_vault/boss_hydromancer_thespia.cpp
-   scripts/zone/coilfang_resevoir/steam_vault/boss_mekgineer_steamrigger.cpp
-   scripts/zone/coilfang_resevoir/steam_vault/boss_warlord_kalithresh.cpp
-   scripts/zone/coilfang_resevoir/steam_vault/def_steam_vault.h
-   scripts/zone/coilfang_resevoir/steam_vault/instance_steam_vault.cpp
-   scripts/zone/coilfang_resevoir/underbog/boss_hungarfen.cpp
-   scripts/zone/coilfang_resevoir/underbog/boss_the_black_stalker.cpp
    scripts/zone/darkshore/darkshore.cpp
    scripts/zone/deadmines/def_deadmines.h
    scripts/zone/deadmines/deadmines.cpp
@@ -159,54 +77,10 @@ SET(neoscript_LIB_SRCS
    scripts/zone/dustwallow_marsh/dustwallow_marsh.cpp
    scripts/zone/eastern_plaguelands/eastern_plaguelands.cpp
    scripts/zone/elwynn_forest/elwynn_forest.cpp
-   scripts/zone/eversong_woods/eversong_woods.cpp
    scripts/zone/felwood/felwood.cpp
    scripts/zone/feralas/feralas.cpp
-   scripts/zone/ghostlands/ghostlands.cpp
-   scripts/zone/gruuls_lair/boss_gruul.cpp
-   scripts/zone/gruuls_lair/boss_high_king_maulgar.cpp
-   scripts/zone/gruuls_lair/def_gruuls_lair.h
-   scripts/zone/gruuls_lair/instance_gruuls_lair.cpp
-   scripts/zone/hellfire_citadel/blood_furnace/boss_broggok.cpp
-   scripts/zone/hellfire_citadel/blood_furnace/boss_kelidan_the_breaker.cpp
-   scripts/zone/hellfire_citadel/blood_furnace/boss_the_maker.cpp
-   scripts/zone/hellfire_citadel/blood_furnace/instance_blood_furnace.cpp
-   scripts/zone/hellfire_citadel/blood_furnace/def_blood_furnace.h
-   scripts/zone/hellfire_citadel/hellfire_ramparts/boss_omor_the_unscarred.cpp
-   scripts/zone/hellfire_citadel/hellfire_ramparts/boss_watchkeeper_gargolmar.cpp
-   scripts/zone/hellfire_citadel/hellfire_ramparts/boss_vazruden_the_herald.cpp
-   scripts/zone/hellfire_citadel/magtheridons_lair/boss_magtheridon.cpp
-   scripts/zone/hellfire_citadel/magtheridons_lair/def_magtheridons_lair.h
-   scripts/zone/hellfire_citadel/magtheridons_lair/instance_magtheridons_lair.cpp
-   scripts/zone/hellfire_citadel/shattered_halls/boss_nethekurse.cpp
-   scripts/zone/hellfire_citadel/shattered_halls/boss_warbringer_omrogg.cpp
-   scripts/zone/hellfire_citadel/shattered_halls/def_shattered_halls.h
-   scripts/zone/hellfire_citadel/shattered_halls/instance_shattered_halls.cpp
-   scripts/zone/hellfire_citadel/shattered_halls/boss_warchief_kargath_bladefist.cpp
-   scripts/zone/hellfire_peninsula/boss_doomlord_kazzak.cpp
-   scripts/zone/hellfire_peninsula/hellfire_peninsula.cpp
    scripts/zone/ironforge/ironforge.cpp
-   scripts/zone/isle_of_queldanas/isle_of_queldanas.cpp
-   scripts/zone/karazhan/boss_curator.cpp
-   scripts/zone/karazhan/boss_maiden_of_virtue.cpp
-   scripts/zone/karazhan/boss_midnight.cpp
-   scripts/zone/karazhan/boss_moroes.cpp
-   scripts/zone/karazhan/boss_netherspite.cpp
-   scripts/zone/karazhan/boss_nightbane.cpp
-   scripts/zone/karazhan/boss_prince_malchezaar.cpp
-   scripts/zone/karazhan/boss_shade_of_aran.cpp
-   scripts/zone/karazhan/boss_terestian_illhoof.cpp
-   scripts/zone/karazhan/bosses_opera.cpp
-   scripts/zone/karazhan/def_karazhan.h
-   scripts/zone/karazhan/instance_karazhan.cpp
-   scripts/zone/karazhan/karazhan.cpp
    scripts/zone/loch_modan/loch_modan.cpp
-   scripts/zone/magisters_terrace/boss_felblood_kaelthas.cpp
-   scripts/zone/magisters_terrace/boss_priestess_delrissa.cpp
-   scripts/zone/magisters_terrace/boss_selin_fireheart.cpp
-   scripts/zone/magisters_terrace/boss_vexallus.cpp
-   scripts/zone/magisters_terrace/def_magisters_terrace.h
-   scripts/zone/magisters_terrace/instance_magisters_terrace.cpp
    scripts/zone/maraudon/boss_celebras_the_cursed.cpp
    scripts/zone/maraudon/boss_landslide.cpp
    scripts/zone/maraudon/boss_noxxion.cpp
@@ -226,7 +100,6 @@ SET(neoscript_LIB_SRCS
    scripts/zone/molten_core/molten_core.cpp
    scripts/zone/moonglade/moonglade.cpp
    scripts/zone/mulgore/mulgore.cpp
-   scripts/zone/nagrand/nagrand.cpp
    scripts/zone/naxxramas/boss_anubrekhan.cpp
    scripts/zone/naxxramas/boss_faerlina.cpp
    scripts/zone/naxxramas/boss_gluth.cpp
@@ -244,13 +117,10 @@ SET(neoscript_LIB_SRCS
    scripts/zone/naxxramas/boss_sapphiron.cpp
    scripts/zone/naxxramas/boss_thaddius.cpp
    scripts/zone/naxxramas/instance_naxxramas.cpp
-   scripts/zone/netherstorm/netherstorm.cpp
    scripts/zone/onyxias_lair/boss_onyxia.cpp
    scripts/zone/orgrimmar/orgrimmar.cpp
    scripts/zone/razorfen_downs/boss_amnennar_the_coldbringer.cpp
-   scripts/zone/razorfen_kraul/def_razorfen_kraul.h
-   scripts/zone/razorfen_kraul/instance_razorfen_kraul.cpp
-   scripts/zone/razorfen_kraul/razorfen_kraul.cpp
+   scripts/zone/razorfen_kraul/razorfen_kraul.cpp  
    scripts/zone/ruins_of_ahnqiraj/boss_ayamiss.cpp
    scripts/zone/ruins_of_ahnqiraj/boss_buru.cpp
    scripts/zone/ruins_of_ahnqiraj/boss_kurinnaxx.cpp
@@ -265,8 +135,6 @@ SET(neoscript_LIB_SRCS
    scripts/zone/scarlet_monastery/boss_high_inquisitor_fairbanks.cpp
    scripts/zone/scarlet_monastery/boss_houndmaster_loksey.cpp
    scripts/zone/scarlet_monastery/boss_interrogator_vishas.cpp
-   scripts/zone/scarlet_monastery/boss_scorn.cpp
-   scripts/zone/scarlet_monastery/boss_headless_horseman.cpp
    scripts/zone/scarlet_monastery/boss_mograine_and_whitemane.cpp
    scripts/zone/scarlet_monastery/instance_scarlet_monastery.cpp
    scripts/zone/scarlet_monastery/def_scarlet_monastery.h
@@ -288,11 +156,7 @@ SET(neoscript_LIB_SRCS
    scripts/zone/shadowfang_keep/def_shadowfang_keep.h
    scripts/zone/shadowfang_keep/instance_shadowfang_keep.cpp
    scripts/zone/shadowfang_keep/shadowfang_keep.cpp
-   scripts/zone/shadowmoon_valley/boss_doomwalker.cpp
-   scripts/zone/shadowmoon_valley/shadowmoon_valley.cpp
-   scripts/zone/shattrath/shattrath_city.cpp
    scripts/zone/silithus/silithus.cpp
-   scripts/zone/silvermoon/silvermoon_city.cpp
    scripts/zone/silverpine_forest/silverpine_forest.cpp
    scripts/zone/stonetalon_mountains/stonetalon_mountains.cpp
    scripts/zone/stormwind/stormwind_city.cpp
@@ -304,43 +168,13 @@ SET(neoscript_LIB_SRCS
    scripts/zone/stratholme/boss_magistrate_barthilas.cpp
    scripts/zone/stratholme/boss_maleki_the_pallid.cpp
    scripts/zone/stratholme/boss_nerubenkan.cpp
-   scripts/zone/stratholme/boss_order_of_silver_hand.cpp
    scripts/zone/stratholme/boss_postmaster_malown.cpp
    scripts/zone/stratholme/boss_ramstein_the_gorger.cpp
    scripts/zone/stratholme/boss_timmy_the_cruel.cpp
    scripts/zone/stratholme/def_stratholme.h
    scripts/zone/stratholme/instance_stratholme.cpp
    scripts/zone/stratholme/stratholme.cpp
-   scripts/zone/sunwell_plateau/boss_kiljaeden.cpp
-   scripts/zone/sunwell_plateau/boss_muru.cpp
-   scripts/zone/sunwell_plateau/boss_eredar_twins.cpp
-   scripts/zone/sunwell_plateau/boss_felmyst.cpp
-   scripts/zone/sunwell_plateau/boss_brutallus.cpp
-   scripts/zone/sunwell_plateau/boss_kalecgos.cpp
-   scripts/zone/sunwell_plateau/sunwell_plateau.cpp
-   scripts/zone/sunwell_plateau/def_sunwell_plateau.h
-   scripts/zone/sunwell_plateau/instance_sunwell_plateau.cpp
    scripts/zone/tanaris/tanaris.cpp
-   scripts/zone/tempest_keep/arcatraz/arcatraz.cpp
-   scripts/zone/tempest_keep/arcatraz/boss_harbinger_skyriss.cpp
-   scripts/zone/tempest_keep/arcatraz/def_arcatraz.h
-   scripts/zone/tempest_keep/arcatraz/instance_arcatraz.cpp
-   scripts/zone/tempest_keep/botanica/boss_high_botanist_freywinn.cpp
-   scripts/zone/tempest_keep/botanica/boss_laj.cpp
-   scripts/zone/tempest_keep/botanica/boss_warp_splinter.cpp
-   scripts/zone/tempest_keep/the_eye/boss_alar.cpp
-   scripts/zone/tempest_keep/the_eye/boss_astromancer.cpp
-   scripts/zone/tempest_keep/the_eye/boss_kaelthas.cpp
-   scripts/zone/tempest_keep/the_eye/boss_void_reaver.cpp
-   scripts/zone/tempest_keep/the_eye/def_the_eye.h
-   scripts/zone/tempest_keep/the_eye/instance_the_eye.cpp
-   scripts/zone/tempest_keep/the_eye/the_eye.cpp
-   scripts/zone/tempest_keep/the_mechanar/boss_gatewatcher_gyrokill.cpp
-   scripts/zone/tempest_keep/the_mechanar/boss_gatewatcher_ironhand.cpp
-   scripts/zone/tempest_keep/the_mechanar/boss_nethermancer_sepethrea.cpp
-   scripts/zone/tempest_keep/the_mechanar/boss_pathaleon_the_calculator.cpp
-   scripts/zone/tempest_keep/the_mechanar/def_mechanar.h
-   scripts/zone/tempest_keep/the_mechanar/instance_mechanar.cpp
    scripts/zone/temple_of_ahnqiraj/boss_bug_trio.cpp
    scripts/zone/temple_of_ahnqiraj/boss_cthun.cpp
    scripts/zone/temple_of_ahnqiraj/boss_fankriss.cpp
@@ -353,7 +187,6 @@ SET(neoscript_LIB_SRCS
    scripts/zone/temple_of_ahnqiraj/def_temple_of_ahnqiraj.h
    scripts/zone/temple_of_ahnqiraj/instance_temple_of_ahnqiraj.cpp
    scripts/zone/temple_of_ahnqiraj/mob_anubisath_sentinel.cpp
-   scripts/zone/terokkar_forest/terokkar_forest.cpp
    scripts/zone/thunder_bluff/thunder_bluff.cpp
    scripts/zone/tirisfal_glades/tirisfal_glades.cpp
    scripts/zone/thousand_needles/thousand_needles.cpp
@@ -367,16 +200,6 @@ SET(neoscript_LIB_SRCS
    scripts/zone/western_plaguelands/western_plaguelands.cpp
    scripts/zone/westfall/westfall.cpp
    scripts/zone/winterspring/winterspring.cpp
-   scripts/zone/zangarmarsh/zangarmarsh.cpp
-   scripts/zone/zulaman/boss_akilzon.cpp
-   scripts/zone/zulaman/boss_halazzi.cpp
-   scripts/zone/zulaman/boss_hexlord.cpp
-   scripts/zone/zulaman/boss_janalai.cpp
-   scripts/zone/zulaman/boss_nalorakk.cpp
-   scripts/zone/zulaman/boss_zuljin.cpp
-   scripts/zone/zulaman/def_zulaman.h
-   scripts/zone/zulaman/instance_zulaman.cpp
-   scripts/zone/zulaman/zulaman.cpp
    scripts/zone/zulfarrak/zulfarrak.cpp
    scripts/zone/zulgurub/boss_arlokk.cpp
    scripts/zone/zulgurub/boss_gahzranka.cpp
@@ -399,16 +222,16 @@ SET(neoscript_LIB_SRCS
    system/system.h
 )
 
-add_library(neoscript SHARED ${neoscript_LIB_SRCS})
+add_library(trinityscript SHARED ${trinityscript_LIB_SRCS})
 
-add_definitions(-D_NEO_SCRIPT_CONFIG='"${CONF_DIR}/neocore.conf"')
+add_definitions(-D_TRINITY_SCRIPT_CONFIG='"${CONF_DIR}/trinitycore.conf"')
 
 IF (CMAKE_SYSTEM_NAME MATCHES "Darwin")
-    SET_TARGET_PROPERTIES(neoscript PROPERTIES LINK_FLAGS "-flat_namespace -undefined suppress")
+    SET_TARGET_PROPERTIES(trinityscript PROPERTIES LINK_FLAGS "-flat_namespace -undefined suppress")
 ENDIF (CMAKE_SYSTEM_NAME MATCHES "Darwin")
 
-target_link_libraries(neoscript)
+target_link_libraries(trinityscript)
 
-set_target_properties(neoscript PROPERTIES VERSION 4.2.0 SOVERSION 4)
-install(TARGETS neoscript DESTINATION lib)
+set_target_properties(trinityscript PROPERTIES VERSION 4.2.0 SOVERSION 4)
+install(TARGETS trinityscript DESTINATION lib)
 

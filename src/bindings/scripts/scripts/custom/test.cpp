@@ -22,24 +22,7 @@ SDCategory: Script Examples
 EndScriptData */
 
 #include "precompiled.h"
-#include "escort_ai.h"
-
-#define SAY_WALK        "Hmm a nice day for a walk alright"
-#define SAY_ATTACK      "Wild Felboar attack!"
-#define SAY_TIME_TO_GO  "Time for me to go! See ya around $N!"
-#define SAY_BYE         "Bye Bye!"
-#define SAY_AGGRO1      "Help $N! I'm under attack!"
-#define SAY_AGGRO2      "Die scum!"
-#define WHISPER_TOO_FAR "How dare you leave me like that! I hate you! =*("
-#define SAY_DIE1        "...no...how could you let me die $N"
-#define SAY_DIE2        "ugh..."
-#define SAY_DEATHCOIL   "Taste death!"
-#define SAY_FIREWORKS   "Fireworks!"
-#define SAY_BUFF        "Hmm, I think I could use a buff"
-
-#define GOSSIP_TEXT1    "Click to Test Escort(Attack, Defend, Run)"
-#define GOSSIP_TEXT2    "Click to Test Escort(NoAttack, NoDefend, Walk)"
-#define GOSSIP_TEXT3    "Click to Test Escort(NoAttack, Defend, Walk)"
+#include "../npc/npc_escortAI.h"
 
 struct NEO_DLL_DECL npc_testAI : public npc_escortAI
 {
@@ -57,27 +40,27 @@ struct NEO_DLL_DECL npc_testAI : public npc_escortAI
             switch (i)
             {
                 case 1:
-                    m_creature->Say(SAY_WALK, LANG_UNIVERSAL, 0);
+                    m_creature->Say("Hmm a nice day for a walk alright", LANG_UNIVERSAL, 0);
                     break;
 
                 case 3:
                 {
-                    m_creature->Say(SAY_ATTACK, LANG_UNIVERSAL, 0);
+                    m_creature->Say("Wild Felboar attack!", LANG_UNIVERSAL, 0);
                     Creature* temp = m_creature->SummonCreature(21878, m_creature->GetPositionX()+5, m_creature->GetPositionY()+7, m_creature->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 3000);
-                    if (temp)
-                        temp->AI()->AttackStart(m_creature);
+
+                    temp->AI()->AttackStart(m_creature);
                 }
                 break;
 
                 case 4:
                 {
-                    m_creature->Say(SAY_TIME_TO_GO, LANG_UNIVERSAL, GetPlayerForEscort()->GetGUID());
+                    m_creature->Say("Time for me to go! See ya around $N!", LANG_UNIVERSAL, PlayerGUID);
                     m_creature->HandleEmoteCommand(EMOTE_ONESHOT_WAVE);
 
-                    Unit* temp = Unit::GetUnit(*m_creature, GetPlayerForEscort()->GetGUID());
+                    Unit* temp = Unit::GetUnit(*m_creature, PlayerGUID);
                     if (temp)
                     {
-                        temp->MonsterSay(SAY_BYE, LANG_UNIVERSAL, 0);
+                        temp->MonsterSay("Bye Bye!", LANG_UNIVERSAL, 0);
                         temp->HandleEmoteCommand(EMOTE_ONESHOT_WAVE);
                     }
                 }
@@ -87,9 +70,9 @@ struct NEO_DLL_DECL npc_testAI : public npc_escortAI
 
         void Aggro(Unit*)
         {
-            if (HasEscortState(STATE_ESCORT_ESCORTING))
-                m_creature->Say(SAY_AGGRO1, LANG_UNIVERSAL, GetPlayerForEscort()->GetGUID());
-            else m_creature->Say(SAY_AGGRO2, LANG_UNIVERSAL, 0);
+            if (IsBeingEscorted)
+                m_creature->Say("Help $N! I'm under attack!", LANG_UNIVERSAL, PlayerGUID);
+            else m_creature->Say("Die scum!", LANG_UNIVERSAL, 0);
         }
 
         void Reset()
@@ -100,18 +83,18 @@ struct NEO_DLL_DECL npc_testAI : public npc_escortAI
 
         void JustDied(Unit* killer)
         {
-            if (HasEscortState(STATE_ESCORT_ESCORTING))
+            if (IsBeingEscorted)
             {
                 //killer = m_creature when player got to far from creature
                 if (killer == m_creature)
                 {
-                    Unit *pTemp = Unit::GetUnit(*m_creature, GetPlayerForEscort()->GetGUID());
-                    if (pTemp)
-                        DoWhisper(WHISPER_TOO_FAR, pTemp);
+                    Unit *pTemp = Unit::GetUnit(*m_creature,PlayerGUID);
+                    if( pTemp )
+                        DoWhisper("How dare you leave me like that! I hate you! =*(", pTemp);
                 }
-                else m_creature->Say(SAY_DIE1, LANG_UNIVERSAL, GetPlayerForEscort()->GetGUID());
+                else m_creature->Say("...no...how could you let me die $N", LANG_UNIVERSAL, PlayerGUID);
             }
-            else m_creature->Say(SAY_DIE2, LANG_UNIVERSAL, 0);
+            else m_creature->Say("ugh...", LANG_UNIVERSAL, 0);
         }
 
         void UpdateAI(const uint32 diff)
@@ -120,11 +103,11 @@ struct NEO_DLL_DECL npc_testAI : public npc_escortAI
             npc_escortAI::UpdateAI(diff);
 
             //Combat check
-            if (m_creature->isInCombat() && m_creature->getVictim())
+            if (InCombat && m_creature->getVictim())
             {
                 if (DeathCoilTimer < diff)
                 {
-                    m_creature->Say(SAY_DEATHCOIL, LANG_UNIVERSAL, 0);
+                    m_creature->Say("Taste death!", LANG_UNIVERSAL, 0);
                     m_creature->CastSpell(m_creature->getVictim(), 33130, false);
 
                     DeathCoilTimer = 4000;
@@ -132,16 +115,16 @@ struct NEO_DLL_DECL npc_testAI : public npc_escortAI
             }else
             {
                 //Out of combat but being escorted
-                if (HasEscortState(STATE_ESCORT_ESCORTING))
+                if (IsBeingEscorted)
                     if (ChatTimer < diff)
                 {
                     if (m_creature->HasAura(3593, 0))
                     {
-                        m_creature->Say(SAY_FIREWORKS, LANG_UNIVERSAL, 0);
+                        m_creature->Say("Fireworks!", LANG_UNIVERSAL, 0);
                         m_creature->CastSpell(m_creature, 11540, false);
                     }else
                     {
-                        m_creature->Say(SAY_BUFF, LANG_UNIVERSAL, 0);
+                        m_creature->Say("Hmm, I think I could use a buff", LANG_UNIVERSAL, 0);
                         m_creature->CastSpell(m_creature, 3593, false);
                     }
 
@@ -151,9 +134,9 @@ struct NEO_DLL_DECL npc_testAI : public npc_escortAI
         }
 };
 
-CreatureAI* GetAI_test(Creature* pCreature)
+CreatureAI* GetAI_test(Creature *_Creature)
 {
-    npc_testAI* testAI = new npc_testAI(pCreature);
+    npc_testAI* testAI = new npc_testAI(_Creature);
 
     testAI->AddWaypoint(0, 1231, -4419, 23);
     testAI->AddWaypoint(1, 1198, -4440, 23, 0);
@@ -164,43 +147,43 @@ CreatureAI* GetAI_test(Creature* pCreature)
     return (CreatureAI*)testAI;
 }
 
-bool GossipHello_npc_test(Player* pPlayer, Creature* pCreature)
+bool GossipHello_npc_test(Player *player, Creature *_Creature)
 {
-    pPlayer->TalkedToCreature(pCreature->GetEntry(), pCreature->GetGUID());
-    pCreature->prepareGossipMenu(pPlayer,0);
+    player->TalkedToCreature(_Creature->GetEntry(),_Creature->GetGUID());
+    _Creature->prepareGossipMenu(player,0);
 
-    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_TEXT1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
-    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_TEXT2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
-    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_TEXT3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+3);
+    player->ADD_GOSSIP_ITEM(0, "Click to Test Escort(Attack, Defend, Run)", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+    player->ADD_GOSSIP_ITEM(0, "Click to Test Escort(NoAttack, NoDefend, Walk)", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
+    player->ADD_GOSSIP_ITEM(0, "Click to Test Escort(NoAttack, Defend, Walk)", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+3);
 
-    pCreature->sendPreparedGossip(pPlayer);
+    _Creature->sendPreparedGossip( player );
     return true;
 }
 
-bool GossipSelect_npc_test(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
+bool GossipSelect_npc_test(Player *player, Creature *_Creature, uint32 sender, uint32 action )
 {
-    if (uiAction == GOSSIP_ACTION_INFO_DEF+1)
+    if (action == GOSSIP_ACTION_INFO_DEF+1)
     {
-        pPlayer->CLOSE_GOSSIP_MENU();
-        ((npc_escortAI*)(pCreature->AI()))->Start(true, true, pPlayer->GetGUID());
+        player->CLOSE_GOSSIP_MENU();
+        ((npc_escortAI*)(_Creature->AI()))->Start(true, true, true, player->GetGUID());
 
-        return true;                                        // prevent NEO core handling
+        return true;                                        // prevent Neo core handling
     }
 
-    if (uiAction == GOSSIP_ACTION_INFO_DEF+2)
+    if (action == GOSSIP_ACTION_INFO_DEF+2)
     {
-        pPlayer->CLOSE_GOSSIP_MENU();
-        ((npc_escortAI*)(pCreature->AI()))->Start(false, false, pPlayer->GetGUID());
+        player->CLOSE_GOSSIP_MENU();
+        ((npc_escortAI*)(_Creature->AI()))->Start(false, false, false, player->GetGUID());
 
-        return true;                                        // prevent NEO core handling
+        return true;                                        // prevent Neo core handling
     }
 
-    if (uiAction == GOSSIP_ACTION_INFO_DEF+3)
+    if (action == GOSSIP_ACTION_INFO_DEF+3)
     {
-        pPlayer->CLOSE_GOSSIP_MENU();
-        ((npc_escortAI*)(pCreature->AI()))->Start(false, false, pPlayer->GetGUID());
+        player->CLOSE_GOSSIP_MENU();
+        ((npc_escortAI*)(_Creature->AI()))->Start(false, true, false, player->GetGUID());
 
-        return true;                                        // prevent NEO core handling
+        return true;                                        // prevent Neo core handling
     }
     return false;
 }

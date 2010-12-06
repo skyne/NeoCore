@@ -65,7 +65,7 @@ struct NEO_DLL_DECL boss_instructormaliciaAI : public ScriptedAI
         }
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
     }
 

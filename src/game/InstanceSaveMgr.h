@@ -1,9 +1,10 @@
 /*
  * Copyright (C) 2005-2008 MaNGOS <http://www.mangosproject.org/>
  *
- * Copyright (C) 2008 Trinity <http://www.trinitycore.org/>
+ * Copyright (C) 2008 Neo <http://www.neocore.org/>
  *
- * Copyright (C) 2010 Neo <http://www.neocore.info/>
+ * Copyright (C) 2009-2010 NeoZero <http://www.neozero.org/>
+ *
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,7 +41,7 @@ class Group;
     Holds the information necessary for creating a new map for an existing instance
     Is referenced in three cases:
     - player-instance binds for solo players (not in group)
-    - player-instance binds for permanent heroic/raid saves
+    - player-instance binds for permanent raid saves
     - group-instance binds (both solo and permanent) cache the player binds for the group leader
 */
 class InstanceSave
@@ -51,7 +52,7 @@ class InstanceSave
            - any new instance is being generated
            - the first time a player bound to InstanceId logs in
            - when a group bound to the instance is loaded */
-        InstanceSave(uint16 MapId, uint32 InstanceId, uint8 difficulty, time_t resetTime, bool canReset);
+        InstanceSave(uint16 MapId, uint32 InstanceId, time_t resetTime, bool canReset);
 
         /* Unloaded when m_playerList and m_groupList become empty
            or when the instance is reset */
@@ -72,7 +73,7 @@ class InstanceSave
         void DeleteFromDB();
 
         /* for normal instances this corresponds to max(creature respawn time) + X hours
-           for raid/heroic instances this caches the global respawn time for the map */
+           for raid instances this caches the global respawn time for the map */
         time_t GetResetTime() { return m_resetTime; }
         void SetResetTime(time_t resetTime) { m_resetTime = resetTime; }
         time_t GetResetTimeForDB();
@@ -96,7 +97,6 @@ class InstanceSave
 
         /* currently it is possible to omit this information from this structure
            but that would depend on a lot of things that can easily change in future */
-        uint8 GetDifficulty() { return m_difficulty; }
 
         typedef std::list<Player*> PlayerListType;
         typedef std::list<Group*> GroupListType;
@@ -110,7 +110,6 @@ class InstanceSave
         time_t m_resetTime;
         uint32 m_instanceid;
         uint16 m_mapid;
-        uint8 m_difficulty;
         bool m_canReset;
 };
 
@@ -125,7 +124,7 @@ class NEO_DLL_DECL InstanceSaveManager : public Neo::Singleton<InstanceSaveManag
         typedef UNORDERED_MAP<uint32 /*InstanceId*/, InstanceSave*> InstanceSaveHashMap;
         typedef std::map<uint32 /*mapId*/, InstanceSaveMap> InstanceSaveMapMap;
 
-        /* resetTime is a global propery of each (raid/heroic) map
+        /* resetTime is a global propery of each (raid) map
            all instances of that map reset at the same time */
         struct InstResetEvent
         {
@@ -147,7 +146,7 @@ class NEO_DLL_DECL InstanceSaveManager : public Neo::Singleton<InstanceSaveManag
 
         void Update();
 
-        InstanceSave* AddInstanceSave(uint32 mapId, uint32 instanceId, uint8 difficulty, time_t resetTime, bool canReset, bool load = false);
+        InstanceSave* AddInstanceSave(uint32 mapId, uint32 instanceId, time_t resetTime, bool canReset, bool load = false);
         void RemoveInstanceSave(uint32 InstanceId);
         static void DeleteInstanceFromDB(uint32 instanceid);
 

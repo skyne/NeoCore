@@ -48,7 +48,7 @@ struct NEO_DLL_DECL npc_narm_faulkAI : public ScriptedAI
         spellHit = false;
     }
 
-    void EnterCombat(Unit *who)
+    void Aggro(Unit *who)
     {
     }
 
@@ -62,10 +62,7 @@ struct NEO_DLL_DECL npc_narm_faulkAI : public ScriptedAI
         if (!m_creature->GetUInt32Value(UNIT_FIELD_BYTES_1))
         {
             if(lifeTimer < diff)
-            {
-                EnterEvadeMode();
-                return;
-            }
+                m_creature->AI()->EnterEvadeMode();
             else
                 lifeTimer -= diff;
         }
