@@ -40,7 +40,7 @@ ADD_CUSTOM_TARGET("revision.h" ALL
 
 
 EXECUTE_PROCESS(
-        COMMAND git log|grep "commit [0-9]........." -m 1
+        COMMAND "git log|grep \"commit [0-9].........\" -m 1"
         OUTPUT_VARIABLE HG_REVISION
 )
 
