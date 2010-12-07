@@ -65,7 +65,7 @@ IF (CENTOS)
     )
 ENDIF (CENTOS)
 
-install(TARGETS neo-core DESTINATION bin)
+install(TARGETS trinity-core DESTINATION bin)
 
 
 ########### install files ###############
