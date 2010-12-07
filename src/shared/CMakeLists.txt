@@ -1,4 +1,5 @@
 add_subdirectory(vmap)
+add_subdirectory(pathfinding)
 add_subdirectory(Auth)
 add_subdirectory(Config)
 add_subdirectory(Database)
@@ -12,12 +13,15 @@ SET(shared_STAT_SRCS
    Common.cpp
    Common.h
    Errors.h
+   LockedQueue.h
    Log.cpp
    Log.h
    Mthread.cpp
    Mthread.h
    ProgressBar.cpp
    ProgressBar.h
+   Threading.cpp
+   Threading.h
    Timer.h
    Util.cpp
    Util.h

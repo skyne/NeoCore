@@ -45,7 +45,6 @@ trinitydatabase
 trinityauth
 trinityconfig
 vmaps
-ZThread
 g3dlite
 ${READLINE_LIBRARY}
 gomp
