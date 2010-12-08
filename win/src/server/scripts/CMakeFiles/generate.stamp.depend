@@ -1,0 +1,11 @@
+# CMake generation dependency list for this directory.
+D:/prog/cactus/CactusEMU/src/server/scripts/CMakeLists.txt
+D:/prog/cactus/CactusEMU/src/server/scripts/Spells/CMakeLists.txt
+D:/prog/cactus/CactusEMU/src/server/scripts/Examples/CMakeLists.txt
+D:/prog/cactus/CactusEMU/src/server/scripts/Custom/CMakeLists.txt
+D:/prog/cactus/CactusEMU/src/server/scripts/World/CMakeLists.txt
+D:/prog/cactus/CactusEMU/src/server/scripts/OutdoorPvP/CMakeLists.txt
+D:/prog/cactus/CactusEMU/src/server/scripts/EasternKingdoms/CMakeLists.txt
+D:/prog/cactus/CactusEMU/src/server/scripts/Kalimdor/CMakeLists.txt
+D:/prog/cactus/CactusEMU/src/server/scripts/Outland/CMakeLists.txt
+D:/prog/cactus/CactusEMU/src/server/scripts/Northrend/CMakeLists.txt

@@ -1,205 +1,75 @@
-PROJECT(Neo)
+# Copyright (C) 2005-2010 Neo <http://www.neocore.org/>
+#
+# Copyright (C) 2005-2010 NeoEMU <http://www.Neoemu.com/>
+#
+# This file is free software; as a special exception the author gives
+# unlimited permission to copy and/or distribute it, with or without
+# modifications, as long as this notice is preserved.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+# Set projectname (must be done AFTER setting configurationtypes)
+project(NeoEMU)
+
+# CMake policies (can not be handled elsewhere)
 cmake_minimum_required(VERSION 2.6)
 cmake_policy(SET CMP0005 OLD)
 
+# Set RPATH-handing (CMake parameters)
+set(CMAKE_SKIP_BUILD_RPATH 0)
+set(CMAKE_BUILD_WITH_INSTALL_RPATH 0)
+set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH 1)
+
+# set macro-directory
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/macros")
+
+# build in Release-mode by default if not explicitly set
+if( NOT CMAKE_BUILD_TYPE )
+  set(CMAKE_BUILD_TYPE "Release")
+endif()
+
+include(CheckCXXSourceRuns)
 include(CheckIncludeFiles)
-include(cmake/FindAce.cmake)
-include(cmake/FindMySql.cmake)
-include(cmake/FindReadline.cmake)
-CONFIGURE_FILE(
-  "${CMAKE_CURRENT_SOURCE_DIR}/cmake/cmake_uninstall.cmake.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
-  IMMEDIATE @ONLY)
-ADD_CUSTOM_TARGET(uninstall "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake")
 
-OPTION(DO_MYSQL "With MySQL support" 1)
-OPTION(DO_SCRIPTS "With neoscripts" 1)
-OPTION(DO_CLI "With CLI" 1)
-OPTION(DO_RA "With RA" 0)
-OPTION(DO_DEBUG "Debug mode" 0)
-OPTION(DO_WARN "Enable all compile warnings" 0)
-OPTION(LARGE_CELL "Large cell size" 0)
-OPTION(SHORT_SLEEP "Short sleep" 0)
-OPTION(CENTOS "CENTOS" 0)
+# set default buildoptions and print them
+include(cmake/options.cmake)
 
-SET(GENREV_SRC
-src/tools/genrevision/genrevision.cpp
-)
+# turn off PCH totally if enabled (hidden setting, mainly for devs)
+if( NOPCH )
+  set(USE_COREPCH 0)
+  set(USE_SCRIPTPCH 0)
+endif()
 
-ADD_EXECUTABLE(genrev
-${GENREV_SRC}
-)
-ADD_CUSTOM_TARGET("revision.h" ALL
-    COMMAND "${Neo_BINARY_DIR}/genrev"
-    ${Neo_SOURCE_DIR}
-    WORKING_DIRECTORY "${Neo_SOURCE_DIR}/src/shared"
-    DEPENDS genrev
-)
+include(CheckPlatform)
 
+# basic packagesearching and setup (further support will be needed, this is a preliminary release!)
+find_package(PCHSupport)
+find_package(ACE REQUIRED)
+find_package(OpenSSL REQUIRED)
+if( NOT USE_MYSQL_SOURCES )
+  find_package(MySQL REQUIRED)
+endif()
 
-EXECUTE_PROCESS(
-#	COMMAND svn info | grep -i "Revision" |  awk -F' ' '{print $2}'      for svn systems
-        COMMAND hg tip --template {rev}
-		WORKING_DIRECTORY "${Neo_SOURCE_DIR}"
-        OUTPUT_VARIABLE HG_REVISION
-)
+if( UNIX )
+  find_package(Readline)
+  find_package(ZLIB)
+  find_package(BZip2)
+endif()
 
-message("* Neo Core revision: ${HG_REVISION}")
+# print out the results before continuing
+include(cmake/showoptions.cmake)
 
-IF (PREFIX)
-    SET(CMAKE_INSTALL_PREFIX ${PREFIX})
-ENDIF (PREFIX)
+# add and generate revision.h
+add_subdirectory(src/genrevision)
 
-if(CONF_DIR)
-
-else(CONF_DIR)
-SET(CONF_DIR ${PREFIX}/etc)
-endif(CONF_DIR)
-SET(LIBSDIR ${CMAKE_INSTALL_PREFIX}/lib)
-
-message("* Will install to: ${CMAKE_INSTALL_PREFIX}")
-message("* With config dir at: ${CONF_DIR}")
-message("* Libs install dir at: ${LIBSDIR}")
-
-FIND_LIBRARY(SSLLIB NAMES ssl DOC "SSL library")
-FIND_LIBRARY(ZLIB z "Zlib library")
-
-IF(DO_MYSQL)
-    MESSAGE("* With MySQL")
-    FIND_MYSQL()
-    ADD_DEFINITIONS(-DDO_MYSQL)
-ENDIF(DO_MYSQL)
-
-if(DO_SCRIPTS)
-message("* With Neo Scripts")
-SET(SCRIPT_LIB neoscript)
-SET(SCRIPT_INCLUDE src/bindings/scripts/include)
-ADD_DEFINITIONS(-DDO_SCRIPTS)
-else (DO_SCRIPTS)
-message("* Without Neo Scripts")
-SET(SCRIPT_LIB neointerface)
-SET(SCRIPT_INCLUDE src/bindings/interface)
-endif(DO_SCRIPTS)
-
-message("-- Miscellaneus options:")
-
-if(DO_CLI)
-message("* With CLI")
-add_definitions(-DENABLE_CLI)
-else (DO_CLI)
-message(* Without CLI)
-endif(DO_CLI)
-
-if(DO_RA)
-message("* With RA")
-add_definitions(-DENABLE_RA)
-else(DO_RA)
-message("* Without RA")
-endif(DO_RA)
-
-if(DO_DEBUG)
-message("* Debug mode ON")
-add_definitions(-g -DNEO_DEBUG)
-endif(DO_DEBUG)
-
-if(DO_WARN)
-    message("* All warnings mode")
-    add_definitions(-Wall -Wfatal-errors -Wextra)
-endif(DO_WARN)
-
-if(LARGE_CELL)
-message("* Large cell size")
-add_definitions(-DLARGE_CELL)
-else(LARGE_CELL)
-message("* Small cell size")
-endif(LARGE_CELL)
-
-if(SHORT_SLEEP)
-message("* System sleep time is 50ms")
-add_definitions(-DSHORT_SLEEP)
-else(SHORT_SLEEP)
-message("* System sleep time is 100ms")
-endif(SHORT_SLEEP)
-
-IF(CENTOS)
-add_definitions(-DCENTOS)
-    message("* Building with termcap")
-else(CENTOS)
-    message("* Building with readline")
-ENDIF(CENTOS)
-
-FIND_ACE(ACE)
-if(ACE_FOUND)
-message(STATUS "Found ACE library: ${ACE_LIBRARY}")
-message(STATUS "Include dir is: ${ACE_INCLUDE_DIR}")
-else(ACE_FOUND)
-message(SEND_ERROR "** ACE library not found! NeoCore cannot be compiled!")
-message(SEND_ERROR "** Please build ACE from http://www.cs.wustl.edu/~schmidt/ACE.html")
-#For now remove msg about install from repo, as ubuntu/debian don't have needed ver in repos.
-#message(SEND_ERROR "** your distro may provide a binary for ACE e.g. for ubuntu try apt-get install libace-dev")
-return()
-#SET(BUILD_ACE 1)
-#SET(ACE_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/dep/ACE_wrappers ${CMAKE_BINARY_DIR}/dep/ACE_wrappers")
-#SET(ACE_LIBRARY ACE)
-#message(STATUS "I will try to build ACE from: ${ACE_INCLUDE_DIR}")
-#message(STATUS "And link using: ${ACE_LIBRARY}")
-endif(ACE_FOUND)
-
-#somehow line below don't work. so for now change it to if exist
-#check_include_files(${ACE_INCLUDE_DIR}/ace/Stack_Trace.h HAVE_ACE_STACK_TRACE_H)
-IF(EXISTS ${ACE_INCLUDE_DIR}/ace/Stack_Trace.h)
-    SET(HAVE_ACE_STACK_TRACE_H 1)
-ELSE(EXISTS ${ACE_INCLUDE_DIR}/ace/Stack_Trace.h)
-    message(STATUS "** Your libace is out of date. Please update your libace!")
-ENDIF(EXISTS ${ACE_INCLUDE_DIR}/ace/Stack_Trace.h)
-
-IF(UNIX AND NOT CENTOS)
-  FIND_READLINE()
-  IF(READLINE_FOUND)
-  message(STATUS "Found Readline library: ${READLINE_LIBRARY}")
-  message(STATUS "Include dir is: ${READLINE_INCLUDE_DIR}")
-  ELSE(READLINE_FOUND)
-  message(SEND_ERROR "** Readline library not found!")
-  message(SEND_ERROR "** Your distro may provide a binary for Readline e.g. for ubuntu try apt-get install libreadline5-dev")
-  return()
-  ENDIF(READLINE_FOUND)
-ENDIF(UNIX AND NOT CENTOS)
-
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config.h)
-
-IF (CMAKE_SYSTEM_NAME MATCHES "Darwin")
-  SET(OSX_LIBS /opt/local/lib/libcrypto.dylib)
-  add_definitions(-D__ASSERTMACROS__)
-ENDIF (CMAKE_SYSTEM_NAME MATCHES "Darwin")
-
-
-add_definitions(--no-warnings) #to make build look nice, no gcc nazi warnings.
-
-INCLUDE_DIRECTORIES(
-dep/include 
-dep/include/g3dlite 
-dep/include/sockets
-src/shared 
-src/framework 
-src/shared/Database 
-src/shared/vmap
-src/game 
-src/bindings/scripts/scripts/npc
-${CMAKE_BINARY_DIR}
-${SCRIPT_INCLUDE}
-${MYSQL_INCLUDE_DIR} 
-${POSTGRESQL_INCLUDE_DIR} 
-${CMAKE_CURRENT_BINARY_DIR}/src/shared 
-${CMAKE_CURRENT_SOURCE_DIR}/..
-${ACE_INCLUDE_DIR}
-${READLINE_INCLUDE_DIR}
-)
-
-SET(CMAKE_SKIP_BUILD_RPATH FALSE)
-SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
-SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
-SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-
+# add dependencies
 add_subdirectory(dep)
-add_subdirectory(doc)
+
+# add core sources
 add_subdirectory(src)
+
+# add sql-files
+add_subdirectory(sql)

@@ -1,0 +1,16 @@
+D:/prog/cactus/CactusEMU/win/CMakeFiles/ALL_BUILD.dir
+D:/prog/cactus/CactusEMU/win/CMakeFiles/ZERO_CHECK.dir
+D:/prog/cactus/CactusEMU/win/dep/acelite/ace/CMakeFiles/ace.dir
+D:/prog/cactus/CactusEMU/win/src/server/authserver/CMakeFiles/authserver.dir
+D:/prog/cactus/CactusEMU/win/dep/bzip2/CMakeFiles/bzip2.dir
+D:/prog/cactus/CactusEMU/win/src/server/collision/CMakeFiles/collision.dir
+D:/prog/cactus/CactusEMU/win/dep/g3dlite/CMakeFiles/g3dlib.dir
+D:/prog/cactus/CactusEMU/win/src/server/game/CMakeFiles/game.dir
+D:/prog/cactus/CactusEMU/win/src/genrevision/CMakeFiles/genrev.dir
+D:/prog/cactus/CactusEMU/win/dep/gsoap/CMakeFiles/gsoap.dir
+D:/prog/cactus/CactusEMU/win/dep/mysqllite/CMakeFiles/libmysql.dir
+D:/prog/cactus/CactusEMU/win/src/server/scripts/CMakeFiles/scripts.dir
+D:/prog/cactus/CactusEMU/win/src/server/shared/CMakeFiles/shared.dir
+D:/prog/cactus/CactusEMU/win/dep/sockets/CMakeFiles/trinitysockets.dir
+D:/prog/cactus/CactusEMU/win/src/server/worldserver/CMakeFiles/worldserver.dir
+D:/prog/cactus/CactusEMU/win/dep/zlib/CMakeFiles/zlib.dir

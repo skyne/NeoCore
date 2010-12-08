@@ -1,0 +1,34 @@
+# CMake generation dependency list for this directory.
+D:/prog/cactus/CactusEMU/CMakeLists.txt
+D:/prog/cactus/CactusEMU/win/CMakeFiles/CMakeSystem.cmake
+D:/prog/cactus/CactusEMU/win/CMakeFiles/CMakeCCompiler.cmake
+D:/prog/cactus/CactusEMU/win/CMakeFiles/CMakeCXXCompiler.cmake
+C:/Program Files (x86)/CMake 2.8/share/cmake-2.8/Modules/CMakeSystemSpecificInformation.cmake
+C:/Program Files (x86)/CMake 2.8/share/cmake-2.8/Modules/CMakeGenericSystem.cmake
+C:/Program Files (x86)/CMake 2.8/share/cmake-2.8/Modules/Platform/Windows.cmake
+C:/Program Files (x86)/CMake 2.8/share/cmake-2.8/Modules/Platform/WindowsPaths.cmake
+C:/Program Files (x86)/CMake 2.8/share/cmake-2.8/Modules/CMakeCInformation.cmake
+C:/Program Files (x86)/CMake 2.8/share/cmake-2.8/Modules/Platform/Windows-cl.cmake
+D:/prog/cactus/CactusEMU/win/CMakeFiles/CMakeCPlatform.cmake
+D:/prog/cactus/CactusEMU/win/CMakeFiles/CMakeCXXPlatform.cmake
+C:/Program Files (x86)/CMake 2.8/share/cmake-2.8/Modules/Platform/cl.cmake
+D:/prog/cactus/CactusEMU/win/CMakeFiles/CMakeRCCompiler.cmake
+C:/Program Files (x86)/CMake 2.8/share/cmake-2.8/Modules/CMakeRCInformation.cmake
+C:/Program Files (x86)/CMake 2.8/share/cmake-2.8/Modules/CMakeCommonLanguageInclude.cmake
+C:/Program Files (x86)/CMake 2.8/share/cmake-2.8/Modules/CMakeCXXInformation.cmake
+C:/Program Files (x86)/CMake 2.8/share/cmake-2.8/Modules/Platform/Windows-cl.cmake
+D:/prog/cactus/CactusEMU/win/CMakeFiles/CMakeCPlatform.cmake
+D:/prog/cactus/CactusEMU/win/CMakeFiles/CMakeCXXPlatform.cmake
+C:/Program Files (x86)/CMake 2.8/share/cmake-2.8/Modules/Platform/cl.cmake
+C:/Program Files (x86)/CMake 2.8/share/cmake-2.8/Modules/CMakeCommonLanguageInclude.cmake
+C:/Program Files (x86)/CMake 2.8/share/cmake-2.8/Modules/CheckCXXSourceRuns.cmake
+C:/Program Files (x86)/CMake 2.8/share/cmake-2.8/Modules/CheckIncludeFiles.cmake
+D:/prog/cactus/CactusEMU/cmake/options.cmake
+D:/prog/cactus/CactusEMU/cmake/macros/CheckPlatform.cmake
+D:/prog/cactus/CactusEMU/cmake/platform/settings.cmake
+D:/prog/cactus/CactusEMU/cmake/platform/win/settings.cmake
+D:/prog/cactus/CactusEMU/cmake/compiler/msvc/settings.cmake
+D:/prog/cactus/CactusEMU/cmake/macros/FindPCHSupport.cmake
+D:/prog/cactus/CactusEMU/cmake/macros/FindACE.cmake
+D:/prog/cactus/CactusEMU/cmake/macros/FindOpenSSL.cmake
+D:/prog/cactus/CactusEMU/cmake/showoptions.cmake
