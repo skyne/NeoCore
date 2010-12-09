@@ -17,7 +17,7 @@ SET(trinity-core_LINK_FLAGS "")
 
 add_executable(trinity-core ${trinity-core_SRCS})
 add_definitions(
--D_TRINITY_CORE_CONFIG='"${CONF_DIR}/neocore.conf"'
+-D_TRINITY_CORE_CONFIG='"${CONF_DIR}/trinitycore.conf"'
 )
 IF (DO_MYSQL)
     SET(trinity-core_LINK_FLAGS "-pthread ${trinity-core_LINK_FLAGS}")
@@ -45,6 +45,7 @@ trinitydatabase
 trinityauth
 trinityconfig
 vmaps
+ZThread
 g3dlite
 ${READLINE_LIBRARY}
 gomp
@@ -59,7 +60,7 @@ ${OSX_LIBS}
 
 IF (CENTOS)
     target_link_libraries(
-        neo-core
+        trinity-core
         termcap
     )
 ENDIF (CENTOS)
@@ -69,5 +70,5 @@ install(TARGETS trinity-core DESTINATION bin)
 
 ########### install files ###############
 
-install(FILES  neocore.conf.dist DESTINATION etc)
+install(FILES  trinitycore.conf.dist DESTINATION etc)
 

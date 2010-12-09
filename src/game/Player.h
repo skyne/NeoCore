@@ -956,7 +956,6 @@ class NEO_DLL_SPEC Player : public Unit
 
         void SetInWater(bool apply);
 
-        bool IsInWater() const { return m_isInWater; }
         bool IsUnderWater() const;
 
         void SendInitialPacketsBeforeAddToMap();
@@ -2172,19 +2171,10 @@ class NEO_DLL_SPEC Player : public Unit
         /***              ENVIRONMENTAL SYSTEM                 ***/
         /*********************************************************/
         void HandleSobering();
-		void SendMirrorTimer(MirrorTimerType Type, uint32 MaxValue, uint32 CurrentValue, int32 Regen);
-        void StartMirrorTimer(MirrorTimerType Type, uint32 MaxValue);
-        void ModifyMirrorTimer(MirrorTimerType Type, uint32 MaxValue, uint32 CurrentValue, uint32 Regen);
+        void SendMirrorTimer(MirrorTimerType Type, uint32 MaxValue, uint32 CurrentValue, int32 Regen);
         void StopMirrorTimer(MirrorTimerType Type);
 		void HandleDrowning(uint32 time_diff);
-		int32 getMaxTimer(MirrorTimerType timer);
-        uint8 m_isunderwater;
-
-		int32 m_MirrorTimer[MAX_TIMERS];
-		uint8 m_MirrorTimerFlags;
-        uint8 m_MirrorTimerFlagsLast;
-        bool m_isInWater;
-
+        int32 getMaxTimer(MirrorTimerType timer);
 
 
         void outDebugValues() const;
@@ -2257,7 +2247,6 @@ class NEO_DLL_SPEC Player : public Unit
         time_t m_lastDailyQuestTime;
 
         uint32 m_regenTimer;
-        uint32 m_breathTimer;
         uint32 m_drunkTimer;
         uint16 m_drunk;
         uint32 m_weaponChangeTimer;
@@ -2329,6 +2318,11 @@ class NEO_DLL_SPEC Player : public Unit
         uint8 _CanStoreItem_InBag( uint8 bag, ItemPosCountVec& dest, ItemPrototype const *pProto, uint32& count, bool merge, bool non_specialized, Item *pSrcItem, uint8 skip_bag, uint8 skip_slot ) const;
         uint8 _CanStoreItem_InInventorySlots( uint8 slot_begin, uint8 slot_end, ItemPosCountVec& dest, ItemPrototype const *pProto, uint32& count, bool merge, Item *pSrcItem, uint8 skip_bag, uint8 skip_slot ) const;
         Item* _StoreItem( uint16 pos, Item *pItem, uint32 count, bool clone, bool update );
+
+		int32 m_MirrorTimer[MAX_TIMERS];
+		uint8 m_MirrorTimerFlags;
+        uint8 m_MirrorTimerFlagsLast;
+		bool  m_isInWater;
 
         GridReference<Player> m_gridRef;
         MapReference m_mapRef;

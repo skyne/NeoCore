@@ -28,11 +28,11 @@ SET_TARGET_PROPERTIES(neo-realm PROPERTIES LINK_FLAGS "${neo-realm_LINK_FLAGS}")
 target_link_libraries(
 neo-realm
 shared
-trinityframework
-trinitysockets
-trinitydatabase
-trinityauth
-trinityconfig
+neoframework
+neosockets
+neodatabase
+neoauth
+neoconfig
 zlib
 gomp
 ${SSLLIB}

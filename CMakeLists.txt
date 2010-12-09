@@ -5,7 +5,7 @@ cmake_policy(SET CMP0005 OLD)
 include(CheckIncludeFiles)
 include(cmake/FindAce.cmake)
 include(cmake/FindMySql.cmake)
-#include(cmake/FindPostgreSql.cmake)
+include(cmake/FindPostgreSql.cmake)
 include(cmake/FindReadline.cmake)
 CONFIGURE_FILE(
   "${CMAKE_CURRENT_SOURCE_DIR}/cmake/cmake_uninstall.cmake.in"
@@ -40,11 +40,11 @@ ADD_CUSTOM_TARGET("revision.h" ALL
 
 
 EXECUTE_PROCESS(
-        COMMAND "git log|grep \"commit [0-9].........\" -m 1"
+        COMMAND hg tip --template {rev}
         OUTPUT_VARIABLE HG_REVISION
 )
 
-message("* NeoZero revision: ${HG_REVISION}")
+message("* Trinity Core revision: ${HG_REVISION}")
 
 IF (PREFIX)
     SET(CMAKE_INSTALL_PREFIX ${PREFIX})
@@ -207,5 +207,6 @@ SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 add_subdirectory(dep)
+add_subdirectory(doc)
 add_subdirectory(src)
 add_subdirectory(sql)
