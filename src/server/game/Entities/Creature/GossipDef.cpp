@@ -595,7 +595,7 @@ void PlayerMenu::SendQuestQueryResponse(Quest const *pQuest)
     data << int32(pQuest->GetRewSpellCast());               // casted spell
 
     // rewarded honor points
-    data << Trinity::Honor::hk_honor_at_level(pSession->GetPlayer()->getLevel(), pQuest->GetRewHonorableKills());
+    data << Neo::Honor::hk_honor_at_level(pSession->GetPlayer()->getLevel(), pQuest->GetRewHonorableKills());
     data << float(0);                                       // new reward honor (multipled by ~62 at client side)
     data << uint32(pQuest->GetSrcItemId());                 // source item id
     data << uint32(pQuest->GetFlags() & 0xFFFF);            // quest flags
