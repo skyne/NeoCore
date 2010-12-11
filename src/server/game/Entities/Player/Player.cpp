@@ -2813,11 +2813,8 @@ void Player::InitTalentForLevel()
     if (level < 10)
     {
         // Remove all talent points
-        if (m_usedTalentCount > 0)                           // Free any used talents
-        {
-            resetTalents(true);
-            SetFreeTalentPoints(0);
-        }
+        resetTalents(true);
+        SetFreeTalentPoints(0);
     }
     else
     {
@@ -19030,7 +19027,7 @@ bool Player::IsAffectedBySpellmod(SpellEntry const *spellInfo, SpellModifier *mo
 void Player::AddSpellMod(SpellModifier* mod, bool apply)
 {
     sLog.outDebug("Player::AddSpellMod %d", mod->spellId);
-    uint16 Opcode = (mod->type == SPELLMOD_FLAT) ? SMSG_SET_FLAT_SPELL_MODIFIER : SMSG_SET_PCT_SPELL_MODIFIER;
+    uint32 Opcode = (mod->type == SPELLMOD_FLAT) ? SMSG_SET_FLAT_SPELL_MODIFIER : SMSG_SET_PCT_SPELL_MODIFIER;
 
     int i = 0;
     flag96 _mask = 0;
@@ -22541,17 +22538,9 @@ void Player::InitGlyphsForLevel()
     uint8 level = getLevel();
     uint32 value = 0;
 
-    // 0x3F = 0x01 | 0x02 | 0x04 | 0x08 | 0x10 | 0x20 for 80 level
-    if (level >= 15)
-        value |= (0x01 | 0x02);
-    if (level >= 30)
-        value |= 0x08;
-    if (level >= 50)
-        value |= 0x04;
-    if (level >= 70)
-        value |= 0x10;
-    if (level >= 80)
-        value |= 0x20;
+    if (level >= 25)
+        value |= 0x43;
+    //mssing flag for level >= 50 and level >= 75
 
     SetUInt32Value(PLAYER_GLYPHS_ENABLED, value);
 }
