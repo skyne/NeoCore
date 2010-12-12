@@ -956,10 +956,10 @@ bool AuthSocket::_HandleRealmList()
         uint8 lock = (i->second.allowedSecurityLevel > _accountSecurityLevel) ? 1 : 0;
 		
 		if(_build != 8606)
-			pkt << (uint32)i->second.icon;                             // realm type
+			pkt << i->second.icon;                             // realm type
 		else
 		{
-			pkt << i->second.icon;        
+			pkt << (uint8)i->second.icon;        
 			pkt << lock;                                       // if 1, then realm locked
 		}
         pkt << i->second.color;                            // if 2, then realm is offline

@@ -32,7 +32,7 @@ struct Realm
 {
     std::string name;
     std::string address;
-    uint8 icon;
+    uint32 icon;
     uint8 color;
     uint8 timezone;
     uint32 m_ID;
