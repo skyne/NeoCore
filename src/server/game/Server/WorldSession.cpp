@@ -845,7 +845,7 @@ void WorldSession::ReadAddonsInfo(WorldPacket &data)
 
             addonInfo >> enabled >> crc >> unk1;
 
-            printf("ADDON: Name: %s, Enabled: 0x%x, CRC: 0x%x, Unknown2: 0x%x\n", addonName.c_str(), enabled, crc, unk1);
+            sLog.outDebug("ADDON: Name: %s, Enabled: 0x%x, CRC: 0x%x, Unknown2: 0x%x\n", addonName.c_str(), enabled, crc, unk1);
 
             AddonInfo addon(addonName, enabled, crc, 2, true);
 
