@@ -1,9 +1,9 @@
 /*
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
- * Copyright (C) 2008-2010 Neo <http://www.neocore.org/>
+ * Copyright (C) 2008-2010 Trinity <http://www.trinitycore.org/>
  *
- * Copyright (C) 2010 NeoCore2 <http://www.neocore.info/>
+ * Copyright (C) 2010 NeoCore2 <http://www.cactusemu.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -215,6 +215,10 @@ bool ItemCanGoIntoBag(ItemPrototype const *pProto, ItemPrototype const *pBagProt
                     return true;
                 case ITEM_SUBCLASS_INSCRIPTION_CONTAINER:
                     if (!(pProto->BagFamily & BAG_FAMILY_MASK_INSCRIPTION_SUPP))
+                        return false;
+                    return true;
+                case ITEM_SUBCLASS_FISHING_CONTAINER:
+                    if (!(pProto->BagFamily & BAG_FAMILY_MASK_FISHING))
                         return false;
                     return true;
                 default:
