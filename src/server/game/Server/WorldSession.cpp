@@ -825,7 +825,7 @@ void WorldSession::ReadAddonsInfo(WorldPacket &data)
     ByteBuffer addonInfo;
     addonInfo.resize(size);
 
-    printf("addon size : %u\n", size);
+    sLog.outDebug("addon size : %u\n", size);
     if (uncompress(const_cast<uint8*>(addonInfo.contents()), &uSize, const_cast<uint8*>(data.contents() + pos), data.size() - pos) == Z_OK)
     {
         uint32 addonsCount;
