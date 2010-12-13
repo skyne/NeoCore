@@ -496,7 +496,7 @@ bool AuthSocket::_HandleLogonChallenge()
 			LoginDatabase.Execute("UPDATE account_banned SET active = 0 WHERE unbandate<=UNIX_TIMESTAMP() AND unbandate<>bandate");
 	       
 			//remove expired friend relationships
-			LoginDatabase.PExecute("UPDATE account SET recruiter = 0, recruit_date = 0 WHERE recruit_date < (UNIX_TIMESTAMP()+%u)",relation_period);
+			LoginDatabase.PExecute("UPDATE account SET recruiter = 0, recruit_date = 0 WHERE recruit_date < (UNIX_TIMESTAMP()-%u)",relation_period);
 
 			///- If the account is banned, reject the logon attempt
 			QueryResult_AutoPtr banresult = LoginDatabase.PQuery("SELECT bandate,unbandate FROM account_banned WHERE id = %u AND active = 1", (*result)[1].GetUInt32());
