@@ -343,7 +343,8 @@ Player::Player (WorldSession *session): Unit()
 
     m_regenTimer = 0;
     m_weaponChangeTimer = 0;
-//    m_isunderwater = 0;
+    m_breathTimer = 0;
+    m_isunderwater = 0;
     m_isInWater = false;
     m_drunkTimer = 0;
     m_drunk = 0;
@@ -808,7 +809,7 @@ bool Player::StoreNewItemInBestSlots(uint32 titem_id, uint32 titem_amount)
     return false;
 }
 
-/*void Player::StartMirrorTimer(MirrorTimerType Type, uint32 MaxValue)
+void Player::StartMirrorTimer(MirrorTimerType Type, uint32 MaxValue)
 {
     uint32 BreathRegen = (uint32)-1;
 
@@ -835,7 +836,7 @@ void Player::ModifyMirrorTimer(MirrorTimerType Type, uint32 MaxValue, uint32 Cur
     data << (uint8)0;
     data << (uint32)0;                                      // spell id
     GetSession()->SendPacket( &data );
-}*/
+}
 
 void Player::SendMirrorTimer(MirrorTimerType Type, uint32 MaxValue, uint32 CurrentValue, int32 Regen)
 {
@@ -857,11 +858,12 @@ void Player::SendMirrorTimer(MirrorTimerType Type, uint32 MaxValue, uint32 Curre
 
 void Player::StopMirrorTimer(MirrorTimerType Type)
 {
-    m_MirrorTimer[Type] = DISABLED_MIRROR_TIMER;
+    if(Type==BREATH_TIMER)
+        m_breathTimer = 0;
 
     WorldPacket data(SMSG_STOP_MIRROR_TIMER, 4);
     data << (uint32)Type;
-    GetSession()->SendPacket(&data);
+    GetSession()->SendPacket( &data );
 }
 
 void Player::EnvironmentalDamage(EnvironmentalDamageType type, uint32 damage)
@@ -936,14 +938,12 @@ void Player::UpdateMirrorTimers()
 
 void Player::HandleDrowning(uint32 time_diff)
 {
-	sLog.outDebug("HandleDrowning, m_MirrorTimerFlags: %u",m_MirrorTimerFlags);
     if (!m_MirrorTimerFlags)
         return;
 
     // In water
     if (m_MirrorTimerFlags & UNDERWATER_INWATER)
     {
-		sLog.outDebug("Player is in water");
         // Breath timer not activated - activate it
         if (m_MirrorTimer[BREATH_TIMER] == DISABLED_MIRROR_TIMER)
         {
@@ -968,8 +968,8 @@ void Player::HandleDrowning(uint32 time_diff)
         }
     }
     else if (m_MirrorTimer[BREATH_TIMER] != DISABLED_MIRROR_TIMER)        // Regen timer
+
     {
-		sLog.outDebug("Player's breath regenerating");
         int32 UnderWaterTime = getMaxTimer(BREATH_TIMER);
         // Need breath regen
         m_MirrorTimer[BREATH_TIMER]+=10*time_diff;
@@ -982,7 +982,6 @@ void Player::HandleDrowning(uint32 time_diff)
     // In dark water
     if (m_MirrorTimerFlags & UNDERWATER_INDARKWATER)
     {
-		sLog.outDebug("Player is in dark water");
         // Fatigue timer not activated - activate it
         if (m_MirrorTimer[FATIGUE_TIMER] == DISABLED_MIRROR_TIMER)
         {
@@ -1316,6 +1315,16 @@ void Player::Update( uint32 p_time )
         {
             m_nextSave -= p_time;
         }
+    }
+
+    //Breathtimer
+    if(m_breathTimer > 0)
+    {
+        if(p_time >= m_breathTimer)
+            m_breathTimer = 0;
+        else
+            m_breathTimer -= p_time;
+
     }
 
     //Handle Water/drowning
@@ -18115,53 +18124,21 @@ PartyResult Player::CanUninviteFromGroup() const
     return PARTY_RESULT_OK;
 }
 
-void Player::UpdateUnderwaterState(Map* m, float x, float y, float z)
+void Player::UpdateUnderwaterState( Map* m, float x, float y, float z )
 {
-	sLog.outDebug("UpdateUnderwaterState");
-    LiquidData liquid_status;
-    ZLiquidStatus res = m->getLiquidStatus(x, y, z, MAP_ALL_LIQUIDS, &liquid_status);
-    if (!res)
-    {
-        m_MirrorTimerFlags &= ~(UNDERWATER_INWATER|UNDERWATER_INLAVA|UNDERWATER_INSLIME|UNDERWATER_INDARKWATER);
-        // Small hack for enable breath in WMO
-        /*if (IsInWater())
-            m_MirrorTimerFlags|=UNDERWATER_INWATER;*/
-		sLog.outDebug("Player has no ZLiquidStatus");
-        return;
-    }
+    float water_z  = m->GetWaterLevel(x,y);
+    float height_z = m->GetHeight(x,y,z, false);            // use .map base surface height
+    uint8 flag1    = m->GetTerrainType(x,y);
 
-    // All liquids type - check under water position
-    if (liquid_status.type&(MAP_LIQUID_TYPE_WATER|MAP_LIQUID_TYPE_OCEAN|MAP_LIQUID_TYPE_MAGMA|MAP_LIQUID_TYPE_SLIME))
-    {
-        if (res & LIQUID_MAP_UNDER_WATER)
-            m_MirrorTimerFlags |= UNDERWATER_INWATER;
-        else
-            m_MirrorTimerFlags &= ~UNDERWATER_INWATER;
-		sLog.outDebug("Player has m_MirrorTimerFlag: %u",m_MirrorTimerFlags);
-    }
+    //!Underwater check, not in water if underground or above water level
+    if (height_z <= INVALID_HEIGHT || z < (height_z-2) || z > (water_z - 2) )
+        m_isunderwater &= 0x7A;
+    else if ((z < (water_z - 2)) && (flag1 & 0x01))
+        m_isunderwater |= 0x01;
 
-    // Allow travel in dark water on taxi or transport
-    if ((liquid_status.type & MAP_LIQUID_TYPE_DARK_WATER) && !isInFlight() && !GetTransport())
-        m_MirrorTimerFlags |= UNDERWATER_INDARKWATER;
-    else
-        m_MirrorTimerFlags &= ~UNDERWATER_INDARKWATER;
-
-    // in lava check, anywhere in lava level
-    if (liquid_status.type&MAP_LIQUID_TYPE_MAGMA)
-    {
-        if (res & (LIQUID_MAP_UNDER_WATER|LIQUID_MAP_IN_WATER|LIQUID_MAP_WATER_WALK))
-            m_MirrorTimerFlags |= UNDERWATER_INLAVA;
-        else
-            m_MirrorTimerFlags &= ~UNDERWATER_INLAVA;
-    }
-    // in slime check, anywhere in slime level
-    if (liquid_status.type&MAP_LIQUID_TYPE_SLIME)
-    {
-        if (res & (LIQUID_MAP_UNDER_WATER|LIQUID_MAP_IN_WATER|LIQUID_MAP_WATER_WALK))
-            m_MirrorTimerFlags |= UNDERWATER_INSLIME;
-        else
-            m_MirrorTimerFlags &= ~UNDERWATER_INSLIME;
-    }
+    //!in lava check, anywhere under lava level
+    if ((height_z <= INVALID_HEIGHT || z < (height_z - 0)) && (flag1 == 0x00) && IsInWater())
+        m_isunderwater |= 0x80;
 }
 
 void Player::SetCanParry( bool value )
